@@ -294,7 +294,7 @@ function SignUp() {
           {/* Submit */}
           <button
             type='submit'
-            className='w-full h-12 mt-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
+            className='w-full h-12  mt-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
           >
             Create Account
             <ArrowRight size={16} />

@@ -1,26 +1,34 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { dataContext } from '../context/userContext.jsx'
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchCart,
+  updateCart,
+  removeCartItem,
+  clearEntireCart,
+} from "../features/cart/cartThunks.js";
 
 function Cart() {
-  const { getCart, updateCartItem, removeFromCart, clearCart } = useContext(dataContext)
+  
   const navigate = useNavigate()
 
-  const [cartItems, setCartItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+ const dispatch = useDispatch();
+
+const {
+  cartItems,
+  loading,
+  error,
+} = useSelector((state) => state.cart);
+console.log("Cart Redux State", {
+  cartItems,
+  loading,
+  error,
+});
 
   // Fetch cart on mount
-  useEffect(() => {
-    loadCart()
-  }, [])
-
-  const loadCart = async () => {
-    setLoading(true)
-    const items = await getCart()
-    setCartItems(items)
-    setLoading(false)
-  }
+useEffect(() => {
+  dispatch(fetchCart());
+}, [dispatch]);
 
   // Increase or decrease quantity
   const handleQuantityChange = async (productId, currentQty, change) => {
@@ -32,35 +40,40 @@ function Cart() {
       return
     }
 
-    const result = await updateCartItem(productId, newQty)
-    if (result.success) {
-      // Update local state directly — no need to re-fetch
-      setCartItems(prev =>
-        prev.map(item =>
-          item.product._id === productId
-            ? { ...item, quantity: newQty }
-            : item
-        )
-      )
-    } else {
+    const result = await dispatch(
+  updateCart({
+    productId,
+    quantity: newQty,
+  })
+);
+
+if (updateCart.fulfilled.match(result)) {
+  // success
+} else {
       setError(result.msg)
       setTimeout(() => setError(null), 3000)
     }
   }
 
-  const handleRemove = async (productId) => {
-    const result = await removeFromCart(productId)
-    if (result.success) {
-      setCartItems(prev => prev.filter(item => item.product._id !== productId))
-    }
+ const handleRemove = async (productId) => {
+  const result = await dispatch(
+    removeCartItem(productId)
+  );
+
+  if (removeCartItem.fulfilled.match(result)) {
+    // success
   }
+};
 
   const handleClearCart = async () => {
-    const result = await clearCart()
-    if (result.success) {
-      setCartItems([])
-    }
+  const result = await dispatch(
+    clearEntireCart()
+  );
+
+  if (clearEntireCart.fulfilled.match(result)) {
+    // success
   }
+};
 
   // Calculate total price
   const total = cartItems.reduce((sum, item) => {

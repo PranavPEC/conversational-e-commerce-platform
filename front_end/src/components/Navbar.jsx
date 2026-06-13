@@ -1,9 +1,18 @@
 import React, { useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { dataContext } from '../context/userContext.jsx'
+import { useSelector } from "react-redux";
 
 function Navbar() {
-  const { userData, logout, cartCount } = useContext(dataContext)
+  const { logout } = useContext(dataContext);
+
+const { cartCount } = useSelector(
+  (state) => state.cart
+);
+
+const { userData } = useSelector(
+  (state) => state.auth
+);
   const navigate = useNavigate()
   const location = useLocation()
 

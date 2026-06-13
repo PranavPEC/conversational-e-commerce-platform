@@ -4,39 +4,46 @@ import { createContext } from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useDispatch } from "react-redux";
+import { fetchCart } from '../features/cart/cartThunks.js';
+import {
+  setUserData as setReduxUserData,
+  clearUserData,
+  setAuthLoading as setReduxAuthLoading,
+} from "../features/auth/authSlice.js";
+
+import {
+  setCartCount as setReduxCartCount,
+  clearCartCount,
+} from "../features/cart/cartSlice.js";
+
+
 export const dataContext=createContext(); 
 function UserContext({children}) {
+  const dispatch=useDispatch();
   const navigate=useNavigate();
   const serverUrl="http://localhost:8000"
-  let [userData,setUserData]=React.useState(null);
-  let [authLoading,setAuthLoading]=React.useState(true);
-  let [cartCount,setCartCount]=React.useState(0);
+  useEffect(() => {
+  dispatch(setReduxAuthLoading(true));
+}, []);
+  
 
-  const getUserData=async()=>{
-    try{
-      let {data}=await axios.get(serverUrl+"/getuserdata",{withCredentials:true});
-      setUserData(data);
-      await fetchCartCount();
-    }
-    catch(error){
-      navigate("/login"); 
-      console.log(error);
-    }
-    finally{
-      setAuthLoading(false);
-    }
-  }
+  const getUserData = async () => {
+  try {
+    let { data } = await axios.get(
+      serverUrl + "/getuserdata",
+      { withCredentials: true }
+    );
 
-  const fetchCartCount=async()=>{
-    try{
-      let {data}=await axios.get(serverUrl+"/cart/",{withCredentials:true});
-      const count=data.products?.reduce((sum,item)=>sum+item.quantity,0)||0;
-      setCartCount(count);
-    }
-    catch(error){
-      setCartCount(0);
-    }
+    dispatch(setReduxUserData(data));
+    dispatch(fetchCart());
+  }catch(e){
+    navigate("/login");
+    console.log(e);
   }
+}
+
+  
 
   // Returns the full cart products array for the Cart page
   const getCart=async()=>{
@@ -56,6 +63,7 @@ function UserContext({children}) {
         {productId,quantity},
         {withCredentials:true}
       );
+      console.log("API success");
       await fetchCartCount();
       return {success:true,msg:data.message};
     }
@@ -105,7 +113,7 @@ function UserContext({children}) {
   const clearCart=async()=>{
     try{
       await axios.delete(serverUrl+"/cart/clear",{withCredentials:true});
-      setCartCount(0);
+      dispatch(clearCartCount());
       return {success:true};
     }
     catch(error){
@@ -119,8 +127,8 @@ function UserContext({children}) {
   const logout=async()=>{
     try{
       await axios.post(serverUrl+"/logout",{},{withCredentials:true});
-      setUserData(null);
-      setCartCount(0);
+      dispatch(clearUserData());
+      dispatch(clearCartCount());
       navigate("/login");
     }
     catch(error){
@@ -150,15 +158,9 @@ function UserContext({children}) {
 
   const value={
     serverUrl,
-    userData,
-    setUserData,
     getUserData,
     getAllProducts,
     getProductById,
-    authLoading,
-    cartCount,
-    setCartCount,
-    fetchCartCount,
     getCart,
     addToCart,
     updateCartItem,

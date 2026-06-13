@@ -1,15 +1,14 @@
-import React from 'react'
-import { useContext } from 'react'
-import { dataContext } from '../context/userContext';
-
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 function Home() {
-    let {userData,setUserData}=useContext(dataContext);
+  const { userData } = useSelector((state) => state.auth);
+
   return (
     <div>
-      {userData.name || "Loading.."}
+      {userData?.name || "Loading..."}
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

@@ -10,9 +10,12 @@ import Cart from './pages/Cart.jsx';
 import Navbar from './components/Navbar.jsx';
 import { useContext } from 'react';
 import { dataContext } from './context/userContext.jsx';
+import { useSelector } from "react-redux";
 
 function App() {
-  let { userData, authLoading } = useContext(dataContext);
+  const { userData, authLoading } = useSelector(
+  (state) => state.auth
+);
   const location = useLocation();
 
   const hideNavbar = ['/login', '/signup'].includes(location.pathname);

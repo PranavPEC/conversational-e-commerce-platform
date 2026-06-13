@@ -1,30 +1,30 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { dataContext } from '../context/userContext.jsx'
 
-import { useDispatch } from "react-redux";
+
+import { useDispatch,useSelector } from "react-redux";
 import { addCartItem } from "../features/cart/cartThunks.js";
+import {
+  fetchProductById,
+} from "../features/products/productThunks.js";
 
 function ProductDetail() {
   const dispatch=useDispatch();
+  const {
+  selectedProduct: product,
+  loading,
+} = useSelector((state) => state.products);
   const { id } = useParams()
-  const { getProductById } = useContext(dataContext)
   const navigate = useNavigate()
 
-  const [product, setProduct] = useState(null)
-  const [loading, setLoading] = useState(true)
+  
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
   const [feedback, setFeedback] = useState(null) // { success: true/false, msg: '' }
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const data = await getProductById(id)
-      if (data) setProduct(data)
-      setLoading(false)
-    }
-    fetchProduct()
-  }, [id])
+  dispatch(fetchProductById(id));
+}, [dispatch, id]);
 
   
 

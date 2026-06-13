@@ -43,34 +43,8 @@ function UserContext({children}) {
   }
 };
 
-  
-
   // Returns the full cart products array for the Cart page
   
-
-  const addToCart = async (productId, quantity) => {
-  try {
-    let { data } = await axios.post(
-      serverUrl + "/cart/add",
-      { productId, quantity },
-      { withCredentials: true }
-    );
-
-    await dispatch(fetchCart());
-
-    return {
-      success: true,
-      msg: data.message,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      msg:
-        error.response?.data?.message ||
-        "Failed to add to cart.",
-    };
-  }
-};
 
 
   const logout=async()=>{
@@ -110,7 +84,6 @@ function UserContext({children}) {
   getUserData,
   getAllProducts,
   getProductById,
-  addToCart,
   logout,
 };
 

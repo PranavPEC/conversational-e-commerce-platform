@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchUserData } from "./authThunks.js";
 const initialState = {
   userData: null,
-  authLoading: false,
+  authLoading: true,
 };
 
 const authSlice = createSlice({
@@ -34,6 +34,7 @@ const authSlice = createSlice({
     })
 
     .addCase(fetchUserData.rejected, (state) => {
+      state.userData = null;
       state.authLoading = false;
     });
 },

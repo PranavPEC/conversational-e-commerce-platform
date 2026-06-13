@@ -11,11 +11,24 @@ import Navbar from './components/Navbar.jsx';
 import { useContext } from 'react';
 import { dataContext } from './context/userContext.jsx';
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchUserData } from "./features/auth/authThunks.js";
+
 
 function App() {
+
+  const dispatch = useDispatch();
   const { userData, authLoading } = useSelector(
   (state) => state.auth
 );
+
+
+
+useEffect(() => {
+  dispatch(fetchUserData());
+}, []);
+
   const location = useLocation();
 
   const hideNavbar = ['/login', '/signup'].includes(location.pathname);

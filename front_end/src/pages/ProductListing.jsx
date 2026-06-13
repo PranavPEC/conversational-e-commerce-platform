@@ -1,23 +1,21 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { dataContext } from '../context/userContext.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchProducts } from '../features/products/productThunks.js'
 
 function ProductListing() {
-  const { getAllProducts } = useContext(dataContext)
+  
   const navigate = useNavigate()
+  const dispatch=useDispatch();
+  const {
+  products,
+  loading,
+} = useSelector((state) => state.products)
 
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const data = await getAllProducts()
-      if (data) setProducts(data)
-      setLoading(false)
-    }
-    
-    fetchProducts()
-  }, [])
+  dispatch(fetchProducts())
+}, [dispatch])
 
   if (loading) {
     return (

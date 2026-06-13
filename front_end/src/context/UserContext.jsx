@@ -25,24 +25,6 @@ function UserContext({children}) {
 }, []);
   
 
-  const getUserData = async () => {
-  try {
-    let { data } = await axios.get(
-      serverUrl + "/getuserdata",
-      { withCredentials: true }
-    );
-
-    dispatch(setReduxUserData(data));
-
-    await dispatch(fetchCart());
-  } catch (e) {
-    navigate("/login");
-    console.log(e);
-  } finally {
-    dispatch(setReduxAuthLoading(false));
-  }
-};
-
   // Returns the full cart products array for the Cart page
   
 
@@ -61,8 +43,6 @@ function UserContext({children}) {
 
 
   const value = {
-  serverUrl,
-  getUserData,
   logout,
 };
 

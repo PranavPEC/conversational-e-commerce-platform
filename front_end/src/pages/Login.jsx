@@ -1,13 +1,15 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
-import { dataContext } from '../context/userContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import {
   Mail, Lock, Eye, EyeOff,
   ShoppingBag, Tag, Truck, Shield, ArrowRight, Star, AlertCircle, X
 } from 'lucide-react'
+import { useDispatch } from "react-redux";
+import { fetchUserData } from "../features/auth/authThunks.js";
 
 function Login() {
+  const dispatch=useDispatch();
   // ── Toast state ──
   const [toast, setToast] = useState(null)
   const [toastVisible, setToastVisible] = useState(false)
@@ -26,7 +28,7 @@ function Login() {
   }
 
   // ── existing logic — untouched ──
-  let { serverUrl, getUserData } = useContext(dataContext)
+  const serverUrl = "http://localhost:8000";
   let navigate = useNavigate()
   let [email, setEmail] = React.useState("")
   let [password, setPassword] = React.useState("")
@@ -43,8 +45,8 @@ function Login() {
       }, {
         withCredentials: true
       })
-      await getUserData()
-      navigate("/home")
+      await dispatch(fetchUserData());
+      navigate("/home");
     } catch (error) {
       if (error.response) {
         showToast(error.response.data.message)

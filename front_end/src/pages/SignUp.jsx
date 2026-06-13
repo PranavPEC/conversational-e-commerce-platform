@@ -1,15 +1,18 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import dp from '../assets/dp.jpg'
 import axios from 'axios'
-import { dataContext } from '../context/userContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import {
   User, Mail, Lock, Eye, EyeOff,
   ShoppingBag, Tag, Truck, Shield, ArrowRight, Star, AlertCircle, X
 } from 'lucide-react'
+import { useDispatch } from "react-redux";
+import { fetchUserData } from "../features/auth/authThunks.js";
+
 
 function SignUp() {
-
+  const dispatch=useDispatch();
+  const serverUrl = "http://localhost:8000";
   // ── Toast state ──
   const [toast, setToast] = useState(null)
   const [toastVisible, setToastVisible] = useState(false)
@@ -28,7 +31,6 @@ function SignUp() {
   }
 
   // ── existing logic — untouched ──
-  let { serverUrl, getUserData } = useContext(dataContext)
   let navigate = useNavigate()
   let [name, setName] = useState("")
   let [email, setEmail] = useState("")
@@ -60,8 +62,8 @@ function SignUp() {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       })
-      await getUserData()
-      navigate("/home")
+      await dispatch(fetchUserData());
+      navigate("/home");
     } catch (error) {
       if (error.response) {
         showToast(error.response.data.message)

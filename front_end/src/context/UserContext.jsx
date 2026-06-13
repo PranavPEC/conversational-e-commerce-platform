@@ -60,20 +60,9 @@ function UserContext({children}) {
   }
 
 
-  const getAllProducts=async()=>{
-    try{
-      let {data}=await axios.get(serverUrl+"/product/all");
-      return data.products;
-    }
-    catch(error){
-      console.log(error);
-    }
-  }
-
   const value = {
   serverUrl,
   getUserData,
-  getAllProducts,
   logout,
 };
 

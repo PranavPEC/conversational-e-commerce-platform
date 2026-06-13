@@ -5,7 +5,7 @@ import { fetchProducts } from '../features/products/productThunks.js'
 
 function ProductListing() {
   
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch=useDispatch();
   const {
   products,

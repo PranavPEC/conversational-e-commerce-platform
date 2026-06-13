@@ -2,9 +2,13 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { dataContext } from '../context/userContext.jsx'
 
+import { useDispatch } from "react-redux";
+import { addCartItem } from "../features/cart/cartThunks.js";
+
 function ProductDetail() {
+  const dispatch=useDispatch();
   const { id } = useParams()
-  const { getProductById, addToCart } = useContext(dataContext)
+  const { getProductById } = useContext(dataContext)
   const navigate = useNavigate()
 
   const [product, setProduct] = useState(null)
@@ -22,10 +26,28 @@ function ProductDetail() {
     fetchProduct()
   }, [id])
 
+  
+
   const handleAddToCart = async () => {
     setAdding(true)
-    const result = await addToCart(product._id, quantity)
-    setFeedback(result)
+    const result = await dispatch(
+  addCartItem({
+    productId: product._id,
+    quantity,
+  })
+);
+
+if (addCartItem.fulfilled.match(result)) {
+  setFeedback({
+    success: true,
+    msg: result.payload,
+  });
+} else {
+  setFeedback({
+    success: false,
+    msg: result.payload,
+  });
+}
     setAdding(false)
     // Clear feedback message after 3 seconds
     setTimeout(() => setFeedback(null), 3000)

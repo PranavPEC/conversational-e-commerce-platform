@@ -12,10 +12,7 @@ import {
   setAuthLoading as setReduxAuthLoading,
 } from "../features/auth/authSlice.js";
 
-import {
-  setCartCount as setReduxCartCount,
-  clearCartCount,
-} from "../features/cart/cartSlice.js";
+import { clearCart } from "../features/cart/cartSlice.js";
 
 
 export const dataContext=createContext(); 
@@ -36,99 +33,51 @@ function UserContext({children}) {
     );
 
     dispatch(setReduxUserData(data));
-    dispatch(fetchCart());
-  }catch(e){
+
+    await dispatch(fetchCart());
+  } catch (e) {
     navigate("/login");
     console.log(e);
+  } finally {
+    dispatch(setReduxAuthLoading(false));
   }
-}
+};
 
   
 
   // Returns the full cart products array for the Cart page
-  const getCart=async()=>{
-    try{
-      let {data}=await axios.get(serverUrl+"/cart/",{withCredentials:true});
-      return data.products||[];
-    }
-    catch(error){
-      return [];
-    }
-  }
+  
 
-  const addToCart=async(productId,quantity)=>{
-    try{
-      let {data}=await axios.post(
-        serverUrl+"/cart/add",
-        {productId,quantity},
-        {withCredentials:true}
-      );
-      console.log("API success");
-      await fetchCartCount();
-      return {success:true,msg:data.message};
-    }
-    catch(error){
-      return {
-        success:false,
-        msg:error.response?.data?.message||"Failed to add to cart."
-      };
-    }
-  }
+  const addToCart = async (productId, quantity) => {
+  try {
+    let { data } = await axios.post(
+      serverUrl + "/cart/add",
+      { productId, quantity },
+      { withCredentials: true }
+    );
 
-  const updateCartItem=async(productId,quantity)=>{
-    try{
-      await axios.put(
-        serverUrl+"/cart/update",
-        {productId,quantity},
-        {withCredentials:true}
-      );
-      await fetchCartCount();
-      return {success:true};
-    }
-    catch(error){
-      return {
-        success:false,
-        msg:error.response?.data?.message||"Failed to update cart."
-      };
-    }
-  }
+    await dispatch(fetchCart());
 
-  const removeFromCart=async(productId)=>{
-    try{
-      await axios.delete(
-        serverUrl+"/cart/remove/"+productId,
-        {withCredentials:true}
-      );
-      await fetchCartCount();
-      return {success:true};
-    }
-    catch(error){
-      return {
-        success:false,
-        msg:error.response?.data?.message||"Failed to remove item."
-      };
-    }
+    return {
+      success: true,
+      msg: data.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      msg:
+        error.response?.data?.message ||
+        "Failed to add to cart.",
+    };
   }
+};
 
-  const clearCart=async()=>{
-    try{
-      await axios.delete(serverUrl+"/cart/clear",{withCredentials:true});
-      dispatch(clearCartCount());
-      return {success:true};
-    }
-    catch(error){
-      return {
-        success:false,
-        msg:error.response?.data?.message||"Failed to clear cart."
-      };
-    }
-  }
 
   const logout=async()=>{
     try{
       await axios.post(serverUrl+"/logout",{},{withCredentials:true});
       dispatch(clearUserData());
-      dispatch(clearCartCount());
+      dispatch(clearCart());
       navigate("/login");
     }
     catch(error){
@@ -156,18 +105,14 @@ function UserContext({children}) {
     }
   }
 
-  const value={
-    serverUrl,
-    getUserData,
-    getAllProducts,
-    getProductById,
-    getCart,
-    addToCart,
-    updateCartItem,
-    removeFromCart,
-    clearCart,
-    logout
-  }
+  const value = {
+  serverUrl,
+  getUserData,
+  getAllProducts,
+  getProductById,
+  addToCart,
+  logout,
+};
 
   useEffect(()=>{
     getUserData();

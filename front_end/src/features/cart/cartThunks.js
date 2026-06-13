@@ -85,3 +85,25 @@ export const clearEntireCart = createAsyncThunk(
     }
   }
 );
+
+export const addCartItem = createAsyncThunk(
+  "cart/addCartItem",
+  async ({ productId, quantity }, { dispatch, rejectWithValue }) => {
+    try {
+      const { data } = await axios.post(
+        serverUrl + "/cart/add",
+        { productId, quantity },
+        { withCredentials: true }
+      );
+
+      await dispatch(fetchCart());
+
+      return data.message;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to add to cart."
+      );
+    }
+  }
+);

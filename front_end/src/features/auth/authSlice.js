@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchUserData } from "./authThunks.js";
 const initialState = {
   userData: null,
-  authLoading: true,
+  authLoading: false,
 };
 
 const authSlice = createSlice({

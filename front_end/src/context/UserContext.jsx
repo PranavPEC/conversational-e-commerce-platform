@@ -1,60 +1,41 @@
-import React from 'react'
-import axios from 'axios';
-import { createContext } from 'react';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import React, { createContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { fetchCart } from '../features/cart/cartThunks.js';
-import {
-  setUserData as setReduxUserData,
-  clearUserData,
-  setAuthLoading as setReduxAuthLoading,
-} from "../features/auth/authSlice.js";
 
+import { clearUserData } from "../features/auth/authSlice.js";
 import { clearCart } from "../features/cart/cartSlice.js";
 
+export const dataContext = createContext();
 
-export const dataContext=createContext(); 
-function UserContext({children}) {
-  const dispatch=useDispatch();
-  const navigate=useNavigate();
-  const serverUrl="http://localhost:8000"
-  useEffect(() => {
-  dispatch(setReduxAuthLoading(true));
-}, []);
-  
+function UserContext({ children }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // Returns the full cart products array for the Cart page
-  
+  const serverUrl = "http://localhost:8000";
 
+  const logout = async () => {
+    try {
+      await axios.post(
+        serverUrl + "/logout",
+        {},
+        { withCredentials: true }
+      );
 
-  const logout=async()=>{
-    try{
-      await axios.post(serverUrl+"/logout",{},{withCredentials:true});
       dispatch(clearUserData());
       dispatch(clearCart());
+
       navigate("/login");
-    }
-    catch(error){
+    } catch (error) {
       console.log(error);
     }
-  }
-
-
-  const value = {
-  logout,
-};
-
-  useEffect(()=>{
-    getUserData();
-  },[]);
+  };
 
   return (
-    <dataContext.Provider value={value}>
+    <dataContext.Provider value={{ logout }}>
       {children}
     </dataContext.Provider>
-  )
+  );
 }
 
 export default UserContext;

@@ -3,14 +3,13 @@ import { SERVER_URL } from "../../api/config.js";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const serverUrl = "http://localhost:8000";
 
 export const fetchUserData = createAsyncThunk(
   "auth/fetchUserData",
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await axios.get(
-        serverUrl + "/getuserdata",
+        SERVER_URL + "/getuserdata",
         { withCredentials: true }
       );
 
@@ -28,7 +27,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await axios.post(
-        serverUrl + "/logout",
+        SERVER_URL + "/logout",
         {},
         { withCredentials: true }
       );

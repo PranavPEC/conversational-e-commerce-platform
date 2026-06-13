@@ -12,7 +12,6 @@ import { SERVER_URL } from "../api/config.js";
 
 function SignUp() {
   const dispatch=useDispatch();
-  const serverUrl = "http://localhost:8000";
   // ── Toast state ──
   const [toast, setToast] = useState(null)
   const [toastVisible, setToastVisible] = useState(false)
@@ -58,7 +57,7 @@ function SignUp() {
       if (backendImage) {
         formData.append("profileImage", backendImage)
       }
-      let { data } = await axios.post(serverUrl + "/signup", formData, {
+      let { data } = await axios.post(SERVER_URL + "/signup", formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       })

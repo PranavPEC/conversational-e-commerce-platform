@@ -28,7 +28,6 @@ function Login() {
   }
 
   // ── existing logic — untouched ──
-  const serverUrl = "http://localhost:8000";
   let navigate = useNavigate()
   let [email, setEmail] = React.useState("")
   let [password, setPassword] = React.useState("")
@@ -39,7 +38,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      let { data } = await axios.post(serverUrl + "/login", {
+      let { data } = await axios.post(SERVER_URL + "/login", {
         email,
         password
       }, {

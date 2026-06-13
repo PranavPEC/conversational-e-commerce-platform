@@ -1,5 +1,5 @@
 // src/features/auth/authThunks.js
-
+import { SERVER_URL } from "../../api/config.js";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 

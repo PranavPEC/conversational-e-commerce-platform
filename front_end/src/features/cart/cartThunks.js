@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
+import { SERVER_URL } from "../../api/config.js";
 const serverUrl = "http://localhost:8000";
 
 export const fetchCart = createAsyncThunk(

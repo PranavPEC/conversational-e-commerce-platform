@@ -8,8 +8,6 @@ import ProductListing from './pages/ProductListing.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import Cart from './pages/Cart.jsx';
 import Navbar from './components/Navbar.jsx';
-import { useContext } from 'react';
-import { dataContext } from './context/userContext.jsx';
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -45,6 +43,7 @@ useEffect(() => {
         <Route path='/products' element={userData ? <ProductListing /> : <Navigate to={"/login"} />} />
         <Route path='/product/:id' element={userData ? <ProductDetail /> : <Navigate to={"/login"} />} />
         <Route path='/cart' element={userData ? <Cart /> : <Navigate to={"/login"} />} />
+        <Route path='/*' element={userData ? <Home /> : <Navigate to={"/login"} />} />
       </Routes>
     </>
   )

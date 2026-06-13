@@ -1,10 +1,15 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { dataContext } from '../context/userContext.jsx'
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../features/auth/authThunks.js";
+import { clearCart } from "../features/cart/cartSlice.js";
+
+
+
 
 function Navbar() {
-  const { logout } = useContext(dataContext);
+const dispatch = useDispatch();  
 
 const { cartCount } = useSelector(
   (state) => state.cart
@@ -15,6 +20,13 @@ const { userData } = useSelector(
 );
   const navigate = useNavigate()
   const location = useLocation()
+  const handleLogout = async () => {
+  await dispatch(logoutUser());
+
+  dispatch(clearCart());
+
+  navigate("/login");
+};
 
   const isActive = (path) => location.pathname === path
 
@@ -86,7 +98,7 @@ const { userData } = useSelector(
         </div>
 
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className='text-sm text-zinc-400 hover:text-red-400 transition-colors duration-200 cursor-pointer'
         >
           Logout

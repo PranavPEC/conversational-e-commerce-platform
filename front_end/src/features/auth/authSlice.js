@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserData } from "./authThunks.js";
+import { fetchUserData, logoutUser } from "./authThunks.js";
 const initialState = {
   userData: null,
   authLoading: true,
@@ -37,6 +37,12 @@ const authSlice = createSlice({
       state.userData = null;
       state.authLoading = false;
     });
+    
+
+    addCase(logoutUser.fulfilled,(state)=>{
+      state.userData=null;
+    })
+    
 },
 });
 

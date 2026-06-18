@@ -168,11 +168,13 @@ export const cancelOrder = async (req, res) => {
         }
 
         // Restore stock for each product
-        for (let item of order.products) {
-            await Product.findByIdAndUpdate(
-                item.product._id,
-                { $inc: { stock: item.quantity } }
-            );
+         if (order.paymentStatus === "paid") {
+            for (let item of order.products) {
+                await Product.findByIdAndUpdate(
+                    item.product._id,
+                    { $inc: { stock: item.quantity } }
+                );
+            }
         }
 
         order.status = "cancelled";

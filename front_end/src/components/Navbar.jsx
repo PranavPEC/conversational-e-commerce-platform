@@ -5,28 +5,20 @@ import { useDispatch } from "react-redux";
 import { logoutUser } from "../features/auth/authThunks.js";
 import { clearCart } from "../features/cart/cartSlice.js";
 
-
-
-
 function Navbar() {
-const dispatch = useDispatch();  
+const dispatch = useDispatch();
 
-const { cartCount } = useSelector(
-  (state) => state.cart
-);
+const { cartCount } = useSelector((state) => state.cart);
+const { userData } = useSelector((state) => state.auth);
 
-const { userData } = useSelector(
-  (state) => state.auth
-);
   const navigate = useNavigate()
   const location = useLocation()
+
   const handleLogout = async () => {
-  await dispatch(logoutUser());
-
-  dispatch(clearCart());
-
-  navigate("/login");
-};
+    await dispatch(logoutUser());
+    dispatch(clearCart());
+    navigate("/login");
+  };
 
   const isActive = (path) => location.pathname === path
 
@@ -60,6 +52,16 @@ const { userData } = useSelector(
           }`}
         >
           Products
+        </button>
+
+        {/* Step 13 — Orders link */}
+        <button
+          onClick={() => navigate('/orders')}
+          className={`text-sm transition-colors duration-200 ${
+            isActive('/orders') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'
+          }`}
+        >
+          Orders
         </button>
 
         {/* Cart with badge */}

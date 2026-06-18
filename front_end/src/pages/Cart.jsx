@@ -7,73 +7,44 @@ import {
   removeCartItem,
   clearEntireCart,
 } from "../features/cart/cartThunks.js";
+import CheckoutModal from './CheckoutModal.jsx';   // Step 12
 
 function Cart() {
-  
+
   const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const [showCheckout, setShowCheckout] = useState(false)   // Step 12
 
- const dispatch = useDispatch();
-
-const {
-  cartItems,
-  loading,
-  error,
-} = useSelector((state) => state.cart);
-console.log("Cart Redux State", {
-  cartItems,
-  loading,
-  error,
-});
+  const {
+    cartItems,
+    loading,
+    error,
+  } = useSelector((state) => state.cart);
 
   // Fetch cart on mount
-useEffect(() => {
-  dispatch(fetchCart());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   // Increase or decrease quantity
   const handleQuantityChange = async (productId, currentQty, change) => {
     const newQty = currentQty + change
 
-    // If new quantity is 0, remove the item instead
     if (newQty < 1) {
       await handleRemove(productId)
       return
     }
 
-    const result = await dispatch(
-  updateCart({
-    productId,
-    quantity: newQty,
-  })
-);
-
-if (updateCart.fulfilled.match(result)) {
-  // success
-} else {
-      setError(result.msg)
-      setTimeout(() => setError(null), 3000)
-    }
+    await dispatch(updateCart({ productId, quantity: newQty }))
   }
 
- const handleRemove = async (productId) => {
-  const result = await dispatch(
-    removeCartItem(productId)
-  );
-
-  if (removeCartItem.fulfilled.match(result)) {
-    // success
-  }
-};
+  const handleRemove = async (productId) => {
+    await dispatch(removeCartItem(productId))
+  };
 
   const handleClearCart = async () => {
-  const result = await dispatch(
-    clearEntireCart()
-  );
-
-  if (clearEntireCart.fulfilled.match(result)) {
-    // success
-  }
-};
+    await dispatch(clearEntireCart())
+  };
 
   // Calculate total price
   const total = cartItems.reduce((sum, item) => {
@@ -109,11 +80,18 @@ if (updateCart.fulfilled.match(result)) {
   return (
     <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
 
+      {/* Checkout Modal — Step 12 */}
+      {showCheckout && (
+        <CheckoutModal onClose={() => setShowCheckout(false)} />
+      )}
+
       {/* Header */}
       <div className='max-w-3xl mx-auto flex items-center justify-between mb-8'>
         <h1 className='text-white text-2xl font-semibold tracking-tight'>
           Your Cart
-          <span className='text-zinc-500 text-base font-normal ml-2'>({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})</span>
+          <span className='text-zinc-500 text-base font-normal ml-2'>
+            ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
+          </span>
         </h1>
         <button
           onClick={handleClearCart}
@@ -196,7 +174,6 @@ if (updateCart.fulfilled.match(result)) {
             >
               ✕
             </button>
-
           </div>
         ))}
 
@@ -220,8 +197,11 @@ if (updateCart.fulfilled.match(result)) {
             <span className='text-emerald-400 text-xl font-bold'>₹{total}</span>
           </div>
 
-          {/* Checkout — wired in Phase 5 */}
-          <button className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 mt-2'>
+          {/* Step 12 — opens CheckoutModal */}
+          <button
+            onClick={() => setShowCheckout(true)}
+            className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer mt-2'
+          >
             Proceed to Checkout
           </button>
 

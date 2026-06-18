@@ -49,10 +49,16 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ["pending", "paid", "failed"],
         default: "pending"
-    }
+    },
 
-    // RAZORPAY HOOK (add in Step 12):
-    // razorpayOrderId: { type: String }
+    // Step 12 — Razorpay
+    razorpayOrderId: {
+        type: String
+    },
+
+    razorpayPaymentId: {
+        type: String
+    }
 
 }, { timestamps: true });
 

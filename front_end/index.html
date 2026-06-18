@@ -7,8 +7,16 @@
     <title>Conversational E-Commerce Platform</title>
   </head>
   <body>
-    <div id="root">
-    </div>
+    <div id="root"></div>
+
+    <!--
+      Razorpay SDK — Step 12
+      This gives us window.Razorpay in the browser.
+      CheckoutModal.jsx calls: new window.Razorpay(options).open()
+      Must be loaded BEFORE your React bundle, so it's ready when the modal opens.
+    -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

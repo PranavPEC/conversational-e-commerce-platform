@@ -5,10 +5,13 @@ import cookieParser from "cookie-parser";
 import mongoConnect from "./config/db.js";
 import cartRouter from "./routes/cart.route.js";
 import productRouter from "./routes/product.route.js";
+import paymentRouter from "./routes/payment.route.js";
 import orderRouter from "./routes/order.route.js";
 import cors from "cors";
-dotenv.config();
 
+dotenv.config();
+// console.log("KEY_ID:", process.env.RAZORPAY_KEY_ID)
+// console.log("KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET)
 const app=express();
 
 app.use(cookieParser());
@@ -25,6 +28,7 @@ app.use("/",userRouter);
 app.use("/cart",cartRouter);
 app.use("/product",productRouter);
 app.use("/order",orderRouter);
+app.use("/payment",paymentRouter);
 
 app.listen(port,()=>{
     mongoConnect();

@@ -1,24 +1,22 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../features/auth/authThunks.js";
-import { clearCart } from "../features/cart/cartSlice.js";
+import { useSelector, useDispatch } from 'react-redux'
+import { logoutUser } from '../features/auth/authThunks.js'
+import { clearCart } from '../features/cart/cartSlice.js'
 
 function Navbar() {
-const dispatch = useDispatch();
-
-const { cartCount } = useSelector((state) => state.cart);
-const { userData } = useSelector((state) => state.auth);
-
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
 
+  const { cartCount } = useSelector(state => state.cart)
+  const { userData } = useSelector(state => state.auth)
+
   const handleLogout = async () => {
-    await dispatch(logoutUser());
-    dispatch(clearCart());
-    navigate("/login");
-  };
+    await dispatch(logoutUser())
+    dispatch(clearCart())
+    navigate('/login')
+  }
 
   const isActive = (path) => location.pathname === path
 
@@ -54,7 +52,7 @@ const { userData } = useSelector((state) => state.auth);
           Products
         </button>
 
-        {/* Step 13 — Orders link */}
+        {/* Step 13 — Orders */}
         <button
           onClick={() => navigate('/orders')}
           className={`text-sm transition-colors duration-200 ${
@@ -78,6 +76,18 @@ const { userData } = useSelector((state) => state.auth);
             </span>
           )}
         </button>
+
+        {/* Step 14 — Admin link — only visible to admin users */}
+        {userData?.role === 'admin' && (
+          <button
+            onClick={() => navigate('/admin')}
+            className={`text-sm transition-colors duration-200 ${
+              isActive('/admin') ? 'text-emerald-400 font-medium' : 'text-emerald-600 hover:text-emerald-400'
+            }`}
+          >
+            Admin
+          </button>
+        )}
 
       </div>
 

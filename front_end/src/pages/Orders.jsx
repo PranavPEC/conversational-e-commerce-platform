@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Package, ChevronRight, ShoppingBag, Clock, CheckCircle, Truck, XCircle } from 'lucide-react'
 import { fetchUserOrders, cancelOrder } from '../features/order/orderThunks.js'
-import { formatDate } from '../../utils/CommonFunctions.js'
+import { formatDate } from '../utils/CommonFunctions.js'
 // ── Status config — each order status gets a colour + icon + label ──
 // Adding new status later just means adding one entry here
 const STATUS_CONFIG = {

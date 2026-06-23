@@ -4,7 +4,7 @@ import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-
 import { createRazorpayOrder, verifyRazorpayPayment } from '../features/order/orderThunks.js'
 import { resetOrder } from '../features/order/orderSlice.js'
 import { clearCart } from '../features/cart/cartSlice.js'
-import { calculateCartTotal } from '../../utils/CommonFunctions.js'
+import { calculateCartTotal } from '../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
     const dispatch = useDispatch()

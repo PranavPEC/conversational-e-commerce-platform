@@ -9,7 +9,7 @@ import {
 import { useDispatch } from "react-redux";
 import { fetchUserData } from "../features/auth/authThunks.js";
 import { SERVER_URL } from "../api/config.js";
-import useToast from '../../utils/useToast.js'
+import useToast from '../utils/useToast.js'
 
 function SignUp() {
   const dispatch=useDispatch();

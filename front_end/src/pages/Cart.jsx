@@ -8,7 +8,7 @@ import {
   clearEntireCart,
 } from "../features/cart/cartThunks.js";
 import CheckoutModal from './CheckoutModal.jsx';   // Step 12
-import { calculateCartTotal } from '../../utils/CommonFunctions.js';
+import { calculateCartTotal } from '../utils/CommonFunctions.js';
 function Cart() {
 
   const navigate = useNavigate()

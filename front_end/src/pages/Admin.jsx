@@ -4,7 +4,7 @@ import { Plus, Pencil, Trash2, X, AlertCircle, CheckCircle, Loader, Package } fr
 import { createProduct, updateProduct, deleteProduct } from '../features/admin/adminThunks.js'
 import { clearAdminStatus, setAdminProducts } from '../features/admin/adminSlice.js'
 import { fetchProducts } from '../features/products/productThunks.js'
-import { buildFormData } from '../../utils/CommonFunctions.js'
+import { buildFormData } from '../utils/CommonFunctions.js'
 
 
 // ── Empty form state — reused for both reset and initial state ──

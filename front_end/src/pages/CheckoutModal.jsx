@@ -4,6 +4,7 @@ import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-
 import { createRazorpayOrder, verifyRazorpayPayment } from '../features/order/orderThunks.js'
 import { resetOrder } from '../features/order/orderSlice.js'
 import { clearCart } from '../features/cart/cartSlice.js'
+import { calculateCartTotal } from '../../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
     const dispatch = useDispatch()
@@ -11,8 +12,6 @@ function CheckoutModal({ onClose }) {
 
     const { pendingOrder, loading, error, paymentSuccess } = useSelector(state => state.order)
     const { cartItems } = useSelector(state => state.cart)
-
-    const total = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
 
     // ── Clean up Redux order state when modal closes ──
     const handleClose = () => {
@@ -146,7 +145,7 @@ useEffect(() => {
 
                         <div className='flex justify-between items-center pt-1'>
                             <span className='text-zinc-400 text-sm'>Total</span>
-                            <span className='text-emerald-400 text-lg font-bold'>₹{total}</span>
+                            <span className='text-emerald-400 text-lg font-bold'>₹{calculateCartTotal(cartItems)}</span>
                         </div>
                     </div>
 
@@ -186,7 +185,7 @@ useEffect(() => {
                             </>
                         ) : (
                             <>
-                                Pay ₹{total}
+                                Pay ₹{calculateCartTotal(cartItems)}
                                 <ArrowRight size={16} />
                             </>
                         )}

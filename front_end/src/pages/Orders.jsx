@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Package, ChevronRight, ShoppingBag, Clock, CheckCircle, Truck, XCircle } from 'lucide-react'
 import { fetchUserOrders, cancelOrder } from '../features/order/orderThunks.js'
-
+import { formatDate } from '../../utils/CommonFunctions.js'
 // ── Status config — each order status gets a colour + icon + label ──
 // Adding new status later just means adding one entry here
 const STATUS_CONFIG = {
@@ -38,13 +38,13 @@ const STATUS_CONFIG = {
 }
 
 // ── Formats "2025-01-15T10:30:00Z" → "15 Jan 2025" ──
-const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-    })
-}
+// const formatDate = (dateStr) => {
+//     return new Date(dateStr).toLocaleDateString('en-IN', {
+//         day: 'numeric',
+//         month: 'short',
+//         year: 'numeric',
+//     })
+// }
 
 function Orders() {
     const dispatch = useDispatch()

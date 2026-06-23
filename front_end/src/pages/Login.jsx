@@ -8,25 +8,12 @@ import {
 import { useDispatch } from "react-redux";
 import { fetchUserData } from "../features/auth/authThunks.js";
 import { SERVER_URL } from "../api/config.js";
+import useToast from '../../utils/useToast.js';
+
 function Login() {
   const dispatch=useDispatch();
-  // ── Toast state ──
-  const [toast, setToast] = useState(null)
-  const [toastVisible, setToastVisible] = useState(false)
-
-  const showToast = (msg) => {
-    setToast(msg)
-    setToastVisible(false)
-    setTimeout(() => setToastVisible(true), 10)
-    setTimeout(() => setToastVisible(false), 2600)
-    setTimeout(() => setToast(null), 3000)
-  }
-
-  const dismissToast = () => {
-    setToastVisible(false)
-    setTimeout(() => setToast(null), 300)
-  }
-
+// ── Toast state ──
+  const {toast,showToast,dismissToast,setToast,setToastVisible,toastVisible}=useToast();
   // ── existing logic — untouched ──
   let navigate = useNavigate()
   let [email, setEmail] = React.useState("")

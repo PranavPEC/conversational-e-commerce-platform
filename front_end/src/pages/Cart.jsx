@@ -8,7 +8,7 @@ import {
   clearEntireCart,
 } from "../features/cart/cartThunks.js";
 import CheckoutModal from './CheckoutModal.jsx';   // Step 12
-
+import { calculateCartTotal } from '../../utils/CommonFunctions.js';
 function Cart() {
 
   const navigate = useNavigate()
@@ -45,11 +45,6 @@ function Cart() {
   const handleClearCart = async () => {
     await dispatch(clearEntireCart())
   };
-
-  // Calculate total price
-  const total = cartItems.reduce((sum, item) => {
-    return sum + item.product.price * item.quantity
-  }, 0)
 
   // ── Loading ──
   if (loading) {
@@ -182,7 +177,7 @@ function Cart() {
 
           <div className='flex justify-between items-center'>
             <span className='text-zinc-400 text-sm'>Subtotal</span>
-            <span className='text-white text-sm'>₹{total}</span>
+            <span className='text-white text-sm'>₹{calculateCartTotal(cartItems)}</span>
           </div>
 
           <div className='flex justify-between items-center'>
@@ -194,7 +189,7 @@ function Cart() {
 
           <div className='flex justify-between items-center'>
             <span className='text-white font-semibold'>Total</span>
-            <span className='text-emerald-400 text-xl font-bold'>₹{total}</span>
+            <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems)}</span>
           </div>
 
           {/* Step 12 — opens CheckoutModal */}

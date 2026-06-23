@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logoutUser } from '../features/auth/authThunks.js'
 import { clearCart } from '../features/cart/cartSlice.js'
+import { getInital } from '../../utils/CommonFunctions.js'
 
 function Navbar() {
   const dispatch = useDispatch()
@@ -103,7 +104,7 @@ function Navbar() {
             />
           ) : (
             <div className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-white text-xs font-semibold'>
-              {userData?.name?.charAt(0).toUpperCase()}
+              {getInital(userData)}
             </div>
           )}
           <span className='text-zinc-300 text-sm hidden md:block'>{userData?.name}</span>

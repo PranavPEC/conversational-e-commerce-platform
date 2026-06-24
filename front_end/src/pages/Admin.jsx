@@ -11,6 +11,9 @@ import ProductForm from '../components/admin/ProductForm.jsx'
 import ProductTable from '../components/admin/ProductTable.jsx'
 import DeleteModal from '../components/admin/DeleteModal.jsx'
 
+// ── Common Functions ──
+import { buildFormData } from '../utils/CommonFunctions.js'
+
 const EMPTY_FORM = { title: '', description: '', price: '', stock: '' }
 
 function Admin() {
@@ -83,12 +86,7 @@ function Admin() {
     const handleSubmit = async () => {
         if (!form.title || !form.description || !form.price || !form.stock) return
 
-        const formData = new FormData()
-        formData.append('title', form.title)
-        formData.append('description', form.description)
-        formData.append('price', form.price)
-        formData.append('stock', form.stock)
-        if (imageFile) formData.append('image', imageFile)
+        const formData = buildFormData(form,imageFile);
 
         if (editingProduct) {
             await dispatch(updateProduct({ id: editingProduct._id, formData }))

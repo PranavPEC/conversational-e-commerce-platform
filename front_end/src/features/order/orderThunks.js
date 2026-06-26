@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { SERVER_URL } from "../../api/config.js";
+import { SERVER_URL } from "../../utils/APIConfig.js";
 
 // ── Step 12 — Create Razorpay order ──
 export const createRazorpayOrder = createAsyncThunk(

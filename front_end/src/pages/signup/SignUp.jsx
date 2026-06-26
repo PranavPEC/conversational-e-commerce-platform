@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { fetchUserData } from '../../features/auth/authThunks.js'
-import { SERVER_URL } from '../../api/config.js'
+import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
 // ── Shared components ──

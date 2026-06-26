@@ -189,7 +189,7 @@ function Cart() {
 
           <div className='flex justify-between items-center'>
             <span className='text-white font-semibold'>Total</span>
-            <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems)}</span>
+            <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems).toLocaleString("en-IN")}</span>
           </div>
 
           {/* Step 12 — opens CheckoutModal */}

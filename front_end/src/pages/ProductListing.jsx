@@ -66,7 +66,7 @@ function ProductListing() {
               <p className='text-zinc-400 text-xs line-clamp-2'>{product.description}</p>
 
               <div className='mt-auto pt-3 flex items-center justify-between'>
-                <span className='text-emerald-400 font-semibold text-sm'>₹{product.price}</span>
+                <span className='text-emerald-400 font-semibold text-sm'>₹{product.price.toLocaleString("en-IN")}</span>
                 {product.stock === 0 ? (
                   <span className='text-xs text-red-400 font-medium'>Out of stock</span>
                 ) : (

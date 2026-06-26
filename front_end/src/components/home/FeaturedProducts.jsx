@@ -78,7 +78,7 @@ function FeaturedProducts({ featured, loading, onProductClick, onSeeAll }) {
                                     </h3>
                                     <div className='mt-auto pt-2 flex items-center justify-between'>
                                         <span className='text-emerald-400 font-semibold text-sm'>
-                                            ₹{product.price}
+                                            ₹{product.price.toLocaleString("en-IN")}
                                         </span>
                                         {product.stock === 0 ? (
                                             <span className='text-xs text-red-400'>Out of stock</span>

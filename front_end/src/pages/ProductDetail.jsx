@@ -110,7 +110,7 @@ if (addCartItem.fulfilled.match(result)) {
             <p className='text-zinc-400 text-sm leading-relaxed'>{product.description}</p>
           </div>
 
-          <span className='text-emerald-400 text-3xl font-bold'>₹{product.price}</span>
+          <span className='text-emerald-400 text-3xl font-bold'>₹{product.price.toLocaleString("en-IN")}</span>
 
           {product.stock === 0 ? (
             <span className='text-red-400 text-sm font-medium'>Out of stock</span>

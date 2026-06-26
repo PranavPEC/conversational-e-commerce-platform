@@ -42,6 +42,7 @@ const authSlice = createSlice({
 
       .addCase(logoutUser.fulfilled, (state) => {
         state.userData = null;
+        state.authLoading = false;
       });
   },
 });

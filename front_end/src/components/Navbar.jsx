@@ -16,7 +16,7 @@ function Navbar() {
   const handleLogout = async () => {
     await dispatch(logoutUser())
     dispatch(clearCart())
-    navigate('/login')
+    navigate('/login',{replace:true})
   }
 
   const isActive = (path) => location.pathname === path

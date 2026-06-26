@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts } from '../features/products/productThunks.js'
 
+
 function ProductListing() {
   
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function ProductListing() {
   products,
   loading,
 } = useSelector((state) => state.products)
-
+const { userData } = useSelector(state => state.auth);
 
   useEffect(() => {
   dispatch(fetchProducts())
@@ -32,6 +33,7 @@ function ProductListing() {
       </div>
     )
   }
+  
 
   return (
     <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
@@ -42,7 +44,13 @@ function ProductListing() {
         {products.map((product) => (
           <div
             key={product._id}
-            onClick={() => navigate('/product/' + product._id)}
+            onClick={() => {
+    if (!userData) {
+        navigate('/login')
+    } else {
+        navigate('/product/' + product._id)
+    }
+}}
             className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
           >
             {/* Product Image */}

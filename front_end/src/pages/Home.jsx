@@ -41,7 +41,13 @@ function Home() {
             <FeaturedProducts
                 featured={featured}
                 loading={loading}
-                onProductClick={(id) => navigate('/product/' + id)}
+                onProductClick={(id) => {
+                    if (userData) {
+                        navigate('/product/' + id)
+                    } else {
+                        navigate('/login')
+                    }
+                }}
                 onSeeAll={() => navigate('/products')}
             />
 

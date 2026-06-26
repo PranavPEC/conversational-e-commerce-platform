@@ -11,7 +11,7 @@ export const calculateCartTotal=(cartItems)=>{
   return total;
 }
 
-export const getInital=(userData)=>{
+export const getInitial=(userData)=>{
     return userData?.name?.charAt(0).toUpperCase()
 }
 

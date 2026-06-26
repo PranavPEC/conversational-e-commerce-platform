@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logoutUser } from '../features/auth/authThunks.js'
 import { clearCart } from '../features/cart/cartSlice.js'
-import { getInital } from '../utils/CommonFunctions.js'
+import { getInitial } from '../utils/CommonFunctions.js'   // fixed typo: getInital → getInitial
 
 function Navbar() {
   const dispatch = useDispatch()
@@ -21,6 +21,41 @@ function Navbar() {
 
   const isActive = (path) => location.pathname === path
 
+  // ── Guest Navbar — shown when not logged in ──
+  // Only shows Logo + Login + Signup
+  if (!userData) {
+    return (
+      <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
+
+        {/* Logo */}
+        <div
+          onClick={() => navigate('/')}
+          className='text-white font-bold text-lg tracking-tight cursor-pointer'
+        >
+          Shop<span className='text-emerald-400'>AI</span>
+        </div>
+
+        {/* Guest actions */}
+        <div className='flex items-center gap-3'>
+          <button
+            onClick={() => navigate('/login')}
+            className='text-sm text-zinc-400 hover:text-white transition-colors duration-200 cursor-pointer'
+          >
+            Login
+          </button>
+          <button
+            onClick={() => navigate('/signup')}
+            className='text-sm px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-colors duration-200 cursor-pointer'
+          >
+            Sign Up
+          </button>
+        </div>
+
+      </nav>
+    )
+  }
+
+  // ── Authenticated Navbar — full nav with links, cart badge, admin ──
   return (
     <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
 
@@ -53,7 +88,6 @@ function Navbar() {
           Products
         </button>
 
-        {/* Step 13 — Orders */}
         <button
           onClick={() => navigate('/orders')}
           className={`text-sm transition-colors duration-200 ${
@@ -78,7 +112,7 @@ function Navbar() {
           )}
         </button>
 
-        {/* Step 14 — Admin link — only visible to admin users */}
+        {/* Admin — only visible to admin role */}
         {userData?.role === 'admin' && (
           <button
             onClick={() => navigate('/admin')}
@@ -92,7 +126,7 @@ function Navbar() {
 
       </div>
 
-      {/* User Info + Logout */}
+      {/* User info + Logout */}
       <div className='flex items-center gap-4'>
 
         <div className='flex items-center gap-2'>
@@ -104,7 +138,7 @@ function Navbar() {
             />
           ) : (
             <div className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-white text-xs font-semibold'>
-              {getInital(userData)}
+              {getInitial(userData)}
             </div>
           )}
           <span className='text-zinc-300 text-sm hidden md:block'>{userData?.name}</span>

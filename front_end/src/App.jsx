@@ -1,14 +1,14 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css'
 
-import SignUp from './pages/SignUp.jsx';
-import Login from './pages/Login.jsx';
-import Home from './pages/Home.jsx';
+import SignUp from './pages/signup/SignUp.jsx';
+import Login from './pages/login/Login.jsx';
+import Home from './pages/home/Home.jsx';
 import ProductListing from './pages/ProductListing.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import Cart from './pages/Cart.jsx';
-import Orders from './pages/Orders.jsx';
-import Admin from './pages/Admin.jsx';
+import Orders from './pages/orders/Orders.jsx';
+import Admin from './pages/admin/Admin.jsx';
 import Navbar from './components/Navbar.jsx';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';

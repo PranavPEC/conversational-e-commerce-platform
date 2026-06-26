@@ -2,14 +2,14 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
-import { fetchUserOrders, cancelOrder } from '../features/order/orderThunks.js'
+import { fetchUserOrders, cancelOrder } from '../../features/order/orderThunks.js'
 
 // ── Orders components ──
-import OrdersLoading from '../components/orders/OrdersLoading.jsx'
-import OrdersEmpty from '../components/orders/OrdersEmpty.jsx'
-import OrdersError from '../components/orders/OrdersError.jsx'
-import OrdersHeader from '../components/orders/OrdersHeader.jsx'
-import OrderCard from '../components/orders/OrderCard.jsx'
+import OrdersLoading from './OrdersLoading.jsx'
+import OrdersEmpty from './OrdersEmpty.jsx'
+import OrdersError from './OrdersError.jsx'
+import OrdersHeader from './OrdersHeader.jsx'
+import OrderCard from './OrderCard.jsx'
 
 function Orders() {
     const dispatch = useDispatch()

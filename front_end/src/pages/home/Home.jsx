@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchProducts } from '../features/products/productThunks.js'
+import { fetchProducts } from '../../features/products/productThunks.js'
 
 // ── Home components ──
-import HeroSection from '../components/home/HeroSection.jsx'
-import PerksBar from '../components/home/PerksBar.jsx'
-import FeaturedProducts from '../components/home/FeaturedProducts.jsx'
-import SocialProofBanner from '../components/home/SocialProofBanner.jsx'
+import HeroSection from './HeroSection.jsx'
+import PerksBar from './PerksBar.jsx'
+import FeaturedProducts from './FeaturedProducts.jsx'
+import SocialProofBanner from './SocialProofBanner.jsx'
 
 function Home() {
     const navigate = useNavigate()

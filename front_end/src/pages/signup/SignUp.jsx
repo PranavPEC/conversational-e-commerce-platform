@@ -2,18 +2,18 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { fetchUserData } from '../features/auth/authThunks.js'
-import { SERVER_URL } from '../api/config.js'
-import useToast from '../utils/useToast.js'
+import { fetchUserData } from '../../features/auth/authThunks.js'
+import { SERVER_URL } from '../../api/config.js'
+import useToast from '../../utils/useToast.js'
 
 // ── Shared components ──
-import Toast from '../components/login/Toast.jsx'
-import SocialButtons from '../components/login/SocialButtons.jsx'
+import Toast from '../login/Toast.jsx'
+import SocialButtons from '../login/SocialButtons.jsx'
 
 // ── SignUp-specific components ──
-import SignUpLeftPanel from '../components/signup/SignUpLeftPanel.jsx'
-import SignUpForm from '../components/signup/SignUpForm.jsx'
-import AvatarPicker from '../components/signup/AvatarPicker.jsx'
+import SignUpLeftPanel from './SignUpLeftPanel.jsx'
+import SignUpForm from './SignUpForm.jsx'
+import AvatarPicker from './AvatarPicker.jsx'
 
 function SignUp() {
     const dispatch = useDispatch()

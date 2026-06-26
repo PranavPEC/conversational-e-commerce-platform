@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createProduct, updateProduct, deleteProduct } from '../features/admin/adminThunks.js'
-import { clearAdminStatus, setAdminProducts } from '../features/admin/adminSlice.js'
-import { fetchProducts } from '../features/products/productThunks.js'
+import { createProduct, updateProduct, deleteProduct } from '../../features/admin/adminThunks.js'
+import { clearAdminStatus, setAdminProducts } from '../../features/admin/adminSlice.js'
+import { fetchProducts } from '../../features/products/productThunks.js'
 
 // ── Admin components ──
-import AdminHeader from '../components/admin/AdminHeader.jsx'
-import AdminToast from '../components/admin/AdminToast.jsx'
-import ProductForm from '../components/admin/ProductForm.jsx'
-import ProductTable from '../components/admin/ProductTable.jsx'
-import DeleteModal from '../components/admin/DeleteModal.jsx'
+import AdminHeader from './AdminHeader.jsx'
+import AdminToast from './AdminToast.jsx'
+import ProductForm from './ProductForm.jsx'
+import ProductTable from './ProductTable.jsx'
+import DeleteModal from './DeleteModal.jsx'
 
 // ── Common Functions ──
-import { buildFormData } from '../utils/CommonFunctions.js'
+import { buildFormData } from '../../utils/CommonFunctions.js'
 
 const EMPTY_FORM = { title: '', description: '', price: '', stock: '' }
 

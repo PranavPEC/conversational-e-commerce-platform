@@ -3,15 +3,15 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react'
 import { useDispatch } from 'react-redux'
-import { fetchUserData } from '../features/auth/authThunks.js'
-import { SERVER_URL } from '../api/config.js'
-import useToast from '../utils/useToast.js'
+import { fetchUserData } from '../../features/auth/authThunks.js'
+import { SERVER_URL } from '../../api/config.js'
+import useToast from '../../utils/useToast.js'
 
 // ── Child components ──
-import Toast from '../components/login/Toast.jsx'
-import LoginLeftPanel from '../components/login/LoginLeftPanel.jsx'
-import LoginForm from '../components/login/LoginForm.jsx'
-import SocialButtons from '../components/login/SocialButtons.jsx'
+import Toast from './Toast.jsx'
+import LoginLeftPanel from './LoginLeftPanel.jsx'
+import LoginForm from './LoginForm.jsx'
+import SocialButtons from './SocialButtons.jsx'
 
 function Login() {
     const dispatch = useDispatch()

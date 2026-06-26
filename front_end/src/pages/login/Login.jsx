@@ -7,11 +7,14 @@ import { fetchUserData } from '../../features/auth/authThunks.js'
 import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
+// ── Common components ──
+import Toast from '../../components/common_components/Toast.jsx'
+import SocialButtons from '../../components/common_components/SocialButtons.jsx'
+
 // ── Child components ──
-import Toast from './Toast.jsx'
 import LoginLeftPanel from './LoginLeftPanel.jsx'
 import LoginForm from './LoginForm.jsx'
-import SocialButtons from './SocialButtons.jsx'
+
 
 function Login() {
     const dispatch = useDispatch()

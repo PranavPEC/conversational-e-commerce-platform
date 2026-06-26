@@ -6,9 +6,9 @@ import { fetchUserData } from '../../features/auth/authThunks.js'
 import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
-// ── Shared components ──
-import Toast from '../login/Toast.jsx'
-import SocialButtons from '../login/SocialButtons.jsx'
+// ── Common components ──
+import Toast from '../../components/common_components/Toast.jsx'
+import SocialButtons from '../../components/common_components/SocialButtons.jsx'
 
 // ── SignUp-specific components ──
 import SignUpLeftPanel from './SignUpLeftPanel.jsx'

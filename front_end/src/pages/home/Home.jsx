@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchProducts } from '../../features/products/productThunks.js'
+import { useSelector } from 'react-redux'
 
-// ── Home components ──
+// ── New architecture: plain async function, call directly ──
+import { fetchProducts } from '../../redux/reduxActions'
+
 import HeroSection from './HeroSection.jsx'
 import PerksBar from './PerksBar.jsx'
 import FeaturedProducts from './FeaturedProducts.jsx'
@@ -11,20 +12,15 @@ import SocialProofBanner from './SocialProofBanner.jsx'
 
 function Home() {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
 
     const { userData } = useSelector(state => state.auth)
-    const { products, loading } = useSelector(state => state.products)
+    const { products, productsLoading } = useSelector(state => state.products)
 
-    // Fetch all products on mount — FeaturedProducts shows first 4
     useEffect(() => {
-        dispatch(fetchProducts())
-    }, [dispatch])
+        fetchProducts()   // call directly — no dispatch() wrapper
+    }, [])
 
-    // First name only — "Pranav Singh" → "Pranav"
     const firstName = userData?.name?.split(' ')[0] || 'there'
-
-    // Slice here so FeaturedProducts stays a pure display component
     const featured = products.slice(0, 4)
 
     return (
@@ -40,14 +36,8 @@ function Home() {
 
             <FeaturedProducts
                 featured={featured}
-                loading={loading}
-                onProductClick={(id) => {
-                    if (userData) {
-                        navigate('/product/' + id)
-                    } else {
-                        navigate('/login')
-                    }
-                }}
+                loading={productsLoading}
+                onProductClick={(id) => navigate('/product/' + id)}
                 onSeeAll={() => navigate('/products')}
             />
 

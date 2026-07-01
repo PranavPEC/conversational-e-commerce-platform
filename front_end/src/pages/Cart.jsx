@@ -1,46 +1,33 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-    fetchCart,
-    updateCart,
-    removeCartItem,
-    clearEntireCart,
-} from '../features/cart/cartThunks.js'
+import { useSelector } from 'react-redux'
+import { fetchCart, updateCart, removeCartItem, clearEntireCart } from '../redux/reduxActions'
 import CheckoutModal from './CheckoutModal.jsx'
 import { calculateCartTotal } from '../utils/CommonFunctions.js'
 import { Loader } from 'lucide-react'
 
 function Cart() {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
     const [showCheckout, setShowCheckout] = useState(false)
 
     const { cartItems, cartLoading, itemLoading, error } = useSelector(state => state.cart)
 
     useEffect(() => {
-        // silent: false — show full page spinner on mount
-        dispatch(fetchCart({ silent: false }))
-    }, [dispatch])
+        fetchCart()   // plain call — no dispatch(), no silent flag needed from component
+    }, [])
 
     const handleQuantityChange = (productId, currentQty, change) => {
         const newQty = currentQty + change
         if (newQty < 1) {
-            dispatch(removeCartItem(productId))
+            removeCartItem(productId)
             return
         }
-        dispatch(updateCart({ productId, quantity: newQty }))
+        updateCart({ productId, quantity: newQty })
     }
 
-    const handleRemove = (productId) => {
-        dispatch(removeCartItem(productId))
-    }
+    const handleRemove = (productId) => removeCartItem(productId)
+    const handleClearCart = () => clearEntireCart()
 
-    const handleClearCart = () => {
-        dispatch(clearEntireCart())
-    }
-
-    // Full page spinner — only on first mount, NEVER during +/-
     if (cartLoading) {
         return (
             <div className='w-full min-h-screen bg-zinc-950 flex justify-center items-center'>
@@ -67,9 +54,7 @@ function Cart() {
     return (
         <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
 
-            {showCheckout && (
-                <CheckoutModal onClose={() => setShowCheckout(false)} />
-            )}
+            {showCheckout && <CheckoutModal onClose={() => setShowCheckout(false)} />}
 
             <div className='max-w-3xl mx-auto flex items-center justify-between mb-8'>
                 <h1 className='text-white text-2xl font-semibold tracking-tight'>
@@ -98,24 +83,16 @@ function Cart() {
                     const isItemLoading = itemLoading[item.product._id] || false
 
                     return (
-                        <div
-                            key={item.product._id}
-                            className='bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex gap-4 items-center'
-                        >
+                        <div key={item.product._id} className='bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex gap-4 items-center'>
+
                             <div
                                 onClick={() => navigate('/product/' + item.product._id)}
                                 className='w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 cursor-pointer'
                             >
                                 {item.product.image ? (
-                                    <img
-                                        src={item.product.image}
-                                        alt={item.product.title}
-                                        className='w-full h-full object-cover'
-                                    />
+                                    <img src={item.product.image} alt={item.product.title} className='w-full h-full object-cover' />
                                 ) : (
-                                    <div className='w-full h-full flex items-center justify-center text-zinc-600 text-xs'>
-                                        No img
-                                    </div>
+                                    <div className='w-full h-full flex items-center justify-center text-zinc-600 text-xs'>No img</div>
                                 )}
                             </div>
 
@@ -126,12 +103,9 @@ function Cart() {
                                 >
                                     {item.product.title}
                                 </h2>
-                                <p className='text-emerald-400 text-sm font-semibold'>
-                                    ₹{item.product.price}
-                                </p>
+                                <p className='text-emerald-400 text-sm font-semibold'>₹{item.product.price}</p>
                             </div>
 
-                            {/* Quantity Controls — only THIS item's buttons disable */}
                             <div className='flex items-center gap-3'>
                                 <button
                                     onClick={() => handleQuantityChange(item.product._id, item.quantity, -1)}
@@ -140,9 +114,7 @@ function Cart() {
                                 >
                                     {isItemLoading ? <Loader size={10} className='animate-spin' /> : '−'}
                                 </button>
-                                <span className='text-white font-medium w-5 text-center text-sm'>
-                                    {item.quantity}
-                                </span>
+                                <span className='text-white font-medium w-5 text-center text-sm'>{item.quantity}</span>
                                 <button
                                     onClick={() => handleQuantityChange(item.product._id, item.quantity, +1)}
                                     disabled={isItemLoading}
@@ -153,9 +125,7 @@ function Cart() {
                             </div>
 
                             <div className='w-24 text-right'>
-                                <p className='text-white text-sm font-semibold'>
-                                    ₹{item.product.price * item.quantity}
-                                </p>
+                                <p className='text-white text-sm font-semibold'>₹{item.product.price * item.quantity}</p>
                             </div>
 
                             <button
@@ -170,40 +140,31 @@ function Cart() {
                 })}
 
                 <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mt-4 flex flex-col gap-4'>
-
                     <div className='flex justify-between items-center'>
                         <span className='text-zinc-400 text-sm'>Subtotal</span>
                         <span className='text-white text-sm'>₹{calculateCartTotal(cartItems)}</span>
                     </div>
-
                     <div className='flex justify-between items-center'>
                         <span className='text-zinc-400 text-sm'>Shipping</span>
                         <span className='text-emerald-400 text-sm'>Free</span>
                     </div>
-
                     <div className='h-px bg-zinc-800' />
-
                     <div className='flex justify-between items-center'>
                         <span className='text-white font-semibold'>Total</span>
-                        <span className='text-emerald-400 text-xl font-bold'>
-                            ₹{calculateCartTotal(cartItems).toLocaleString('en-IN')}
-                        </span>
+                        <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems).toLocaleString('en-IN')}</span>
                     </div>
-
                     <button
                         onClick={() => setShowCheckout(true)}
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer mt-2'
                     >
                         Proceed to Checkout
                     </button>
-
                     <button
                         onClick={() => navigate('/products')}
                         className='w-full text-center text-zinc-400 hover:text-white text-sm transition-colors duration-200 cursor-pointer'
                     >
                         ← Continue Shopping
                     </button>
-
                 </div>
             </div>
         </div>

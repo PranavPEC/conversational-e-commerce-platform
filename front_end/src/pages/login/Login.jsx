@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react'
 import { useDispatch } from 'react-redux'
-import { fetchUserData } from '../../features/auth/authThunks.js'
+import { fetchUserData } from '../../redux/reduxActions/authActions.js'
 import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
@@ -37,7 +37,7 @@ function Login() {
                 { email, password },
                 { withCredentials: true }
             )
-            await dispatch(fetchUserData())
+            await fetchUserData()
             navigate('/home')
         } catch (error) {
             if (error.response) {

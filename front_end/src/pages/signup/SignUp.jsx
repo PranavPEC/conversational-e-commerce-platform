@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { fetchUserData } from '../../features/auth/authThunks.js'
+import { fetchUserData } from '../../redux/reduxActions/authActions.js'
 import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
@@ -16,7 +15,6 @@ import SignUpForm from './SignUpForm.jsx'
 import AvatarPicker from './AvatarPicker.jsx'
 
 function SignUp() {
-    const dispatch = useDispatch()
     const navigate = useNavigate()
 
     // ── Toast ──
@@ -42,38 +40,59 @@ function SignUp() {
     }
 
     // ── Submit handler ──
-    const handleSignUp = async (e) => {
-        e.preventDefault()
+const handleSignUp = async (e) => {
+    e.preventDefault()
 
-        if (password !== confirmPassword) {
-            showToast('Passwords do not match.')
-            return
+    // ── Password validations ──
+    if (password.length < 8) {
+        showToast('Password must be at least 8 characters long.')
+        return
+    }
+
+    if (!/[A-Z]/.test(password)) {
+        showToast('Password must contain at least one uppercase letter.')
+        return
+    }
+
+    if (!/[0-9]/.test(password)) {
+        showToast('Password must contain at least one number.')
+        return
+    }
+
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        showToast('Password must contain at least one special character.')
+        return
+    }
+
+    if (password !== confirmPassword) {
+        showToast('Passwords do not match.')
+        return
+    }
+
+    try {
+        const formData = new FormData()
+        formData.append('name', name)
+        formData.append('email', email)
+        formData.append('password', password)
+        if (backendImage) {
+            formData.append('profileImage', backendImage)
         }
 
-        try {
-            const formData = new FormData()
-            formData.append('name', name)
-            formData.append('email', email)
-            formData.append('password', password)
-            if (backendImage) {
-                formData.append('profileImage', backendImage)
-            }
+        await axios.post(SERVER_URL + '/signup', formData, {
+            withCredentials: true,
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
 
-            await axios.post(SERVER_URL + '/signup', formData, {
-                withCredentials: true,
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
-
-            await dispatch(fetchUserData())
-            navigate('/home')
-        } catch (error) {
-            if (error.response) {
-                showToast(error.response.data.message)
-            } else {
-                showToast('Server not reachable.')
-            }
+        await fetchUserData()
+        navigate('/home')
+    } catch (error) {
+        if (error.response) {
+            showToast(error.response.data.message)
+        } else {
+            showToast('Server not reachable.')
         }
     }
+}
 
     return (
         <div className='w-full min-h-screen bg-zinc-950 flex'>

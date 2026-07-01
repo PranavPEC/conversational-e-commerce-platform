@@ -10,56 +10,54 @@ import Cart from './pages/Cart.jsx';
 import Orders from './pages/orders/Orders.jsx';
 import Admin from './pages/admin/Admin.jsx';
 import Navbar from './components/Navbar.jsx';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchUserData } from './features/auth/authThunks.js';
+
+// ── New architecture: fetchUserData is a plain async function ──
+// It dispatches internally via store.dispatch — we do NOT wrap it in dispatch()
+import { fetchUserData } from './redux/reduxActions'
 
 function App() {
 
-  const dispatch = useDispatch();
-  const { userData, authLoading } = useSelector(state => state.auth);
+  const { userData, authLoading } = useSelector(state => state.auth)
 
-  // Auth bootstrap — checks cookie on every app start
   useEffect(() => {
-    dispatch(fetchUserData());
-  }, []);
+    // Call directly — no dispatch() wrapper needed
+    // fetchUserData() handles its own dispatching internally
+    fetchUserData()
 
-  const location = useLocation();
+    // bfcache fix — re-validate auth when browser restores frozen page
+    const handlePageShow = (event) => {
+      if (event.persisted) fetchUserData()
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [])
 
-  // Navbar hidden only on login and signup pages
-  const hideNavbar = ['/login', '/signup'].includes(location.pathname);
+  const location = useLocation()
+  const hideNavbar = ['/login', '/signup'].includes(location.pathname)
 
-  // Show nothing while auth check is in progress
-  // Prevents flash between login/home
-  if (authLoading) return null;
+  if (authLoading) return null
 
   return (
     <>
-      {/* Navbar shown to everyone except on login/signup
-          Navbar.jsx handles two states internally:
-          - No userData → shows Login + Signup buttons
-          - userData    → shows full nav with links, cart, logout */}
       {!hideNavbar && <Navbar />}
 
       <Routes>
 
-        {/* ── Public routes — no auth needed ── */}
+        {/* ── Public routes ── */}
         <Route path='/signup' element={<SignUp />} />
         <Route path='/login' element={<Login />} />
-
-        {/* / — guests see ProductListing, logged-in users see Home */}
         <Route path='/' element={<Home />} />
-
-        {/* Products are public — backend has no checkAuth on these routes */}
         <Route path='/products' element={<ProductListing />} />
         <Route path='/product/:id' element={<ProductDetail />} />
 
-        {/* ── Protected routes — must be logged in ── */}
+        {/* ── Protected routes ── */}
         <Route path='/home' element={userData ? <Home /> : <Navigate to='/login' />} />
         <Route path='/cart' element={userData ? <Cart /> : <Navigate to='/login' />} />
         <Route path='/orders' element={userData ? <Orders /> : <Navigate to='/login' />} />
 
-        {/* Admin — must be logged in AND role === 'admin' */}
+        {/* Admin — logged in AND role === admin */}
         <Route
           path='/admin'
           element={
@@ -71,7 +69,6 @@ function App() {
           }
         />
 
-        {/* Fallback */}
         <Route path='/*' element={userData ? <Home /> : <ProductListing />} />
 
       </Routes>
@@ -79,4 +76,4 @@ function App() {
   )
 }
 
-export default App;
+export default App

@@ -1,12 +1,18 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { logoutUser } from '../features/auth/authThunks.js'
+
+// ── New architecture: logoutUser is a plain async function, call directly ──
+import { logoutUser } from '../redux/reduxActions'
+
+// ── clearCart is still from features/ — not yet migrated ──
+// Will be swapped to ../redux/reduxActions once cartActions.js is migrated
 import { clearCart } from '../features/cart/cartSlice.js'
-import { getInitial } from '../utils/CommonFunctions.js'   // fixed typo: getInital → getInitial
+
+import { getInitial } from '../utils/CommonFunctions.js'
 
 function Navbar() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch()    // still needed for clearCart (RTK action)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -14,28 +20,25 @@ function Navbar() {
   const { userData } = useSelector(state => state.auth)
 
   const handleLogout = async () => {
-    await dispatch(logoutUser())
+    // logoutUser is a plain async function — call directly, no dispatch()
+    await logoutUser()
+    // clearCart is still an RTK action — needs dispatch() until cart is migrated
     dispatch(clearCart())
-    navigate('/login',{replace:true})
+    navigate('/login', { replace: true })
   }
 
   const isActive = (path) => location.pathname === path
 
-  // ── Guest Navbar — shown when not logged in ──
-  // Only shows Logo + Login + Signup
+  // ── Guest Navbar ──
   if (!userData) {
     return (
       <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
-
-        {/* Logo */}
         <div
           onClick={() => navigate('/')}
           className='text-white font-bold text-lg tracking-tight cursor-pointer'
         >
           Shop<span className='text-emerald-400'>AI</span>
         </div>
-
-        {/* Guest actions */}
         <div className='flex items-center gap-3'>
           <button
             onClick={() => navigate('/login')}
@@ -50,16 +53,14 @@ function Navbar() {
             Sign Up
           </button>
         </div>
-
       </nav>
     )
   }
 
-  // ── Authenticated Navbar — full nav with links, cart badge, admin ──
+  // ── Authenticated Navbar ──
   return (
     <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
 
-      {/* Logo */}
       <div
         onClick={() => navigate('/home')}
         className='text-white font-bold text-lg tracking-tight cursor-pointer'
@@ -67,42 +68,32 @@ function Navbar() {
         Shop<span className='text-emerald-400'>AI</span>
       </div>
 
-      {/* Nav Links */}
       <div className='flex items-center gap-6'>
 
         <button
           onClick={() => navigate('/home')}
-          className={`text-sm transition-colors duration-200 ${
-            isActive('/home') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'
-          }`}
+          className={`text-sm transition-colors duration-200 ${isActive('/home') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
         >
           Home
         </button>
 
         <button
           onClick={() => navigate('/products')}
-          className={`text-sm transition-colors duration-200 ${
-            isActive('/products') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'
-          }`}
+          className={`text-sm transition-colors duration-200 ${isActive('/products') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
         >
           Products
         </button>
 
         <button
           onClick={() => navigate('/orders')}
-          className={`text-sm transition-colors duration-200 ${
-            isActive('/orders') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'
-          }`}
+          className={`text-sm transition-colors duration-200 ${isActive('/orders') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
         >
           Orders
         </button>
 
-        {/* Cart with badge */}
         <button
           onClick={() => navigate('/cart')}
-          className={`relative text-sm transition-colors duration-200 ${
-            isActive('/cart') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'
-          }`}
+          className={`relative text-sm transition-colors duration-200 ${isActive('/cart') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
         >
           Cart
           {cartCount > 0 && (
@@ -112,13 +103,10 @@ function Navbar() {
           )}
         </button>
 
-        {/* Admin — only visible to admin role */}
         {userData?.role === 'admin' && (
           <button
             onClick={() => navigate('/admin')}
-            className={`text-sm transition-colors duration-200 ${
-              isActive('/admin') ? 'text-emerald-400 font-medium' : 'text-emerald-600 hover:text-emerald-400'
-            }`}
+            className={`text-sm transition-colors duration-200 ${isActive('/admin') ? 'text-emerald-400 font-medium' : 'text-emerald-600 hover:text-emerald-400'}`}
           >
             Admin
           </button>
@@ -126,9 +114,7 @@ function Navbar() {
 
       </div>
 
-      {/* User info + Logout */}
       <div className='flex items-center gap-4'>
-
         <div className='flex items-center gap-2'>
           {userData?.profileImage ? (
             <img
@@ -150,7 +136,6 @@ function Navbar() {
         >
           Logout
         </button>
-
       </div>
 
     </nav>

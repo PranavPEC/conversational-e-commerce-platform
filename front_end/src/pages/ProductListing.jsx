@@ -1,24 +1,18 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchProducts } from '../features/products/productThunks.js'
-
+import { useSelector } from 'react-redux'
+import { fetchProducts } from '../redux/reduxActions'
 
 function ProductListing() {
-  
-  const navigate = useNavigate();
-  const dispatch=useDispatch();
-  const {
-  products,
-  loading,
-} = useSelector((state) => state.products)
-const { userData } = useSelector(state => state.auth);
+  const navigate = useNavigate()
+
+  const { products, productsLoading } = useSelector(state => state.products)
 
   useEffect(() => {
-  dispatch(fetchProducts())
-}, [dispatch])
+    fetchProducts()   // plain call — no dispatch()
+  }, [])
 
-  if (loading) {
+  if (productsLoading) {
     return (
       <div className='w-full min-h-screen bg-zinc-950 flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>Loading products...</p>
@@ -33,7 +27,6 @@ const { userData } = useSelector(state => state.auth);
       </div>
     )
   }
-  
 
   return (
     <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
@@ -44,23 +37,12 @@ const { userData } = useSelector(state => state.auth);
         {products.map((product) => (
           <div
             key={product._id}
-            onClick={() => {
-    if (!userData) {
-        navigate('/login')
-    } else {
-        navigate('/product/' + product._id)
-    }
-}}
+            onClick={() => navigate('/product/' + product._id)}
             className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
           >
-            {/* Product Image */}
             <div className='w-full h-48 overflow-hidden bg-zinc-800'>
               {product.image ? (
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className='w-full h-full object-cover'
-                />
+                <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
               ) : (
                 <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>
                   No Image
@@ -68,13 +50,14 @@ const { userData } = useSelector(state => state.auth);
               )}
             </div>
 
-            {/* Product Info */}
             <div className='p-4 flex flex-col gap-2 flex-1'>
               <h2 className='text-white text-sm font-medium leading-tight'>{product.title}</h2>
               <p className='text-zinc-400 text-xs line-clamp-2'>{product.description}</p>
 
               <div className='mt-auto pt-3 flex items-center justify-between'>
-                <span className='text-emerald-400 font-semibold text-sm'>₹{product.price.toLocaleString("en-IN")}</span>
+                <span className='text-emerald-400 font-semibold text-sm'>
+                  ₹{product.price.toLocaleString('en-IN')}
+                </span>
                 {product.stock === 0 ? (
                   <span className='text-xs text-red-400 font-medium'>Out of stock</span>
                 ) : (
@@ -82,7 +65,6 @@ const { userData } = useSelector(state => state.auth);
                 )}
               </div>
             </div>
-
           </div>
         ))}
       </div>
@@ -91,4 +73,4 @@ const { userData } = useSelector(state => state.auth);
   )
 }
 
-export default ProductListing;
+export default ProductListing

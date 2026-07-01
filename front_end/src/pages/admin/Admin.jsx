@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { createProduct, updateProduct, deleteProduct } from '../../features/admin/adminThunks.js'
-import { clearAdminStatus, setAdminProducts } from '../../features/admin/adminSlice.js'
-import { fetchProducts } from '../../features/products/productThunks.js'
+import { useSelector } from 'react-redux'
+import {
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    fetchProducts,
+    setAdminProducts,
+    clearAdminStatus,
+} from '../../redux/reduxActions'
 
-// ── Admin components ──
 import AdminHeader from './AdminHeader.jsx'
 import AdminToast from './AdminToast.jsx'
 import ProductForm from './ProductForm.jsx'
 import ProductTable from './ProductTable.jsx'
 import DeleteModal from './DeleteModal.jsx'
-
-// ── Common Functions ──
 import { buildFormData } from '../../utils/CommonFunctions.js'
 
 const EMPTY_FORM = { title: '', description: '', price: '', stock: '' }
 
 function Admin() {
-    const dispatch = useDispatch()
-
-    const { products, loading, error, success } = useSelector(state => state.admin)
+    // New state keys from adminReducers — adminLoading/adminError/adminSuccess
+    const { products, adminLoading, adminError, adminSuccess } = useSelector(state => state.admin)
     const { products: publicProducts } = useSelector(state => state.products)
 
-    // ── Local state ──
     const [form, setForm] = useState(EMPTY_FORM)
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState(null)
@@ -30,27 +30,23 @@ function Admin() {
     const [deleteTarget, setDeleteTarget] = useState(null)
     const [showForm, setShowForm] = useState(false)
 
-    // ── Fetch products on mount ──
     useEffect(() => {
-        dispatch(fetchProducts())
-    }, [dispatch])
+        fetchProducts()   // plain call
+    }, [])
 
-    // ── Sync public products into adminSlice ──
     useEffect(() => {
         if (publicProducts.length > 0) {
-            dispatch(setAdminProducts(publicProducts))
+            setAdminProducts(publicProducts)   // plain call — dispatches internally
         }
     }, [publicProducts])
 
-    // ── Auto-clear success/error after 3 seconds ──
     useEffect(() => {
-        if (success || error) {
-            const t = setTimeout(() => dispatch(clearAdminStatus()), 3000)
+        if (adminSuccess || adminError) {
+            const t = setTimeout(() => clearAdminStatus(), 3000)
             return () => clearTimeout(t)
         }
-    }, [success, error])
+    }, [adminSuccess, adminError])
 
-    // ── Image pick handler ──
     const handleImageChange = (e) => {
         const file = e.target.files[0]
         if (!file) return
@@ -58,7 +54,6 @@ function Admin() {
         setImagePreview(URL.createObjectURL(file))
     }
 
-    // ── Open form in Edit mode ──
     const handleEdit = (product) => {
         setEditingProduct(product)
         setForm({
@@ -73,7 +68,6 @@ function Admin() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    // ── Reset to Create mode ──
     const handleResetForm = () => {
         setEditingProduct(null)
         setForm(EMPTY_FORM)
@@ -82,25 +76,21 @@ function Admin() {
         setShowForm(false)
     }
 
-    // ── Submit — create or update ──
     const handleSubmit = async () => {
         if (!form.title || !form.description || !form.price || !form.stock) return
-
-        const formData = buildFormData(form,imageFile);
+        const formData = buildFormData(form, imageFile)
 
         if (editingProduct) {
-            await dispatch(updateProduct({ id: editingProduct._id, formData }))
+            await updateProduct({ id: editingProduct._id, formData })   // plain call
         } else {
-            await dispatch(createProduct(formData))
+            await createProduct(formData)   // plain call
         }
-
         handleResetForm()
     }
 
-    // ── Delete confirmed ──
     const handleDeleteConfirm = async () => {
         if (!deleteTarget) return
-        await dispatch(deleteProduct(deleteTarget._id))
+        await deleteProduct(deleteTarget._id)   // plain call
         setDeleteTarget(null)
     }
 
@@ -108,14 +98,9 @@ function Admin() {
         <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
             <div className='max-w-5xl mx-auto flex flex-col gap-8'>
 
-                <AdminHeader
-                    onAddClick={() => { handleResetForm(); setShowForm(true) }}
-                />
+                <AdminHeader onAddClick={() => { handleResetForm(); setShowForm(true) }} />
 
-                <AdminToast
-                    success={success}
-                    error={error}
-                />
+                <AdminToast success={adminSuccess} error={adminError} />
 
                 {showForm && (
                     <ProductForm
@@ -126,7 +111,7 @@ function Admin() {
                         handleSubmit={handleSubmit}
                         handleResetForm={handleResetForm}
                         editingProduct={editingProduct}
-                        loading={loading}
+                        loading={adminLoading}
                     />
                 )}
 
@@ -140,7 +125,7 @@ function Admin() {
 
             <DeleteModal
                 deleteTarget={deleteTarget}
-                loading={loading}
+                loading={adminLoading}
                 onConfirm={handleDeleteConfirm}
                 onCancel={() => setDeleteTarget(null)}
             />

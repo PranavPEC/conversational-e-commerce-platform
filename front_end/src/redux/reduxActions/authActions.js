@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { SERVER_URL } from "../../utils/APIConfig";
-
+import { GET_USER_DATA_URL,LOGOUT_URL } from "../../config/urls";
 import store from "../reduxStore";
 
 import {
@@ -18,7 +18,7 @@ export const fetchUserData = async () => {
 
   try {
     const { data } = await axios.get(
-      SERVER_URL + "/getuserdata",
+      GET_USER_DATA_URL,
       {
         withCredentials: true,
       }
@@ -40,7 +40,7 @@ export const logoutUser = async () => {
 
   try {
     await axios.post(
-      SERVER_URL + "/logout",
+      LOGOUT_URL,
       {},
       {
         withCredentials: true,

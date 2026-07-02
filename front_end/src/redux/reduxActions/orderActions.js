@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { SERVER_URL } from "../../utils/APIConfig"
+import { CREATE_RAZORPAY_ORDER_URL,VERIFY_PAYMENT_URL,GET_MY_ORDERS_URL,CANCEL_ORDER_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
     setPendingOrder,
@@ -25,7 +26,7 @@ export const createRazorpayOrder = async ({ address }) => {
 
     try {
         const { data } = await axios.post(
-            SERVER_URL + "/payment/create-order",
+            CREATE_RAZORPAY_ORDER_URL,
             { address },
             { withCredentials: true }
         )
@@ -53,7 +54,7 @@ export const verifyRazorpayPayment = async ({
 
     try {
         const { data } = await axios.post(
-            SERVER_URL + "/payment/verify",
+            VERIFY_PAYMENT_URL,
             { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId },
             { withCredentials: true }
         )
@@ -76,7 +77,7 @@ export const fetchUserOrders = async () => {
 
     try {
         const { data } = await axios.get(
-            SERVER_URL + "/order/myorders",
+            GET_MY_ORDERS_URL,
             { withCredentials: true }
         )
         dispatch(setOrders(data.orders))
@@ -97,7 +98,7 @@ export const cancelOrder = async (orderId) => {
 
     try {
         const { data } = await axios.put(
-            SERVER_URL + "/order/cancel/" + orderId,
+            CANCEL_ORDER_URL(orderId),
             {},
             { withCredentials: true }
         )

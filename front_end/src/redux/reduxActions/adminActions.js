@@ -2,16 +2,17 @@
 
 import axios from "axios"
 import { SERVER_URL } from "../../utils/APIConfig"
+import { CREATE_PRODUCT_URL,UPDATE_PRODUCT_URL,DELETE_PRODUCT_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
-    setAdminProducts,
+    setAdminProducts as _setAdminProducts,
     addAdminProduct,
     updateAdminProduct,
     removeAdminProduct,
     setAdminLoading,
     setAdminError,
     setAdminSuccess,
-    clearAdminStatus,
+    clearAdminStatus as _clearAdminStatus,
 } from "../reduxReducers/adminReducers"
 
 const { dispatch } = store
@@ -24,7 +25,7 @@ export const createProduct = async (formData) => {
 
     try {
         const { data } = await axios.post(
-            SERVER_URL + "/product/create",
+            CREATE_PRODUCT_URL,
             formData,
             { withCredentials: true }
         )
@@ -49,7 +50,7 @@ export const updateProduct = async ({ id, formData }) => {
 
     try {
         const { data } = await axios.put(
-            SERVER_URL + "/product/update/" + id,
+            UPDATE_PRODUCT_URL(id),
             formData,
             { withCredentials: true }
         )
@@ -74,7 +75,7 @@ export const deleteProduct = async (id) => {
 
     try {
         await axios.delete(
-            SERVER_URL + "/product/delete/" + id,
+            DELETE_PRODUCT_URL(id),
             { withCredentials: true }
         )
         dispatch(removeAdminProduct(id))
@@ -90,4 +91,10 @@ export const deleteProduct = async (id) => {
     }
 }
 
-export { setAdminProducts, clearAdminStatus }
+export const setAdminProducts = (products) => {
+    dispatch(_setAdminProducts(products))
+}
+
+export const clearAdminStatus = () => {
+    dispatch(_clearAdminStatus())
+}

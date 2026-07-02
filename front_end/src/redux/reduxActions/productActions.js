@@ -9,6 +9,7 @@
 
 import axios from "axios"
 import { SERVER_URL } from "../../utils/APIConfig"
+import { GET_ALL_PRODUCTS_URL,GET_PRODUCT_BY_ID_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
     setProducts,
@@ -27,7 +28,7 @@ export const fetchProducts = async () => {
     dispatch(setProductsError(null))
 
     try {
-        const { data } = await axios.get(SERVER_URL + "/product/all")
+        const { data } = await axios.get(GET_ALL_PRODUCTS_URL)
         dispatch(setProducts(data.products))
         return data.products
     } catch (error) {
@@ -48,7 +49,7 @@ export const fetchProductById = async (id) => {
     dispatch(setProductsError(null))
 
     try {
-        const { data } = await axios.get(SERVER_URL + "/product/" + id)
+        const { data } = await axios.get(GET_PRODUCT_BY_ID_URL(id))
         dispatch(setSelectedProduct(data.product))
         return data.product
     } catch (error) {

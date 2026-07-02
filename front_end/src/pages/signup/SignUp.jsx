@@ -5,6 +5,15 @@ import { fetchUserData } from '../../redux/reduxActions/authActions.js'
 import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
+// ── Validations ──
+import {
+    checkIsEmpty,
+    isValidEmail,
+    checkPasswordValidations,
+    checkPasswordMatch,
+    checkNameValidation,
+} from '../../utils/validations.js'
+
 // ── Common components ──
 import Toast from '../../components/common_components/Toast.jsx'
 import SocialButtons from '../../components/common_components/SocialButtons.jsx'
@@ -29,88 +38,73 @@ function SignUp() {
     const [showConfirm, setShowConfirm] = useState(false)
 
     // ── Avatar state ──
-    const [frontendImage, setFrontendImage] = useState(null)  // blob URL for preview
-    const [backendImage, setBackendImage] = useState(null)    // actual File object
+    const [frontendImage, setFrontendImage] = useState(null)
+    const [backendImage, setBackendImage] = useState(null)
 
     // ── Avatar picker callback ──
-    // AvatarPicker calls this with (file, previewUrl) when user picks an image
     const handleImageChange = (file, previewUrl) => {
         setBackendImage(file)
         setFrontendImage(previewUrl)
     }
 
+    // ── Validations — same pattern as inspiration project's _checkValidations ──
+    // Each validator shows its own error and returns false
+    // We just check the return value and return early
+    const _checkValidations = () => {
+        if (!checkNameValidation(name, showToast)) return false
+        if (checkIsEmpty(email)) { showToast("Please enter your email."); return false }
+        if (!isValidEmail(email)) { showToast("Please enter a valid email address."); return false }
+        if (!checkPasswordValidations(password, showToast)) return false
+        if (!checkPasswordMatch(password, confirmPassword, showToast)) return false
+        return true
+    }
+
     // ── Submit handler ──
-const handleSignUp = async (e) => {
-    e.preventDefault()
+    const handleSignUp = async (e) => {
+        e.preventDefault()
 
-    // ── Password validations ──
-    if (password.length < 8) {
-        showToast('Password must be at least 8 characters long.')
-        return
-    }
+        // Run all validations first — stop if any fail
+        if (!_checkValidations()) return
 
-    if (!/[A-Z]/.test(password)) {
-        showToast('Password must contain at least one uppercase letter.')
-        return
-    }
+        try {
+            const formData = new FormData()
+            formData.append('name', name)
+            formData.append('email', email)
+            formData.append('password', password)
+            if (backendImage) {
+                formData.append('profileImage', backendImage)
+            }
 
-    if (!/[0-9]/.test(password)) {
-        showToast('Password must contain at least one number.')
-        return
-    }
+            await axios.post(SERVER_URL + '/signup', formData, {
+                withCredentials: true,
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
 
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-        showToast('Password must contain at least one special character.')
-        return
-    }
-
-    if (password !== confirmPassword) {
-        showToast('Passwords do not match.')
-        return
-    }
-
-    try {
-        const formData = new FormData()
-        formData.append('name', name)
-        formData.append('email', email)
-        formData.append('password', password)
-        if (backendImage) {
-            formData.append('profileImage', backendImage)
-        }
-
-        await axios.post(SERVER_URL + '/signup', formData, {
-            withCredentials: true,
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-
-        await fetchUserData()
-        navigate('/home')
-    } catch (error) {
-        if (error.response) {
-            showToast(error.response.data.message)
-        } else {
-            showToast('Server not reachable.')
+            // fetchUserData dispatches internally — no dispatch() needed here
+            await fetchUserData()
+            navigate('/home')
+        } catch (error) {
+            if (error.response) {
+                showToast(error.response.data.message)
+            } else {
+                showToast('Server not reachable.')
+            }
         }
     }
-}
 
     return (
         <div className='w-full min-h-screen bg-zinc-950 flex'>
 
-            {/* Toast notification — shared with Login */}
             <Toast
                 toast={toast}
                 toastVisible={toastVisible}
                 dismissToast={dismissToast}
             />
 
-            {/* Left panel — signup-specific headline */}
             <SignUpLeftPanel />
 
-            {/* Right panel */}
             <div className='w-full lg:w-[55%] bg-zinc-950 lg:bg-zinc-900 flex flex-col justify-center px-8 md:px-16 py-10 overflow-y-auto'>
 
-                {/* Switch to login */}
                 <div className='flex justify-end mb-6'>
                     <p className='text-zinc-400 text-sm'>
                         Already have an account?{' '}
@@ -123,7 +117,6 @@ const handleSignUp = async (e) => {
                     </p>
                 </div>
 
-                {/* Header — avatar picker + title */}
                 <div className='flex items-center gap-4 mb-8'>
                     <AvatarPicker
                         frontendImage={frontendImage}
@@ -140,7 +133,6 @@ const handleSignUp = async (e) => {
                     </div>
                 </div>
 
-                {/* Form — name, email, password, confirm, submit */}
                 <SignUpForm
                     name={name} setName={setName}
                     email={email} setEmail={setEmail}
@@ -151,10 +143,8 @@ const handleSignUp = async (e) => {
                     handleSignUp={handleSignUp}
                 />
 
-                {/* Divider + Google, Apple, Facebook — shared with Login */}
                 <SocialButtons />
 
-                {/* Terms */}
                 <p className='text-zinc-500 text-xs text-center mt-5'>
                     By signing up, you agree to our{' '}
                     <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>

@@ -2,35 +2,42 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react'
-import { useDispatch } from 'react-redux'
 import { fetchUserData } from '../../redux/reduxActions/authActions.js'
 import { SERVER_URL } from '../../utils/APIConfig.js'
 import useToast from '../../utils/useToast.js'
 
-// ── Common components ──
-import Toast from '../../components/common_components/Toast.jsx'
-import SocialButtons from '../../components/common_components/SocialButtons.jsx'
+// ── Validations ──
+import { checkIsEmpty, isValidEmail } from '../../utils/validations.js'
 
 // ── Child components ──
+import Toast from '../../components/common_components/Toast.jsx'
 import LoginLeftPanel from './LoginLeftPanel.jsx'
 import LoginForm from './LoginForm.jsx'
-
+import SocialButtons from '../../components/common_components/SocialButtons.jsx'
 
 function Login() {
-    const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    // ── Toast ──
     const { toast, toastVisible, showToast, dismissToast } = useToast()
 
-    // ── Form state ──
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
+    // ── Validations ──
+    const _checkValidations = () => {
+        if (checkIsEmpty(email)) { showToast("Please enter your email."); return false }
+        if (!isValidEmail(email)) { showToast("Please enter a valid email address."); return false }
+        if (checkIsEmpty(password)) { showToast("Please enter your password."); return false }
+        return true
+    }
+
     // ── Submit handler ──
     const handleLogin = async (e) => {
         e.preventDefault()
+
+        if (!_checkValidations()) return
+
         try {
             await axios.post(
                 SERVER_URL + '/login',
@@ -51,20 +58,16 @@ function Login() {
     return (
         <div className='w-full min-h-screen bg-zinc-950 flex'>
 
-            {/* Toast notification */}
             <Toast
                 toast={toast}
                 toastVisible={toastVisible}
                 dismissToast={dismissToast}
             />
 
-            {/* Left panel — logo, headline, features, social proof */}
             <LoginLeftPanel />
 
-            {/* Right panel — form */}
             <div className='w-full lg:w-[55%] bg-zinc-950 lg:bg-zinc-900 flex flex-col justify-center px-8 md:px-16 py-10'>
 
-                {/* Switch to signup */}
                 <div className='flex justify-end mb-6'>
                     <p className='text-zinc-400 text-sm'>
                         New here?{' '}
@@ -77,7 +80,6 @@ function Login() {
                     </p>
                 </div>
 
-                {/* Header */}
                 <div className='flex items-center gap-4 mb-8'>
                     <div className='w-14 h-14 rounded-full bg-emerald-500 bg-opacity-20 border-2 border-emerald-500 flex items-center justify-center flex-shrink-0'>
                         <Lock size={22} className='text-emerald-400' />
@@ -88,7 +90,6 @@ function Login() {
                     </div>
                 </div>
 
-                {/* Form — email, password, submit */}
                 <LoginForm
                     email={email}
                     setEmail={setEmail}
@@ -99,10 +100,8 @@ function Login() {
                     handleLogin={handleLogin}
                 />
 
-                {/* Divider + Google, Apple, Facebook buttons */}
                 <SocialButtons />
 
-                {/* Terms */}
                 <p className='text-zinc-500 text-xs text-center mt-5'>
                     By logging in, you agree to our{' '}
                     <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>

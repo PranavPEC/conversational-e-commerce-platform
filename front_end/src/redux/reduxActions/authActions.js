@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { SERVER_URL } from "../../utils/APIConfig";
-import { GET_USER_DATA_URL,LOGIN_URL,LOGOUT_URL, SIGNUP_URL } from "../../config/urls";
+import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL } from "../../config/urls";
 import store from "../reduxStore";
 
 import {
@@ -57,11 +57,11 @@ export const logoutUser = async () => {
   }
 };
 
-export const loginUser = async ({email,password}) => {
+export const loginUser = async ({ email, password }) => {
   try {
     await axios.post(
       LOGIN_URL,
-      {email,password},
+      { email, password },
       {
         withCredentials: true,
       }

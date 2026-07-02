@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { fetchUserData } from '../../redux/reduxActions/authActions.js'
-import { SERVER_URL } from '../../utils/APIConfig.js'
+import { fetchUserData, signupUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
 
 // ── Validations ──
@@ -36,6 +35,7 @@ function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     // ── Avatar state ──
     const [frontendImage, setFrontendImage] = useState(null)
@@ -74,15 +74,26 @@ function SignUp() {
             if (backendImage) {
                 formData.append('profileImage', backendImage)
             }
+            setLoading(true);
+            try {
+                await signupUser(formData);
+                await fetchUserData()
+                navigate('/home')
+            }
+            catch (error) {
+                if (error.response) {
+                    showToast(error.response.data.message)
+                } else {
+                    showToast('Server not reachable.')
+                }
+            }
+            finally {
+                setLoading(false);
+            }
 
-            await axios.post(SERVER_URL + '/signup', formData, {
-                withCredentials: true,
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
 
             // fetchUserData dispatches internally — no dispatch() needed here
-            await fetchUserData()
-            navigate('/home')
+
         } catch (error) {
             if (error.response) {
                 showToast(error.response.data.message)
@@ -141,6 +152,7 @@ function SignUp() {
                     showPassword={showPassword} setShowPassword={setShowPassword}
                     showConfirm={showConfirm} setShowConfirm={setShowConfirm}
                     handleSignUp={handleSignUp}
+                    loading={loading}
                 />
 
                 <SocialButtons />

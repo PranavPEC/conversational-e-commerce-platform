@@ -3,7 +3,7 @@ import { AlertCircle, X } from 'lucide-react'
 
 // Shared by Login.jsx and SignUp.jsx
 // Props:
-//   toast        — string message to show, null when hidden
+//   toast        — string message to show, null when hidden   
 //   toastVisible — boolean controlling opacity/translate animation
 //   dismissToast — function to manually close the toast
 

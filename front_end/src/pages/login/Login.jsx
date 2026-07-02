@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react'
-import { fetchUserData } from '../../redux/reduxActions/authActions.js'
-import { SERVER_URL } from '../../utils/APIConfig.js'
+import { fetchUserData, loginUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
 
 // ── Validations ──
@@ -23,6 +22,7 @@ function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const [loading,setLoading]=useState(false);
 
     // ── Validations ──
     const _checkValidations = () => {
@@ -38,12 +38,9 @@ function Login() {
 
         if (!_checkValidations()) return
 
+        setLoading(true);
         try {
-            await axios.post(
-                SERVER_URL + '/login',
-                { email, password },
-                { withCredentials: true }
-            )
+            await loginUser({email,password});
             await fetchUserData()
             navigate('/home')
         } catch (error) {
@@ -52,6 +49,9 @@ function Login() {
             } else {
                 showToast('Server not reachable.')
             }
+        }
+        finally{
+            setLoading(false);
         }
     }
 
@@ -98,6 +98,7 @@ function Login() {
                     showPassword={showPassword}
                     setShowPassword={setShowPassword}
                     handleLogin={handleLogin}
+                    loading={loading}
                 />
 
                 <SocialButtons />

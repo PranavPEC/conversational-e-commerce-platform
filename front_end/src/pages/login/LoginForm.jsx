@@ -12,7 +12,8 @@ function LoginForm({
     email, setEmail,
     password, setPassword,
     showPassword, setShowPassword,
-    handleLogin
+    handleLogin,
+    loading
 }) {
     return (
         <form onSubmit={handleLogin} className='flex flex-col gap-5'>
@@ -62,9 +63,10 @@ function LoginForm({
             {/* Submit */}
             <button
                 type='submit'
+                disabled={loading}
                 className='w-full h-12 mt-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
             >
-                Log In
+                {loading ? 'Logging in...' : 'Log In'}
                 <ArrowRight size={16} />
             </button>
 

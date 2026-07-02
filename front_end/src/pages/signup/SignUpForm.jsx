@@ -17,7 +17,8 @@ function SignUpForm({
     confirmPassword, setConfirmPassword,
     showPassword, setShowPassword,
     showConfirm, setShowConfirm,
-    handleSignUp
+    handleSignUp,
+    loading
 }) {
     return (
         <form onSubmit={handleSignUp} className='flex flex-col gap-5'>
@@ -99,9 +100,10 @@ function SignUpForm({
             {/* Submit */}
             <button
                 type='submit'
+                disabled={loading}
                 className='w-full h-12 mt-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
             >
-                Create Account
+                {loading ? 'Creating Account...' : 'Creat Account'}
                 <ArrowRight size={16} />
             </button>
 

@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -7,7 +7,7 @@ import { logoutUser } from '../redux/reduxActions'
 
 // ── clearCart is still from features/ — not yet migrated ──
 // Will be swapped to ../redux/reduxActions once cartActions.js is migrated
-import { clearCart } from '../features/cart/cartSlice.js'
+import { clearCart } from '../redux/reduxActions'
 
 import { getInitial } from '../utils/CommonFunctions.js'
 

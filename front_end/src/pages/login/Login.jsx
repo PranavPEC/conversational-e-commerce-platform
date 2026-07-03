@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react'
 import { fetchUserData, loginUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
+
 
 // ── Validations ──
 import { checkIsEmpty, isValidEmail } from '../../utils/validations.js'
@@ -13,6 +13,7 @@ import Toast from '../../components/common_components/Toast.jsx'
 import LoginLeftPanel from './LoginLeftPanel.jsx'
 import LoginForm from './LoginForm.jsx'
 import SocialButtons from '../../components/common_components/SocialButtons.jsx'
+import BrandLogo from '../../components/common_components/BrandLogo.jsx'
 
 function Login() {
     const navigate = useNavigate()
@@ -66,7 +67,11 @@ function Login() {
 
             <LoginLeftPanel />
 
+            
+
             <div className='w-full lg:w-[55%] bg-zinc-950 lg:bg-zinc-900 flex flex-col justify-center px-8 md:px-16 py-10'>
+
+            <BrandLogo />
 
                 <div className='flex justify-end mb-6'>
                     <p className='text-zinc-400 text-sm'>

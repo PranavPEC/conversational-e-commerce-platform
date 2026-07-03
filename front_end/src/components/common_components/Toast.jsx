@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { AlertCircle, X } from 'lucide-react'
 
 // Shared by Login.jsx and SignUp.jsx

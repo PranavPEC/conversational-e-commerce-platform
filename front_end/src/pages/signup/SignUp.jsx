@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import  { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchUserData, signupUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
@@ -16,6 +15,7 @@ import {
 // ── Common components ──
 import Toast from '../../components/common_components/Toast.jsx'
 import SocialButtons from '../../components/common_components/SocialButtons.jsx'
+import BrandLogo from '../../components/common_components/BrandLogo.jsx'
 
 // ── SignUp-specific components ──
 import SignUpLeftPanel from './SignUpLeftPanel.jsx'
@@ -115,6 +115,8 @@ function SignUp() {
             <SignUpLeftPanel />
 
             <div className='w-full lg:w-[55%] bg-zinc-950 lg:bg-zinc-900 flex flex-col justify-center px-8 md:px-16 py-10 overflow-y-auto'>
+                
+                <BrandLogo />
 
                 <div className='flex justify-end mb-6'>
                     <p className='text-zinc-400 text-sm'>

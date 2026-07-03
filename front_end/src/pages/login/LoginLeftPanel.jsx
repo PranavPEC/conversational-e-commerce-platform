@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
 
 // Static panel — no props, no logic

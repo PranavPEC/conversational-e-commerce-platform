@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
 
 // Props:
@@ -103,7 +103,7 @@ function SignUpForm({
                 disabled={loading}
                 className='w-full h-12 mt-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
             >
-                {loading ? 'Creating Account...' : 'Creat Account'}
+                {loading ? 'Creating...' : 'Create'}
                 <ArrowRight size={16} />
             </button>
 

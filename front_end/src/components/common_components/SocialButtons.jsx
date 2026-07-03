@@ -1,4 +1,4 @@
-import React from 'react'
+
 import colors from '../../constants/colors/colors'
 import { localStrings } from '../../constants/lang'
 

@@ -12,7 +12,9 @@ import Admin from './pages/admin/Admin.jsx';
 import Navbar from './components/Navbar.jsx';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
-
+import ForgotPassword from './pages/forgot_password/ForgotPassword.jsx';
+import VerifyOTP from './pages/forgot_password/VerifyOTP.jsx';
+import ResetPassword from './pages/forgot_password/ResetPassword.jsx';
 // ── New architecture: fetchUserData is a plain async function ──
 // It dispatches internally via store.dispatch — we do NOT wrap it in dispatch()
 import { fetchUserData } from './redux/reduxActions'
@@ -35,7 +37,7 @@ function App() {
   }, [])
 
   const location = useLocation()
-  const hideNavbar = ['/login', '/signup'].includes(location.pathname)
+  const hideNavbar = ['/login', '/signup','/forgot-password','/verify-otp','/reset-password'].includes(location.pathname)
 
   if (authLoading) return null
 
@@ -51,6 +53,10 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/products' element={<ProductListing />} />
         <Route path='/product/:id' element={<ProductDetail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
 
         {/* ── Protected routes ── */}
         <Route path='/home' element={userData ? <Home /> : <Navigate to='/login' />} />

@@ -1,5 +1,6 @@
-import React from 'react'
+
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // Props:
 //   email, setEmail           — email field state
@@ -15,7 +16,9 @@ function LoginForm({
     handleLogin,
     loading
 }) {
+    const navigate=useNavigate()
     return (
+        
         <form onSubmit={handleLogin} className='flex flex-col gap-5'>
 
             {/* Email */}
@@ -37,9 +40,7 @@ function LoginForm({
             <div className='flex flex-col gap-1.5'>
                 <div className='flex items-center justify-between'>
                     <label className='text-zinc-300 text-sm font-medium'>Password</label>
-                    <span className='text-emerald-400 text-xs hover:text-emerald-300 cursor-pointer transition-colors duration-200'>
-                        Forgot password?
-                    </span>
+                    
                 </div>
                 <div className='relative'>
                     <Lock size={16} className='absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500' />
@@ -59,7 +60,9 @@ function LoginForm({
                     </button>
                 </div>
             </div>
-
+            <span className='text-emerald-400 text-xs hover:text-emerald-300 cursor-pointer transition-colors duration-200' onClick={() => navigate("/forgot-password")}>
+                        Forgot password?
+                    </span>
             {/* Submit */}
             <button
                 type='submit'

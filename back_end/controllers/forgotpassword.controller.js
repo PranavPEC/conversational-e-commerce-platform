@@ -2,9 +2,9 @@ import User from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 export const forgotPassword = async (req, res) => {
-    console.log("Forgot Password Controller Hits.")
+    //console.log("Forgot Password Controller Hits.")
     try {
-        console.log("Entered Forgot Password Controller try Block.")
+        //console.log("Entered Forgot Password Controller try Block.")
         const { email } = req.body;
         if (!email) {
             return res.status(400).json({

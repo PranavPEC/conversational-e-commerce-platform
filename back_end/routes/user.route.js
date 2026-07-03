@@ -3,6 +3,8 @@ import { createNewUser, deleteUser, getCurrentUser, getUserById, home , login, l
 import { upload } from "../middleware/multer.js";
 import { checkAuth } from "../middleware/checkAuth.user.js";
 import { forgotPassword } from "../controllers/forgotpassword.controller.js";
+import { verifyOTP } from "../controllers/verifyotp.controller.js";
+import { resetPassword } from "../controllers/resetpassword.controller.js";
 const userRouter=express.Router();
 
 userRouter.get("/",home);
@@ -14,6 +16,8 @@ userRouter.put("/update/:id",checkAuth,updateUser);
 userRouter.delete("/delete/:id",checkAuth,deleteUser);
 userRouter.get("/getuserdata",checkAuth,getCurrentUser);
 userRouter.post("/forgot-password",forgotPassword);
+userRouter.post("/verify-otp", verifyOTP);
+userRouter.post("/reset-password", resetPassword);
 
 
 export default userRouter;

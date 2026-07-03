@@ -1,8 +1,7 @@
 // src/redux/reduxActions/authActions.js
 
 import axios from "axios";
-import { SERVER_URL } from "../../utils/APIConfig";
-import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL } from "../../config/urls";
+import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,FORGOT_PASSWORD_URL,VERIFY_OTP_URL,RESET_PASSWORD_URL } from "../../config/urls";
 import store from "../reduxStore";
 
 import {
@@ -69,7 +68,6 @@ export const loginUser = async ({ email, password }) => {
     return true;
   } catch (error) {
     throw error;
-  } finally {
   }
 };
 
@@ -86,6 +84,63 @@ export const signupUser = async (formData) => {
     return true;
   } catch (error) {
     throw error;
-  } finally {
+  } 
+};
+// ── Forgot Password ──
+export const forgotPassword = async ({ email }) => {
+  try {
+    const { data } = await axios.post(
+      FORGOT_PASSWORD_URL,
+      { email },
+      {
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// ── Verify OTP ──
+export const verifyOTP = async ({ email, otp }) => {
+  try {
+    const { data } = await axios.post(
+      VERIFY_OTP_URL,
+      { email, otp },
+      {
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// ── Reset Password ──
+export const resetPassword = async ({
+  email,
+  otp,
+  newPassword,
+}) => {
+  try {
+    const { data } = await axios.post(
+      RESET_PASSWORD_URL,
+      {
+        email,
+        otp,
+        newPassword,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    throw error;
   }
 };

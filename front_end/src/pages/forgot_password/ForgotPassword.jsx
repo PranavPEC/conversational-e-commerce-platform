@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
 import useToast from "../../utils/useToast.js";
+import { forgotPassword } from "../../redux/reduxActions/authActions.js";
 
 // ── Validations ──
 import { checkIsEmpty, isValidEmail } from "../../utils/validations.js";
@@ -43,15 +44,25 @@ function ForgotPassword() {
         setLoading(true);
 
         try {
-            // Backend API will be connected in the next step
-            console.log(email);
 
-            navigate("/verify-otp", {
-                state: { email },
-            });
+            const response = await forgotPassword({ email });
+
+            showToast(response.message);
+
+            setTimeout(() => {
+                navigate("/verify-otp", {
+                    state: { email },
+                });
+            }, 1000);
+
         } catch (error) {
-            console.log(error);
-            showToast("Something went wrong.");
+
+            if (error.response) {
+                showToast(error.response.data.message);
+            } else {
+                showToast("Server not reachable.");
+            }
+
         } finally {
             setLoading(false);
         }

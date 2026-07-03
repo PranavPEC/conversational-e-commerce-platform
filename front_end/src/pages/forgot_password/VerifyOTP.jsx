@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import useToast from "../../utils/useToast.js";
+import { verifyOTP,forgotPassword } from "../../redux/reduxActions/authActions.js";
 
 // ── Child Components ──
 import Toast from "../../components/common_components/Toast.jsx";
@@ -40,40 +41,62 @@ function VerifyOTP() {
 
     // ── Verify OTP ──
     const handleVerifyOTP = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        if (!_checkValidations()) return;
+    if (!_checkValidations()) return;
 
-        setLoading(true);
+    setLoading(true);
 
-        try {
-            const enteredOTP = otp.join("");
+    try {
+        const enteredOTP = otp.join("");
 
-            console.log({
-                email,
-                otp: enteredOTP,
-            });
+        const response = await verifyOTP({
+            email,
+            otp: enteredOTP,
+        });
 
-            // Backend API will come here
+        showToast(response.message);
 
+        setTimeout(() => {
             navigate("/reset-password", {
                 state: {
                     email,
+                    otp: enteredOTP,
                 },
             });
-        } catch (error) {
-            console.log(error);
-            showToast("Invalid OTP.");
-        } finally {
-            setLoading(false);
+        }, 1000);
+
+    } catch (error) {
+
+        if (error.response) {
+            showToast(error.response.data.message);
+        } else {
+            showToast("Server not reachable.");
         }
-    };
+
+    } finally {
+        setLoading(false);
+    }
+};
 
     // ── Resend OTP ──
-    const handleResendOTP = () => {
-        // Backend API will come later
-        showToast("OTP sent successfully.");
-    };
+    const handleResendOTP = async () => {
+    try {
+
+        const response = await forgotPassword({ email });
+
+        showToast(response.message);
+
+    } catch (error) {
+
+        if (error.response) {
+            showToast(error.response.data.message);
+        } else {
+            showToast("Server not reachable.");
+        }
+
+    }
+};
 
     return (
         <div className="w-full min-h-screen bg-zinc-950 flex items-center justify-center px-6 py-10">

@@ -20,6 +20,14 @@ password:{
   profileImage:{
     type:String,
     required:false
+  },
+  otp:{
+    type:String,
+    required:false
+  },
+  otpExpiry:{
+    type:Date,
+    required:false
   }
 },{
     timestamps:true

@@ -1,36 +1,40 @@
 import mongoose, { trusted } from "mongoose";
-const userSchema=new mongoose.Schema({
-name:{
-    type:String,
-    required:true
-},
-email:{
-    type:String,
-    required:true,
-    unique:true
-},
-password:{
-    type:String,
-    required:true
-},
- role: {
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  role: {
     type: String,
     default: "user",
   },
-  profileImage:{
-    type:String,
-    required:false
+  profileImage: {
+    type: String,
+    required: false
   },
-  otp:{
-    type:String,
-    required:false
+  otp: {
+    type: String,
+    required: false
   },
-  otpExpiry:{
-    type:Date,
-    required:false
+  otpExpiry: {
+    type: Date,
+    required: false
+  },
+  otpSentAt: {
+    type: Date,
+    required: false,
   }
-},{
-    timestamps:true
+}, {
+  timestamps: true
 })
-let User=mongoose.model("User",userSchema);
+let User = mongoose.model("User", userSchema);
 export default User;

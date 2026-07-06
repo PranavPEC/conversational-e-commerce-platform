@@ -58,6 +58,7 @@ export const resetPassword = async (req, res) => {
         // ── Clear OTP ──
         user.otp = undefined;
         user.otpExpiry = undefined;
+        user.otpSentAt = undefined;
 
         await user.save();
 

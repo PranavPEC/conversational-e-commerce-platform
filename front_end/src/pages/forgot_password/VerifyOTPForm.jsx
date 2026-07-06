@@ -7,6 +7,7 @@ function VerifyOTPForm({
     handleVerifyOTP,
     handleResendOTP,
     loading,
+    resendTimer
 }) {
     const inputRefs = useRef([]);
 
@@ -124,9 +125,15 @@ function VerifyOTPForm({
                     <button
                         type="button"
                         onClick={handleResendOTP}
-                        className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors duration-200"
+                        disabled={resendTimer > 0}
+                        className={`font-medium transition-colors duration-200 ${resendTimer > 0
+                                ? "text-zinc-500 cursor-not-allowed"
+                                : "text-emerald-400 hover:text-emerald-300"
+                            }`}
                     >
-                        Resend OTP
+                        {resendTimer > 0
+                            ? `Resend OTP in ${resendTimer}s`
+                            : "Resend OTP"}
                     </button>
                 </p>
             </div>

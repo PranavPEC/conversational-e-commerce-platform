@@ -20,9 +20,11 @@ function VerifyOTP() {
 
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [loading, setLoading] = useState(false);
+    const [resendTimer, setResendTimer] = useState(60);
+
+
 
     // Redirect if user directly opens this page
-
 
     useEffect(() => {
         if (!email) {
@@ -33,6 +35,16 @@ function VerifyOTP() {
     if (!email) {
         return null;
     }
+
+    useEffect(() => {
+    if (resendTimer <= 0) return;
+
+    const timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+}, [resendTimer]);
 
     // ── Validation ──
     const _checkValidations = () => {
@@ -93,7 +105,7 @@ function VerifyOTP() {
             const response = await forgotPassword({ email });
 
             showToast(response.message);
-
+            setResendTimer(60);
         } catch (error) {
 
             if (error.response) {
@@ -147,6 +159,7 @@ function VerifyOTP() {
                     handleVerifyOTP={handleVerifyOTP}
                     handleResendOTP={handleResendOTP}
                     loading={loading}
+                    resendTimer={resendTimer}
                 />
 
                 <p

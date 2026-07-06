@@ -121,16 +121,14 @@ export const verifyOTP = async ({ email, otp }) => {
 
 // ── Reset Password ──
 export const resetPassword = async ({
-  email,
-  otp,
+  resetToken,
   newPassword,
 }) => {
   try {
     const { data } = await axios.post(
       RESET_PASSWORD_URL,
       {
-        email,
-        otp,
+        resetToken,
         newPassword,
       },
       {

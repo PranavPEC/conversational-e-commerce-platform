@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import  { useRef } from 'react'
 import { User } from 'lucide-react'
 
 // Handles the profile image picker shown in the SignUp header

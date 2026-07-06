@@ -4,10 +4,11 @@ import { isValidPassword } from "../utils/validations.js";
 
 export const resetPassword = async (req, res) => {
     try {
-        const { email, otp, newPassword } = req.body;
+
+        const { resetToken, newPassword } = req.body;
 
         // ── Required Fields Validation ──
-        if (!email || !otp || !newPassword) {
+        if (!resetToken || !newPassword) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide complete information.",
@@ -15,38 +16,36 @@ export const resetPassword = async (req, res) => {
         }
 
         // ── Password Validation ──
-
         const passwordError = isValidPassword(newPassword);
+
         if (passwordError) {
             return res.status(400).json({
                 success: false,
                 message: passwordError,
             });
         }
-        
 
-        // ── Find User ──
-        const user = await User.findOne({ email });
+        // ── Find User Using Reset Token ──
+        const user = await User.findOne({ resetToken });
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "User not found.",
+                message: "Invalid or expired reset session.",
             });
         }
 
-        // ── OTP Validation ──
-        if (user.otp !== otp) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid OTP.",
-            });
-        }
+        // ── Check Reset Token Expiry ──
+        if (new Date() > user.resetTokenExpiry) {
 
-        if (new Date() > user.otpExpiry) {
+            user.resetToken = undefined;
+            user.resetTokenExpiry = undefined;
+
+            await user.save();
+
             return res.status(400).json({
                 success: false,
-                message: "OTP has expired.",
+                message: "Reset session has expired. Please start again.",
             });
         }
 
@@ -55,10 +54,9 @@ export const resetPassword = async (req, res) => {
 
         user.password = hashedPassword;
 
-        // ── Clear OTP ──
-        user.otp = undefined;
-        user.otpExpiry = undefined;
-        user.otpSentAt = undefined;
+        // ── Clear Reset Token ──
+        user.resetToken = undefined;
+        user.resetTokenExpiry = undefined;
 
         await user.save();
 
@@ -68,9 +66,11 @@ export const resetPassword = async (req, res) => {
         });
 
     } catch (error) {
+
         return res.status(500).json({
             success: false,
             message: error.message,
         });
+
     }
 };

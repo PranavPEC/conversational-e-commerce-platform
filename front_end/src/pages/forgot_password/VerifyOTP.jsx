@@ -37,14 +37,14 @@ function VerifyOTP() {
     }
 
     useEffect(() => {
-    if (resendTimer <= 0) return;
+        if (resendTimer <= 0) return;
 
-    const timer = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-    }, 1000);
+        const timer = setInterval(() => {
+            setResendTimer((prev) => prev - 1);
+        }, 1000);
 
-    return () => clearInterval(timer);
-}, [resendTimer]);
+        return () => clearInterval(timer);
+    }, [resendTimer]);
 
     // ── Validation ──
     const _checkValidations = () => {
@@ -79,8 +79,7 @@ function VerifyOTP() {
             setTimeout(() => {
                 navigate("/reset-password", {
                     state: {
-                        email,
-                        otp: enteredOTP,
+                        resetToken: response.resetToken,
                     },
                 });
             }, 1000);

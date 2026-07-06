@@ -32,7 +32,20 @@ const userSchema = new mongoose.Schema({
   otpSentAt: {
     type: Date,
     required: false,
-  }
+  },
+  otpAttempts: {
+    type: Number,
+    default: 0,
+},
+resetToken: {
+    type: String,
+    required: false,
+},
+
+resetTokenExpiry: {
+    type: Date,
+    required: false,
+}
 }, {
   timestamps: true
 })

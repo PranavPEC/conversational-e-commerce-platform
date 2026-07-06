@@ -23,8 +23,7 @@ function ResetPassword() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const email = location.state?.email;
-    const otp = location.state?.otp;
+    const resetToken = location.state?.resetToken;
 
     const { toast, toastVisible, showToast, dismissToast } = useToast();
 
@@ -39,12 +38,12 @@ function ResetPassword() {
     // Prevent direct access
 
     useEffect(() => {
-        if (!email || !otp) {
+        if (!resetToken) {
             navigate("/forgot-password");
         }
-    }, [email, otp, navigate]);
+    }, [resetToken, navigate]);
 
-    if (!email || !otp) {
+    if (!resetToken) {
         return null;
     }
 
@@ -88,8 +87,7 @@ function ResetPassword() {
         try {
 
             const response = await resetPassword({
-                email,
-                otp,
+                resetToken,
                 newPassword,
             });
 

@@ -45,6 +45,7 @@ export const forgotPassword = async (req, res) => {
         user.otp = otp;
         user.otpExpiry = otpExpiry;
         user.otpSentAt = new Date();
+        user.otpAttempts = 0;
 
         await user.save();
         await sendEmail(email, otp);

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import useToast from "../../utils/useToast.js";
-import { verifyOTP,forgotPassword } from "../../redux/reduxActions/authActions.js";
+import { verifyOTP, forgotPassword } from "../../redux/reduxActions/authActions.js";
 
 // ── Child Components ──
 import Toast from "../../components/common_components/Toast.jsx";
@@ -22,8 +22,15 @@ function VerifyOTP() {
     const [loading, setLoading] = useState(false);
 
     // Redirect if user directly opens this page
+
+
+    useEffect(() => {
+        if (!email) {
+            navigate("/forgot-password");
+        }
+    }, [email, navigate]);
+
     if (!email) {
-        navigate("/forgot-password");
         return null;
     }
 
@@ -41,62 +48,62 @@ function VerifyOTP() {
 
     // ── Verify OTP ──
     const handleVerifyOTP = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (!_checkValidations()) return;
+        if (!_checkValidations()) return;
 
-    setLoading(true);
+        setLoading(true);
 
-    try {
-        const enteredOTP = otp.join("");
+        try {
+            const enteredOTP = otp.join("");
 
-        const response = await verifyOTP({
-            email,
-            otp: enteredOTP,
-        });
-
-        showToast(response.message);
-
-        setTimeout(() => {
-            navigate("/reset-password", {
-                state: {
-                    email,
-                    otp: enteredOTP,
-                },
+            const response = await verifyOTP({
+                email,
+                otp: enteredOTP,
             });
-        }, 1000);
 
-    } catch (error) {
+            showToast(response.message);
 
-        if (error.response) {
-            showToast(error.response.data.message);
-        } else {
-            showToast("Server not reachable.");
+            setTimeout(() => {
+                navigate("/reset-password", {
+                    state: {
+                        email,
+                        otp: enteredOTP,
+                    },
+                });
+            }, 1000);
+
+        } catch (error) {
+
+            if (error.response) {
+                showToast(error.response.data.message);
+            } else {
+                showToast("Server not reachable.");
+            }
+
+        } finally {
+            setLoading(false);
         }
-
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     // ── Resend OTP ──
     const handleResendOTP = async () => {
-    try {
+        try {
 
-        const response = await forgotPassword({ email });
+            const response = await forgotPassword({ email });
 
-        showToast(response.message);
+            showToast(response.message);
 
-    } catch (error) {
+        } catch (error) {
 
-        if (error.response) {
-            showToast(error.response.data.message);
-        } else {
-            showToast("Server not reachable.");
+            if (error.response) {
+                showToast(error.response.data.message);
+            } else {
+                showToast("Server not reachable.");
+            }
+
         }
-
-    }
-};
+    };
 
     return (
         <div className="w-full min-h-screen bg-zinc-950 flex items-center justify-center px-6 py-10">

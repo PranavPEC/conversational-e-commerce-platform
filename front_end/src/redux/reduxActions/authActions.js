@@ -96,7 +96,6 @@ export const forgotPassword = async ({ email }) => {
         withCredentials: true,
       }
     );
-
     return data;
   } catch (error) {
     throw error;

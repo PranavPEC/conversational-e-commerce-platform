@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 
@@ -37,8 +37,14 @@ function ResetPassword() {
     const [loading, setLoading] = useState(false);
 
     // Prevent direct access
+
+    useEffect(() => {
+        if (!email || !otp) {
+            navigate("/forgot-password");
+        }
+    }, [email, otp, navigate]);
+
     if (!email || !otp) {
-        navigate("/forgot-password");
         return null;
     }
 

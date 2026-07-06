@@ -1,5 +1,6 @@
 
 import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // Static panel — no props, no logic
 // Same markup for Login and SignUp left panels
@@ -12,6 +13,7 @@ const features = [
 ]
 
 function LoginLeftPanel() {
+    const navigate=useNavigate();
     return (
         <div
             className='hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
@@ -28,11 +30,11 @@ function LoginLeftPanel() {
             />
 
             {/* Logo */}
-            <div className='flex items-center gap-2 z-10'>
-                <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center'>
+            <div className='flex items-center gap-2 z-10' onClick={() => navigate('/')}>
+                <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center cursor-pointer'>
                     <ShoppingBag size={18} className='text-zinc-950' />
                 </div>
-                <span className='text-white font-semibold text-lg tracking-tight'>ShopAI</span>
+                <span className='text-white font-semibold text-lg tracking-tight cursor-pointer'>ShopAI</span>
             </div>
 
             {/* Center content */}

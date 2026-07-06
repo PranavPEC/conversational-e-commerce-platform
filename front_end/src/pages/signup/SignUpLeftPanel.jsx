@@ -1,5 +1,6 @@
-import React from 'react'
+
 import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // Signup-specific left panel
 // Same structure as LoginLeftPanel but different headline and description copy
@@ -12,6 +13,7 @@ const features = [
 ]
 
 function SignUpLeftPanel() {
+    const navigate=useNavigate();
     return (
         <div
             className='hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
@@ -28,11 +30,11 @@ function SignUpLeftPanel() {
             />
 
             {/* Logo */}
-            <div className='flex items-center gap-2 z-10'>
-                <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center'>
+            <div className='flex items-center gap-2 z-10' onClick={() => navigate('/')}>
+                <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center cursor-pointer'>
                     <ShoppingBag size={18} className='text-zinc-950' />
                 </div>
-                <span className='text-white font-semibold text-lg tracking-tight'>ShopAI</span>
+                <span className='text-white font-semibold text-lg tracking-tight cursor-pointer'>ShopAI</span>
             </div>
 
             {/* Center content */}

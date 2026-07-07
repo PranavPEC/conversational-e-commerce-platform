@@ -53,7 +53,7 @@ function ForgotPassword() {
                 navigate("/verify-otp", {
                     state: { email },
                 });
-            }, 1000);
+            }, 1500);
 
         } catch (error) {
 

@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { ShoppingBag, ChevronRight } from 'lucide-react'
 
 // Handles all three states: loading skeleton, product grid, empty state

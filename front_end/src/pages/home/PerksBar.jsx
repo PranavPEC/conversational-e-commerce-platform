@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Tag, Truck, Shield, Package } from 'lucide-react'
 
 // Static perks bar — no props, no logic, no Redux

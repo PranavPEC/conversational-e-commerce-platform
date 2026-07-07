@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { ShoppingBag, ArrowRight } from 'lucide-react'
 
 // Full-width gradient hero section

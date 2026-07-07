@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Star, ArrowRight } from 'lucide-react'
 
 // Static social proof banner at the bottom of Home

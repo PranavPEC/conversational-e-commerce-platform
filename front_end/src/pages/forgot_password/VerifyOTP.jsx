@@ -47,6 +47,7 @@ function VerifyOTP() {
     }, [resendTimer]);
 
     // ── Validation ──
+
     const _checkValidations = () => {
         const enteredOTP = otp.join("");
 
@@ -59,8 +60,9 @@ function VerifyOTP() {
     };
 
     // ── Verify OTP ──
+    
     const handleVerifyOTP = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
 
         if (!_checkValidations()) return;
 
@@ -74,12 +76,12 @@ function VerifyOTP() {
                 otp: enteredOTP,
             });
 
-            showToast(response.message);
 
             setTimeout(() => {
                 navigate("/reset-password", {
                     state: {
                         resetToken: response.resetToken,
+                        successMessage: response.message,
                     },
                 });
             }, 1000);
@@ -96,6 +98,24 @@ function VerifyOTP() {
             setLoading(false);
         }
     };
+
+    // ── AutoSubmit OTP ──
+
+    useEffect(() => {
+
+    const enteredOTP = otp.join("");
+
+    if (
+        enteredOTP.length === 6 &&
+        !otp.includes("") &&
+        !loading
+    ) {
+
+        handleVerifyOTP();
+
+    }
+
+}, [otp]);
 
     // ── Resend OTP ──
     const handleResendOTP = async () => {

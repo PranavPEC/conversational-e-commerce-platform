@@ -24,6 +24,7 @@ function ResetPassword() {
     const location = useLocation();
 
     const resetToken = location.state?.resetToken;
+    const successMessage = location.state?.successMessage;
 
     const { toast, toastVisible, showToast, dismissToast } = useToast();
 
@@ -46,6 +47,16 @@ function ResetPassword() {
     if (!resetToken) {
         return null;
     }
+
+    // ── Verify OTP Success Message ──
+
+    useEffect(() => {
+
+        if (successMessage) {
+            showToast(successMessage);
+        }
+
+    }, [successMessage]);
 
     // ── Validations ──
     const _checkValidations = () => {

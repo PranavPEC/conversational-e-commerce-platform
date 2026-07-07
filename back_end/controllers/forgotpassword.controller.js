@@ -14,6 +14,13 @@ export const forgotPassword = async (req, res) => {
         }
         const user = await User.findOne({ email });
 
+        if (!user) {
+            return res.status(200).json({
+                success: true,
+                message: "If an account with this email exists, an OTP has been sent.",
+            })
+        }
+
         // ── Resend OTP Cooldown ──
         if (user.otpSentAt) {
 
@@ -34,12 +41,6 @@ export const forgotPassword = async (req, res) => {
 
         }
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User Not Found.",
-            })
-        }
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
         user.otp = otp;
@@ -51,7 +52,7 @@ export const forgotPassword = async (req, res) => {
         await sendEmail(email, otp);
         return res.status(200).json({
             success: true,
-            message: "OTP Generated Successfully."
+            message: "If an account with this email exists, an OTP has been sent.",
         })
 
 

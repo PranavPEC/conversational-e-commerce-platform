@@ -60,7 +60,7 @@ function VerifyOTP() {
     };
 
     // ── Verify OTP ──
-    
+
     const handleVerifyOTP = async (e) => {
         e?.preventDefault();
 
@@ -123,7 +123,7 @@ function VerifyOTP() {
 
             const response = await forgotPassword({ email });
 
-            showToast(response.message);
+            showToast(response.message,"success");
             setResendTimer(60);
         } catch (error) {
 

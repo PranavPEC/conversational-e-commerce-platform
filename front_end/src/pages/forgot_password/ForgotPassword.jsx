@@ -47,7 +47,7 @@ function ForgotPassword() {
 
             const response = await forgotPassword({ email });
 
-            showToast(response.message);
+            showToast(response.message,"success");
 
             setTimeout(() => {
                 navigate("/verify-otp", {

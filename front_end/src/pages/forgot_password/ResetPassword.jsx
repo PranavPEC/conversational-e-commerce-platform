@@ -53,7 +53,7 @@ function ResetPassword() {
     useEffect(() => {
 
         if (successMessage) {
-            showToast(successMessage);
+            showToast(successMessage,"success");
         }
 
     }, [successMessage]);
@@ -102,7 +102,7 @@ function ResetPassword() {
                 newPassword,
             });
 
-            showToast(response.message);
+            showToast(response.message,"success");
 
             setTimeout(() => {
                 navigate("/login");

@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Pencil, Trash2, Package } from 'lucide-react'
 
 // Props:

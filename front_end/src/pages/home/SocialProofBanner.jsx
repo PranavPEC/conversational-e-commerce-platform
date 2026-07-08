@@ -39,10 +39,14 @@ function SocialProofBanner({ onShopNow }) {
                 {/* CTA */}
                 <button
                     onClick={onShopNow}
-                    className='flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer whitespace-nowrap'
+                    className="group flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 active:scale-95 hover:-translate-y-1 text-zinc-950 font-semibold rounded-xl text-sm transition-all duration-300 cursor-pointer whitespace-nowrap"
                 >
                     Shop Now
-                    <ArrowRight size={15} />
+
+                    <ArrowRight
+                        size={15}
+                        className="transition-transform duration-300 group-hover:translate-x-1"
+                    />
                 </button>
 
             </div>

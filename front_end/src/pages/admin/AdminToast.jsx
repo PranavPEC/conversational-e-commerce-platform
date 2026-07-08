@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { CheckCircle, AlertCircle } from 'lucide-react'
 
 // Inline banner — sits inside the page flow, not a fixed overlay

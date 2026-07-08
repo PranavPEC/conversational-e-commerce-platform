@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Trash2, Loader } from 'lucide-react'
 
 // Props:

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import  { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-react'
 import {

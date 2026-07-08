@@ -100,23 +100,6 @@ function VerifyOTPForm({
             </div>
 
             {/* Verify Button */}
-            {/* <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/60 disabled:cursor-not-allowed text-zinc-950 font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-            >
-                {loading ? (
-                    <>
-                        <Loader
-                            size={18}
-                            className="animate-spin"
-                        />
-                        Verifying...
-                    </>
-                ) : (
-                    "Verify OTP"
-                )}
-            </button> */}
 
             <PrimaryButton
                 text="Verify OTP"

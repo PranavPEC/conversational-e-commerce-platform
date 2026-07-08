@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 // ── New architecture: plain async function, call directly ──
 import { fetchProducts } from '../../redux/reduxActions'
 
+// ── Child Components ──
 import HeroSection from './HeroSection.jsx'
 import PerksBar from './PerksBar.jsx'
 import FeaturedProducts from './FeaturedProducts.jsx'

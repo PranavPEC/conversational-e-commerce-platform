@@ -1,6 +1,6 @@
-import { Loader } from "lucide-react";
-import { useRef } from "react";
 
+import { useRef } from "react";
+import PrimaryButton from "../../components/common_components/PrimaryButton";
 function VerifyOTPForm({
     otp,
     setOtp,
@@ -100,7 +100,7 @@ function VerifyOTPForm({
             </div>
 
             {/* Verify Button */}
-            <button
+            {/* <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/60 disabled:cursor-not-allowed text-zinc-950 font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
@@ -116,7 +116,17 @@ function VerifyOTPForm({
                 ) : (
                     "Verify OTP"
                 )}
-            </button>
+            </button> */}
+
+            <PrimaryButton
+                text="Verify OTP"
+                type="submit"
+                loading={loading}
+                disabled={loading}
+                loadingText="Verifying..."
+                className="w-full"
+                textColor='text-white'
+            />
 
             {/* Resend OTP */}
             <div className="text-center">

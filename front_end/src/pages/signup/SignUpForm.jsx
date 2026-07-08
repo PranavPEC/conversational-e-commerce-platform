@@ -1,6 +1,6 @@
 
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
-
+import PrimaryButton from '../../components/common_components/PrimaryButton'
 // Props:
 //   name, setName
 //   email, setEmail
@@ -98,14 +98,17 @@ function SignUpForm({
             </div>
 
             {/* Submit */}
-            <button
-                type='submit'
+            
+            <PrimaryButton
+                text="Create"
+                type="submit"
+                loading={loading}
+                loadingText="Creating..."
                 disabled={loading}
-                className='w-full h-12 mt-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
-            >
-                {loading ? 'Creating...' : 'Create'}
-                <ArrowRight size={16} />
-            </button>
+                icon={<ArrowRight size={16} />}
+                className="w-full h-12 mt-1"
+                textColor="text-white"
+            />
 
         </form>
     )

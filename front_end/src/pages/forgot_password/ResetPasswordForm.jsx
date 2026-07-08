@@ -1,5 +1,5 @@
-import { Eye, EyeOff, Loader } from "lucide-react";
-
+import { Eye, EyeOff } from "lucide-react";
+import PrimaryButton from '../../components/common_components/PrimaryButton'
 function ResetPasswordForm({
     newPassword,
     setNewPassword,
@@ -84,7 +84,7 @@ function ResetPasswordForm({
             </div>
 
             {/* Submit Button */}
-            <button
+            {/* <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/60 disabled:cursor-not-allowed text-zinc-950 font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
@@ -100,7 +100,18 @@ function ResetPasswordForm({
                 ) : (
                     "Update Password"
                 )}
-            </button>
+            </button> */}
+
+            <PrimaryButton
+                text="Update Password"
+                type="submit"
+                loading={loading}
+                disabled={loading}
+                loadingText="Updating Password..."
+                className="w-full"
+                textColor='text-white'
+            />
+
         </form>
     );
 }

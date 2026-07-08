@@ -1,6 +1,6 @@
 
 import { Star, ArrowRight } from 'lucide-react'
-
+import PrimaryButton from '../../components/common_components/PrimaryButton'
 // Static social proof banner at the bottom of Home
 // Props:
 //   onShopNow — navigates to /products
@@ -37,17 +37,11 @@ function SocialProofBanner({ onShopNow }) {
                 </div>
 
                 {/* CTA */}
-                <button
+                <PrimaryButton
+                    text="Shop Now"
+                    icon={<ArrowRight size={15} />}
                     onClick={onShopNow}
-                    className="group flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 active:scale-95 hover:-translate-y-1 text-zinc-950 font-semibold rounded-xl text-sm transition-all duration-300 cursor-pointer whitespace-nowrap"
-                >
-                    Shop Now
-
-                    <ArrowRight
-                        size={15}
-                        className="transition-transform duration-300 group-hover:translate-x-1"
-                    />
-                </button>
+                />
 
             </div>
         </section>

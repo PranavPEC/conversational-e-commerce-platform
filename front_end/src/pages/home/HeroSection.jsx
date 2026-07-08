@@ -1,4 +1,5 @@
 import { ShoppingBag, ArrowRight } from "lucide-react";
+import PrimaryButton from "../../components/common_components/PrimaryButton";
 import "./HeroSection.css";
 
 function HeroSection({ firstName, onBrowse, onCart }) {
@@ -42,17 +43,11 @@ function HeroSection({ firstName, onBrowse, onCart }) {
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3">
 
-                    <button
-                        onClick={onBrowse}
-                        className="group flex items-center justify-center gap-2 px-7 py-3.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 hover:-translate-y-1 text-zinc-950 font-semibold rounded-xl text-sm transition-all duration-300 cursor-pointer"
-                    >
-                        Browse Products
-
-                        <ArrowRight
-                            size={16}
-                            className="transition-transform duration-300 group-hover:translate-x-1"
-                        />
-                    </button>
+                    <PrimaryButton
+                    text="Browse Products"
+                    icon={<ArrowRight size={16}/>}
+                    onClick={onBrowse}
+                    />
 
                     <button
                         onClick={onCart}

@@ -1,13 +1,21 @@
-
 import { Star, ArrowRight } from 'lucide-react'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
+import useScrollReveal from '../../hooks/useScrollReveal'
 // Static social proof banner at the bottom of Home
 // Props:
 //   onShopNow — navigates to /products
 
 function SocialProofBanner({ onShopNow }) {
+    // ── Scroll Reveal ──
+    const [ref, isVisible] = useScrollReveal()
+
     return (
-        <section className='w-full px-6 md:px-16 pb-16'>
+        <section
+            ref={ref}
+            className={`w-full px-6 md:px-16 pb-16 transition-all duration-700 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+        >
             <div className='max-w-5xl mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6'>
 
                 {/* Avatar stack + rating */}

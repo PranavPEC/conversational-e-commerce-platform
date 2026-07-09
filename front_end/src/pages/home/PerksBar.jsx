@@ -1,5 +1,5 @@
-
 import { Tag, Truck, Shield, Package } from 'lucide-react'
+import useScrollReveal from '../../hooks/useScrollReveal'
 
 // Static perks bar — no props, no logic, no Redux
 // Data lives here because it never changes and has no external dependency
@@ -13,8 +13,16 @@ const PERKS = [
 ]
 
 function PerksBar() {
+    // ── Scroll Reveal ──
+    const [ref, isVisible] = useScrollReveal()
+
     return (
-        <section className='w-full bg-zinc-900 border-y border-zinc-800 px-6 md:px-16 py-8'>
+        <section
+            ref={ref}
+            className={`w-full bg-zinc-900 border-y border-zinc-800 px-6 md:px-16 py-8 transition-all duration-700 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+        >
             <div className='max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6'>
                 {PERKS.map(({ icon: Icon, title, desc }) => (
                     <div key={title} className='flex items-start gap-3'>

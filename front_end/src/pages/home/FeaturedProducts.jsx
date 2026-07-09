@@ -1,4 +1,5 @@
 import { ShoppingBag, ChevronRight, Eye } from 'lucide-react'
+import useScrollReveal from '../../hooks/useScrollReveal'
 
 // Handles all three states: loading skeleton, product grid, empty state
 // Props:
@@ -8,8 +9,16 @@ import { ShoppingBag, ChevronRight, Eye } from 'lucide-react'
 //   onSeeAll       — navigate to /products
 
 function FeaturedProducts({ featured, loading, onProductClick, onSeeAll }) {
+    // ── Scroll Reveal ──
+    const [ref, isVisible] = useScrollReveal()
+
     return (
-        <section className='w-full px-6 md:px-16 py-14'>
+        <section
+            ref={ref}
+            className={`w-full px-6 md:px-16 py-14 transition-all duration-700 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+        >
             <div className='max-w-5xl mx-auto'>
 
                 {/* ── Section Header ── */}

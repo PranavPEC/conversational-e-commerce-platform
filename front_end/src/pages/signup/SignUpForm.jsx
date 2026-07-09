@@ -100,10 +100,10 @@ function SignUpForm({
             {/* Submit */}
             
             <PrimaryButton
-                text="Create"
+                text="Sign Up"
                 type="submit"
                 loading={loading}
-                loadingText="Creating..."
+                loadingText="Signing Up..."
                 disabled={loading}
                 icon={<ArrowRight size={16} />}
                 className="w-full h-12 mt-1"

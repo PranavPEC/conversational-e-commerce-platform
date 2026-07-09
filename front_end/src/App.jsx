@@ -9,6 +9,7 @@ import ProductDetail from './pages/ProductDetail.jsx';
 import Cart from './pages/Cart.jsx';
 import Orders from './pages/orders/Orders.jsx';
 import Admin from './pages/admin/Admin.jsx';
+import Profile from './pages/profile/Profile.jsx';
 import Navbar from './components/Navbar.jsx';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -62,6 +63,7 @@ function App() {
         <Route path='/home' element={userData ? <Home /> : <Navigate to='/login' />} />
         <Route path='/cart' element={userData ? <Cart /> : <Navigate to='/login' />} />
         <Route path='/orders' element={userData ? <Orders /> : <Navigate to='/login' />} />
+        <Route path='/profile' element={userData ? <Profile /> : <Navigate to='/login' />} />
 
         {/* Admin — logged in AND role === admin */}
         <Route

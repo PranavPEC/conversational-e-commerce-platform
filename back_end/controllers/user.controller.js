@@ -74,13 +74,13 @@ export const updateUser = async (req, res) => {
                 message: "Unauthorize Access."
             });
         }
-        const { name, email, profileImage } = req.body;
+        const { name, email, profileImage, phone, dateOfBirth, gender } = req.body;
 
-const user = await User.findByIdAndUpdate(
-    req.params.id,
-    { name, email, profileImage },
-    { new: true }
-).select("-password");
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { name, email, profileImage, phone, dateOfBirth, gender },
+            { returnDocument: 'after' }
+        ).select("-password");
         if (!user) {
             return res.status(404).json({ message: "User Not Found." });
         }

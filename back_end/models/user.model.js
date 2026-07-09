@@ -36,16 +36,28 @@ const userSchema = new mongoose.Schema({
   otpAttempts: {
     type: Number,
     default: 0,
-},
-resetToken: {
+  },
+  resetToken: {
     type: String,
     required: false,
-},
+  },
 
-resetTokenExpiry: {
+  resetTokenExpiry: {
     type: Date,
     required: false,
-}
+  },
+  phone: {
+    type: String,
+    required: false,
+  },
+  dateOfBirth: {
+    type: Date,
+    required: false
+  },
+  gender: {
+    type: String,
+    required: false
+  }
 }, {
   timestamps: true
 })

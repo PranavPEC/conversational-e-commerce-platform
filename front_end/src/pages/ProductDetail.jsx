@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchProductById, addCartItem } from '../redux/reduxActions'
+import PrimaryButton from '../components/common_components/PrimaryButton'
 
 function ProductDetail() {
     const { id } = useParams()
@@ -66,7 +67,7 @@ function ProductDetail() {
 
             <button
                 onClick={() => navigate('/products')}
-                className='text-zinc-400 text-sm hover:text-white transition-colors duration-200 mb-8 flex items-center gap-2'
+                className='text-zinc-400 text-sm hover:text-white transition-colors duration-200 mb-8 flex items-center gap-2 cursor-pointer'
             >
                 ← Back to products
             </button>
@@ -115,13 +116,14 @@ function ProductDetail() {
                         </p>
                     )}
 
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={product.stock === 0 || adding}
-                        className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer'
-                    >
-                        {adding ? 'Adding...' : product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                    </button>
+                    <PrimaryButton
+                    onClick={handleAddToCart}
+                    text="Add to Cart"
+                    LoadingText='Adding...'
+                    className='w-full'
+                    disabled={product.stock === 0 || adding}
+                    loading={adding}
+                    />
 
                 </div>
             </div>

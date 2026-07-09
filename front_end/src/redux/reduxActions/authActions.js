@@ -1,7 +1,7 @@
 // src/redux/reduxActions/authActions.js
 
 import axios from "axios";
-import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,FORGOT_PASSWORD_URL,VERIFY_OTP_URL,RESET_PASSWORD_URL } from "../../config/urls";
+import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,FORGOT_PASSWORD_URL,VERIFY_OTP_URL,RESET_PASSWORD_URL, UPDATE_USER_URL } from "../../config/urls";
 import store from "../reduxStore";
 
 import {
@@ -112,6 +112,30 @@ export const verifyOTP = async ({ email, otp }) => {
         withCredentials: true,
       }
     );
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// ── Update Profile ──
+// Reuses your existing PUT /update/:id route + updateUser controller.
+// Backend just accepts a few more optional fields on the same destructure —
+// no new route, no new controller function.
+export const updateUserProfile = async ({ id, name, email, phone, dateOfBirth, gender }) => {
+  try {
+    const { data } = await axios.put(
+      UPDATE_USER_URL(id),
+      { name, email, phone, dateOfBirth, gender },
+      {
+        withCredentials: true,
+      }
+    );
+
+    // Backend returns the full updated user (minus password) —
+    // push it straight into Redux so Navbar, Profile, everywhere stays in sync.
+    dispatch(setUserData(data));
 
     return data;
   } catch (error) {

@@ -18,6 +18,7 @@ export const LOGOUT_URL = SERVER_URL + "/logout"
 export const FORGOT_PASSWORD_URL = SERVER_URL + "/forgot-password";
 export const VERIFY_OTP_URL = SERVER_URL + "/verify-otp";
 export const RESET_PASSWORD_URL = SERVER_URL + "/reset-password";
+export const UPDATE_USER_URL = (id) => SERVER_URL + "/update/" + id
 
 // ── Products ──
 export const GET_ALL_PRODUCTS_URL = SERVER_URL + "/product/all"

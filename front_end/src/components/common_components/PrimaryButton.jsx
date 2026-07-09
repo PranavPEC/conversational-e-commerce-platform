@@ -9,7 +9,7 @@ function PrimaryButton({
     disabled = false,
     className = "",
     LoadingText = "Loading...",
-    textColor = "text-zinc-950",
+    textColor = "text-white",
 }) {
 
     const isDisabled = loading || disabled;

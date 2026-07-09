@@ -42,9 +42,9 @@ function ResetPasswordForm({
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300 transition-colors duration-200"
                     >
                         {showNewPassword ? (
-                            <EyeOff size={20} />
-                        ) : (
                             <Eye size={20} />
+                        ) : (
+                            <EyeOff size={20} />
                         )}
                     </button>
                 </div>
@@ -75,9 +75,9 @@ function ResetPasswordForm({
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300 transition-colors duration-200"
                     >
                         {showConfirmPassword ? (
-                            <EyeOff size={20} />
-                        ) : (
                             <Eye size={20} />
+                        ) : (
+                            <EyeOff size={20} />
                         )}
                     </button>
                 </div>

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
+import PrimaryButton from './common_components/PrimaryButton.jsx'
 import { Heart, ShoppingCart, User, Package, Settings, LogOut, ChevronDown } from 'lucide-react'
 
 // ── New architecture: logoutUser is a plain async function, call directly ──
@@ -57,18 +58,20 @@ function Navbar() {
           Shop<span className='text-emerald-400'>AI</span>
         </div>
         <div className='flex items-center gap-3'>
+          {/* ── Login — outline/secondary style, sized to match the navbar's natural height ── */}
           <button
             onClick={() => navigate('/login')}
-            className='text-sm text-zinc-400 hover:text-white transition-colors duration-200 cursor-pointer'
+            className='flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent border border-zinc-700 hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-white rounded-xl text-sm transition-all duration-300 cursor-pointer'
           >
             Login
           </button>
-          <button
+
+          {/* ── Sign Up — reuses PrimaryButton, opted into the compact "sm" size for Navbar ── */}
+          <PrimaryButton
+            text='Sign Up'
             onClick={() => navigate('/signup')}
-            className='text-sm px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl transition-colors duration-200 cursor-pointer'
-          >
-            Sign Up
-          </button>
+            size='sm'
+          />
         </div>
       </nav>
     )
@@ -117,7 +120,7 @@ function Navbar() {
 
         {/* ── Wishlist — icon only, not functional yet ── */}
         <button
-          onClick={() => {}}
+          onClick={() => { }}
           aria-label='Wishlist'
           className='text-zinc-400 hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
         >
@@ -164,9 +167,9 @@ function Navbar() {
           {dropdownOpen && (
             <div className='absolute right-0 mt-3 w-52 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/40 py-2 z-50'>
 
-              {/* ── Profile — not functional yet ── */}
+              {/* ── Profile — navigates to /profile ── */}
               <button
-                onClick={() => {setDropdownOpen(false); navigate('/profile')}}
+                onClick={() => { setDropdownOpen(false); navigate('/profile') }}
                 className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors duration-200 cursor-pointer'
               >
                 <User size={16} /> Profile

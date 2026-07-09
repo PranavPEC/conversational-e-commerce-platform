@@ -10,9 +10,14 @@ function PrimaryButton({
     className = "",
     LoadingText = "Loading...",
     textColor = "text-white",
+    size = "lg"
 }) {
 
     const isDisabled = loading || disabled;
+
+    // "lg" (default) keeps every existing usage (Hero, Login, SignUp, Profile)
+    // pixel-identical to before. "sm" is opt-in only — used by Navbar.
+    const sizeClasses = size === "sm" ? "px-5 py-2.5" : "px-7 py-3.5";
 
     return (
         <button
@@ -26,8 +31,7 @@ function PrimaryButton({
                 justify-center
                 gap-2
 
-                px-7
-                py-3.5
+                ${sizeClasses}
 
                 bg-emerald-500
                 hover:bg-emerald-400

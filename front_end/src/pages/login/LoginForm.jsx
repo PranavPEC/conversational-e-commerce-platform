@@ -57,7 +57,7 @@ function LoginForm({
                         onClick={() => setShowPassword(p => !p)}
                         className='absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors duration-200'
                     >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
                     </button>
                 </div>
             </div>

@@ -7,34 +7,33 @@ import PrimaryButton from '../../components/common_components/PrimaryButton'
 // ── Props ──
 //   userData    — from Redux state.auth
 //   isEditing   — bool, owned by Profile.jsx
-//   onCancel    — turns isEditing off without saving
+//   avatarFile  — pending File from ProfileSummaryCard's picker, or null —
+//                 sent along in the same save request when present
+//   onCancel    — turns isEditing off without saving (also clears avatarFile in Profile.jsx)
 //   onSaved     — turns isEditing off after a successful save
 
-function PersonalInformationForm({ userData, isEditing, onCancel, onSaved }) {
+const formatDOB = (value) => (value ? value.slice(0, 10) : '')
+
+function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, onSaved }) {
     const { toast, toastVisible, showToast, dismissToast } = useToast()
-    const formatDOB = (value) => (value ? value.slice(0, 10) : '')
+
     // ── Local form state ──
-    // Seeded from userData. Only meaningful while isEditing is true —
-    // while it's false, the inputs are disabled and just display these values.
     const [form, setForm] = useState({
         name: userData?.name || '',
         phone: userData?.phone || '',
-        dateOfBirth:  formatDOB(userData?.dateOfBirth) || '',
+        dateOfBirth: formatDOB(userData?.dateOfBirth),
         gender: userData?.gender || '',
     })
 
     const [saving, setSaving] = useState(false)
-    
+
     // ── Re-sync fields every time edit mode is (re)entered ──
-    // Without this, opening "Edit Profile" a second time would still show
-    // whatever was typed and then cancelled last time, instead of the
-    // actual current values from Redux.
     useEffect(() => {
         if (isEditing) {
             setForm({
                 name: userData?.name || '',
                 phone: userData?.phone || '',
-                dateOfBirth:  formatDOB(userData?.dateOfBirth) || '',
+                dateOfBirth: formatDOB(userData?.dateOfBirth),
                 gender: userData?.gender || '',
             })
         }
@@ -45,6 +44,10 @@ function PersonalInformationForm({ userData, isEditing, onCancel, onSaved }) {
     }
 
     // ── Submit Handler ──
+    // Saves name/phone/DOB/gender AND the pending avatar (if any) in one
+    // single request — updateUserProfile now always builds multipart
+    // FormData, so passing profileImageFile: null here is harmless (your
+    // controller only touches profileImage when a real file is present).
     const handleSave = async () => {
         if (!form.name.trim()) {
             showToast('Name cannot be empty', 'error')
@@ -60,6 +63,7 @@ function PersonalInformationForm({ userData, isEditing, onCancel, onSaved }) {
                 phone: form.phone,
                 dateOfBirth: form.dateOfBirth,
                 gender: form.gender,
+                profileImageFile: avatarFile,
             })
             showToast('Profile updated successfully', 'success')
             onSaved()

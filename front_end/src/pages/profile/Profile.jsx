@@ -13,19 +13,45 @@ function Profile() {
     const { orders } = useSelector(state => state.order)
 
     // ── Edit mode ──
-    // Lifted up here (not inside ProfileSummaryCard or the form) because
-    // BOTH children need to react to it: the summary card's "Edit Profile"
-    // button turns it on, and the form uses it to unlock its inputs.
-    // This is the same "lift state to the nearest shared parent" pattern
-    // your project already uses — e.g. Home.jsx owns `products` and hands
-    // slices of it down to FeaturedProducts as props.
+    // Lifted up here because ProfileSummaryCard, ProfileStatsGrid and
+    // PersonalInformationForm all need to react to it.
     const [isEditing, setIsEditing] = useState(false)
 
+    // ── Pending avatar selection ──
+    // Also lifted up: ProfileSummaryCard is where the picker lives and shows
+    // the preview, but PersonalInformationForm is where the actual "Save
+    // Changes" button and handleSave live — the file has to be visible to
+    // both, so it lives here in their shared parent.
+    // avatarFile    — the actual File object, sent to the backend on save
+    // avatarPreview — a blob URL just for on-screen preview, discarded after
+    const [avatarFile, setAvatarFile] = useState(null)
+    const [avatarPreview, setAvatarPreview] = useState(null)
+
+    const handleAvatarChange = (file, previewUrl) => {
+        setAvatarFile(file)
+        setAvatarPreview(previewUrl)
+    }
+
+    // ── Clears any picked-but-not-yet-saved avatar ──
+    // Called on both Cancel (discard) and a successful Save (already
+    // persisted, so the local pending copy is no longer needed — the fresh
+    // userData.profileImage from Redux takes over from here).
+    const resetAvatarSelection = () => {
+        setAvatarFile(null)
+        setAvatarPreview(null)
+    }
+
+    const handleCancelEdit = () => {
+        resetAvatarSelection()
+        setIsEditing(false)
+    }
+
+    const handleSaved = () => {
+        resetAvatarSelection()
+        setIsEditing(false)
+    }
+
     // ── Fetch orders for the stats grid ──
-    // The user may already have orders in Redux (e.g. they visited /orders
-    // earlier this session), but we re-fetch here so the "Total Orders"
-    // number on this page is correct even on a hard refresh or a direct
-    // visit to /profile without having gone through /orders first.
     useEffect(() => {
         fetchUserOrders()   // plain async function — no dispatch(), same convention as Orders.jsx
     }, [])
@@ -34,7 +60,7 @@ function Profile() {
         <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
             <div className='max-w-6xl mx-auto flex flex-col md:flex-row gap-8'>
 
-                {/* ── Left nav — shared component, will also serve Settings/Wishlist later ── */}
+                {/* ── Left nav — shared component, also used by Orders.jsx ── */}
                 <AccountSidebar />
 
                 {/* ── Right column — everything specific to the Profile page ── */}
@@ -53,17 +79,22 @@ function Profile() {
                         userData={userData}
                         isEditing={isEditing}
                         onEditClick={() => setIsEditing(true)}
+                        avatarPreview={avatarPreview}
+                        onAvatarChange={handleAvatarChange}
                     />
 
                     {/* ── Orders / Wishlist / Addresses / Account stat cards ── */}
                     <ProfileStatsGrid ordersCount={orders.length} />
 
-                    {/* ── Editable form — reads/writes isEditing via props ── */}
+                    {/* ── Editable form — reads/writes isEditing via props, now also
+                        carries the pending avatar file so it saves together with
+                        name/phone/DOB/gender in a single request ── */}
                     <PersonalInformationForm
                         userData={userData}
                         isEditing={isEditing}
-                        onCancel={() => setIsEditing(false)}
-                        onSaved={() => setIsEditing(false)}
+                        avatarFile={avatarFile}
+                        onCancel={handleCancelEdit}
+                        onSaved={handleSaved}
                     />
 
                     {/* ── Static placeholder — real address CRUD is a future feature ── */}

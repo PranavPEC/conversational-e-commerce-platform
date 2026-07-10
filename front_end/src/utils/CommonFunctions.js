@@ -15,13 +15,13 @@ export const getInitial=(userData)=>{
     return userData?.name?.charAt(0).toUpperCase()
 }
 
-export const buildFormData=(form,imageFile)=>{
+export const buildFormData = (fields, imageFile, imageFieldName = 'image') => {
     const formData = new FormData()
-    formData.append('title', form.title)
-    formData.append('description', form.description)
-    formData.append('price', form.price)
-    formData.append('stock', form.stock)
-    if (imageFile) formData.append('image', imageFile)
-
-    return formData;
+    Object.entries(fields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            formData.append(key, value)
+        }
+    })
+    if (imageFile) formData.append(imageFieldName, imageFile)
+    return formData
 }

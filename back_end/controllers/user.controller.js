@@ -74,7 +74,11 @@ export const updateUser = async (req, res) => {
                 message: "Unauthorize Access."
             });
         }
-        const { name, email, profileImage, phone, dateOfBirth, gender } = req.body;
+        const { name, email, phone, dateOfBirth, gender } = req.body;
+        let profileImage;
+        if (req.file) {
+            profileImage = await uploadOnCloudinary(req.file.path);
+        }
 
         const user = await User.findByIdAndUpdate(
             req.params.id,

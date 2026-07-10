@@ -1,13 +1,16 @@
-import { Camera, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { getInitial } from '../../utils/CommonFunctions.js'
+import AvatarPicker from '../../components/common_components/AvatarPicker.jsx'
 
 // ── Top card on the Profile page ──
 // Props:
-//   userData    — from Redux state.auth, same object Navbar reads
-//   isEditing   — bool, lifted up in Profile.jsx
-//   onEditClick — turns isEditing on in the parent
+//   userData        — from Redux state.auth
+//   isEditing       — bool, lifted up in Profile.jsx
+//   onEditClick     — turns isEditing on in the parent
+//   avatarPreview   — blob URL for a newly-picked (not yet saved) avatar
+//   onAvatarChange  — (file, previewUrl) => void, bubbles the pick up to Profile.jsx
 
-function ProfileSummaryCard({ userData, isEditing, onEditClick }) {
+function ProfileSummaryCard({ userData, isEditing, onEditClick, avatarPreview, onAvatarChange }) {
 
     return (
         <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4'>
@@ -15,29 +18,32 @@ function ProfileSummaryCard({ userData, isEditing, onEditClick }) {
             {/* ── Avatar + Name + Email ── */}
             <div className='flex items-center gap-4'>
 
-                {/* ── Avatar ── */}
-                <div className='relative flex-shrink-0'>
-                    {userData?.profileImage ? (
+                {/* ── Avatar ──
+                    Only becomes a clickable picker while isEditing is true —
+                    same gating as the form fields below it. Otherwise it's
+                    just a plain display, identical to how it looked before
+                    this feature existed. ── */}
+                {isEditing ? (
+                    <AvatarPicker
+                        frontendImage={avatarPreview}
+                        existingImage={userData?.profileImage}
+                        onImageChange={onAvatarChange}
+                        initial={!userData?.profileImage ? getInitial(userData) : null}
+                        size='lg'
+                    />
+                ) : (
+                    userData?.profileImage ? (
                         <img
                             src={userData.profileImage}
                             alt={userData.name}
-                            className='w-20 h-20 rounded-full object-cover border border-zinc-700'
+                            className='w-20 h-20 rounded-full object-cover border border-zinc-700 flex-shrink-0'
                         />
                     ) : (
-                        <div className='w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl font-semibold'>
+                        <div className='w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl font-semibold flex-shrink-0'>
                             {getInitial(userData)}
                         </div>
-                    )}
-
-                    {/* ── Avatar upload — not functional yet ── */}
-                    <button
-                        onClick={() => {}}
-                        aria-label='Change profile photo'
-                        className='absolute bottom-0 right-0 w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 hover:text-emerald-400 hover:border-emerald-500 transition-colors duration-200 cursor-pointer'
-                    >
-                        <Camera size={13} />
-                    </button>
-                </div>
+                    )
+                )}
 
                 {/* ── Name + Email ── */}
                 <div>

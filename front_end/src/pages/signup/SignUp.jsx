@@ -16,11 +16,12 @@ import {
 import Toast from '../../components/common_components/Toast.jsx'
 import SocialButtons from '../../components/common_components/SocialButtons.jsx'
 import BrandLogo from '../../components/common_components/BrandLogo.jsx'
+import AvatarPicker from '../../components/common_components/AvatarPicker.jsx'
 
 // ── SignUp-specific components ──
 import SignUpLeftPanel from './SignUpLeftPanel.jsx'
 import SignUpForm from './SignUpForm.jsx'
-import AvatarPicker from './AvatarPicker.jsx'
+
 
 function SignUp() {
     const navigate = useNavigate()

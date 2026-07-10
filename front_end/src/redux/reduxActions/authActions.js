@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,FORGOT_PASSWORD_URL,VERIFY_OTP_URL,RESET_PASSWORD_URL, UPDATE_USER_URL } from "../../config/urls";
+import { buildFormData } from "../../utils/CommonFunctions.js";
 import store from "../reduxStore";
 
 import {
@@ -120,16 +121,25 @@ export const verifyOTP = async ({ email, otp }) => {
 };
 
 // ── Update Profile ──
-// Reuses your existing PUT /update/:id route + updateUser controller.
-// Backend just accepts a few more optional fields on the same destructure —
-// no new route, no new controller function.
-export const updateUserProfile = async ({ id, name, email, phone, dateOfBirth, gender }) => {
+export const updateUserProfile = async ({ id, name, email, phone, dateOfBirth, gender, profileImageFile }) => {
   try {
+    // Always builds multipart/form-data now (via buildFormData) instead of
+    // JSON — this one request can carry text fields alone, an avatar alone,
+    // or both together. Your controller already handles this: it only
+    // touches profileImage when req.file is actually present, and Mongoose
+    // ignores undefined fields, so partial updates stay safe either way.
+    const formData = buildFormData(
+      { name, email, phone, dateOfBirth, gender },
+      profileImageFile,
+      'profileImage'
+    );
+
     const { data } = await axios.put(
       UPDATE_USER_URL(id),
-      { name, email, phone, dateOfBirth, gender },
+      formData,
       {
         withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' }
       }
     );
 

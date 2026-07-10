@@ -82,7 +82,7 @@ function Navbar() {
     <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
 
       <div
-        onClick={() => navigate('/home')}
+        onClick={() => navigate('/')}
         className='text-white font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
       >
         Shop<span className='text-emerald-400'>AI</span>
@@ -91,8 +91,8 @@ function Navbar() {
       <div className='flex items-center gap-6'>
 
         <button
-          onClick={() => navigate('/home')}
-          className={`text-sm transition-colors duration-200 ${isActive('/home') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
+          onClick={() => navigate('/')}
+          className={`text-sm transition-colors duration-200 ${isActive('/') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
         >
           Home
         </button>

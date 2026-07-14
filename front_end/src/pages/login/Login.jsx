@@ -43,7 +43,7 @@ function Login() {
         try {
             await loginUser({email,password});
             await fetchUserData()
-            navigate('/home')
+            navigate('/')
         } catch (error) {
             if (error.response) {
                 showToast(error.response.data.message)

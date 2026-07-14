@@ -7,6 +7,7 @@ import cartRouter from "./routes/cart.route.js";
 import productRouter from "./routes/product.route.js";
 import paymentRouter from "./routes/payment.route.js";
 import orderRouter from "./routes/order.route.js";
+import addressRouter from "./routes/address.route.js";
 import cors from "cors";
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/cart",cartRouter);
 app.use("/product",productRouter);
 app.use("/order",orderRouter);
 app.use("/payment",paymentRouter);
+app.use("/address",addressRouter);
 
 app.listen(port,()=>{
     mongoConnect();

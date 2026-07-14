@@ -79,7 +79,7 @@ function SignUp() {
             try {
                 await signupUser(formData);
                 await fetchUserData()
-                navigate('/home')
+                navigate('/')
             }
             catch (error) {
                 if (error.response) {

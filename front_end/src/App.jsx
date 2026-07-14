@@ -60,7 +60,6 @@ function App() {
 
 
         {/* ── Protected routes ── */}
-        {/* <Route path='/home' element={userData ? <Home /> : <Navigate to='/login' />} /> */}
         <Route path='/cart' element={userData ? <Cart /> : <Navigate to='/login' />} />
         <Route path='/orders' element={userData ? <Orders /> : <Navigate to='/login' />} />
         <Route path='/profile' element={userData ? <Profile /> : <Navigate to='/login' />} />
@@ -72,7 +71,7 @@ function App() {
             userData
               ? userData.role === 'admin'
                 ? <Admin />
-                : <Navigate to='/home' />
+                : <Navigate to='/' />
               : <Navigate to='/login' />
           }
         />

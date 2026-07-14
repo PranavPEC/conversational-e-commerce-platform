@@ -91,13 +91,6 @@ function Navbar() {
       <div className='flex items-center gap-6'>
 
         <button
-          onClick={() => navigate('/')}
-          className={`text-sm transition-colors duration-200 ${isActive('/') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
-        >
-          Home
-        </button>
-
-        <button
           onClick={() => navigate('/products')}
           className={`text-sm transition-colors duration-200 ${isActive('/products') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
         >

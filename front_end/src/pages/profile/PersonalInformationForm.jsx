@@ -3,6 +3,7 @@ import { updateUserProfile } from '../../redux/reduxActions'
 import useToast from '../../utils/useToast'
 import Toast from '../../components/common_components/Toast'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
+import { checkNameValidation, checkPhoneValidation, checkDateOfBirthValidation } from '../../utils/validations'
 
 // ── Props ──
 //   userData    — from Redux state.auth
@@ -43,16 +44,30 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
         setForm(prev => ({ ...prev, [field]: e.target.value }))
     }
 
+    // ── Phone gets its own handler ──
+    // Strips anything non-numeric as the user types and caps it at 10
+    // characters — this is a UX nicety layered on top of checkPhoneValidation
+    // below, not a replacement for it. Someone pasting "abc1234567890" should
+    // never even see letters land in the field in the first place.
+    const handlePhoneChange = (e) => {
+        const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10)
+        setForm(prev => ({ ...prev, phone: digitsOnly }))
+    }
+
     // ── Submit Handler ──
     // Saves name/phone/DOB/gender AND the pending avatar (if any) in one
     // single request — updateUserProfile now always builds multipart
     // FormData, so passing profileImageFile: null here is harmless (your
     // controller only touches profileImage when a real file is present).
     const handleSave = async () => {
-        if (!form.name.trim()) {
-            showToast('Name cannot be empty', 'error')
-            return
-        }
+        // ── Validation ──
+        // Same pattern as Login/SignUp: each check shows its own toast and
+        // returns false on failure, caller returns early on the first one
+        // that fails. Phone and DOB are optional, so their validators pass
+        // straight through when the field is empty.
+        if (!checkNameValidation(form.name, showToast)) return
+        if (!checkPhoneValidation(form.phone, showToast)) return
+        if (!checkDateOfBirthValidation(form.dateOfBirth, showToast)) return
 
         setSaving(true)
         try {
@@ -112,10 +127,12 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                         <label className='block text-zinc-400 text-xs mb-1.5'>Phone Number</label>
                         <input
                             type='tel'
+                            inputMode='numeric'
+                            maxLength={10}
                             value={form.phone}
-                            onChange={handleChange('phone')}
+                            onChange={handlePhoneChange}
                             disabled={!isEditing}
-                            placeholder='+91 00000 00000'
+                            placeholder='10-digit mobile number'
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
                     </div>

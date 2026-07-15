@@ -8,6 +8,7 @@ import productReducer from "./productReducers"
 import cartReducer from "./cartReducers"
 import orderReducer from "./orderReducers"
 import adminReducer from "./adminReducers"
+import addressReducer from "./addressReducers"
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     cart: cartReducer,
     order: orderReducer,
     admin: adminReducer,
+    address:addressReducer
 })
 
 export default rootReducer

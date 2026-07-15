@@ -13,7 +13,7 @@ import AdminHeader from './AdminHeader.jsx'
 import AdminToast from './AdminToast.jsx'
 import ProductForm from './ProductForm.jsx'
 import ProductTable from './ProductTable.jsx'
-import DeleteModal from './DeleteModal.jsx'
+import DeleteModal from '../../components/common_components/DeleteModal.jsx'
 import { buildFormData } from '../../utils/CommonFunctions.js'
 
 const EMPTY_FORM = { title: '', description: '', price: '', stock: '' }
@@ -126,6 +126,8 @@ function Admin() {
             <DeleteModal
                 deleteTarget={deleteTarget}
                 loading={adminLoading}
+                title='Delete Product'
+                itemName={deleteTarget?.title}
                 onConfirm={handleDeleteConfirm}
                 onCancel={() => setDeleteTarget(null)}
             />

@@ -44,3 +44,9 @@ export const CREATE_PRODUCT_URL = SERVER_URL + "/product/create"
 export const UPDATE_PRODUCT_URL = (id) => SERVER_URL + "/product/update/" + id
 export const DELETE_PRODUCT_URL = (id) => SERVER_URL + "/product/delete/" + id
 
+// ── Addresses ──
+export const ADD_ADDRESS_URL = SERVER_URL + "/address/add"
+export const GET_MY_ADDRESSES_URL = SERVER_URL + "/address/myaddresses"
+export const UPDATE_ADDRESS_URL = (id) => SERVER_URL + "/address/update/" + id
+export const DELETE_ADDRESS_URL = (id) => SERVER_URL + "/address/delete/" + id
+export const SET_DEFAULT_ADDRESS_URL = (id) => SERVER_URL + "/address/set-default/" + id

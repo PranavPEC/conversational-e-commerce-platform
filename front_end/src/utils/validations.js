@@ -107,6 +107,7 @@ export const isValidPassword = (password) => {
     return passwordRegex.test(password);
 };
 
+
 // ── Phone validation ──
 // Optional field on Profile — blank is allowed (user may not have added it
 // yet), but if something is entered, it must be exactly 10 digits.
@@ -138,6 +139,23 @@ export const checkDateOfBirthValidation = (dob, showToast) => {
 
     if (enteredDate > today) {
         showToast("Date of birth cannot be in the future.")
+        return false
+    }
+
+    return true
+}
+
+
+// ── Pincode validation ──
+// Format-only check (blank passes) — same convention as checkPhoneValidation.
+// The caller decides whether the field is required in their context; here
+// AddressForm treats pincode as required, so it runs checkIsEmpty itself
+// before calling this.
+export const checkPincodeValidation = (pincode, showToast) => {
+    if (checkIsEmpty(pincode)) return true
+
+    if (!/^\d{6}$/.test(pincode)) {
+        showToast("Pincode must be exactly 6 digits.")
         return false
     }
 

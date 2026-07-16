@@ -1,10 +1,10 @@
-
+﻿
 import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 // Signup-specific left panel
 // Same structure as LoginLeftPanel but different headline and description copy
-// Static — no props, no logic
+// Static â€” no props, no logic
 
 const features = [
     { icon: Tag,    title: 'Exclusive offers',  desc: 'Access special deals' },
@@ -16,7 +16,7 @@ function SignUpLeftPanel() {
     const navigate=useNavigate();
     return (
         <div
-            className='hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
+            className='theme-lock-dark hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
             style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #0d1f1a 50%, #0a0f0a 100%)' }}
         >
             {/* Decorative blobs */}
@@ -95,3 +95,4 @@ function SignUpLeftPanel() {
 }
 
 export default SignUpLeftPanel
+

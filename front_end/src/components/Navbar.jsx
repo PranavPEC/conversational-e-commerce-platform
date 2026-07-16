@@ -50,10 +50,10 @@ function Navbar() {
   // ── Guest Navbar ──
   if (!userData) {
     return (
-      <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
+      <nav className='w-full bg-[var(--color-card)] border-b border-[var(--color-border)] px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
         <div
           onClick={() => navigate('/')}
-          className='text-white font-bold text-lg tracking-tight cursor-pointer'
+          className='text-[var(--color-text-primary)] font-bold text-lg tracking-tight cursor-pointer'
         >
           Shop<span className='text-emerald-400'>AI</span>
         </div>
@@ -61,7 +61,7 @@ function Navbar() {
           {/* ── Login — outline/secondary style, sized to match the navbar's natural height ── */}
           <button
             onClick={() => navigate('/login')}
-            className='flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent border border-zinc-700 hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-white rounded-xl text-sm transition-all duration-300 cursor-pointer'
+            className='flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent border border-[var(--color-input-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm transition-all duration-300 cursor-pointer'
           >
             Login
           </button>
@@ -79,11 +79,11 @@ function Navbar() {
 
   // ── Authenticated Navbar ──
   return (
-    <nav className='w-full bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
+    <nav className='w-full bg-[var(--color-card)] border-b border-[var(--color-border)] px-6 py-4 flex items-center justify-between sticky top-0 z-50'>
 
       <div
         onClick={() => navigate('/')}
-        className='text-white font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
+        className='text-[var(--color-text-primary)] font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
       >
         Shop<span className='text-emerald-400'>AI</span>
       </div>
@@ -92,7 +92,7 @@ function Navbar() {
 
         <button
           onClick={() => navigate('/products')}
-          className={`text-sm transition-colors duration-200 ${isActive('/products') ? 'text-white font-medium' : 'text-zinc-400 hover:text-white'}`}
+          className={`text-sm transition-colors duration-200 ${isActive('/products') ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
         >
           Products
         </button>
@@ -115,7 +115,7 @@ function Navbar() {
         <button
           onClick={() => { }}
           aria-label='Wishlist'
-          className='text-zinc-400 hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
+          className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
         >
           <Heart size={20} />
         </button>
@@ -124,7 +124,7 @@ function Navbar() {
         <button
           onClick={() => navigate('/cart')}
           aria-label='Cart'
-          className={`relative transition-colors duration-200 cursor-pointer ${isActive('/cart') ? 'text-emerald-400' : 'text-zinc-400 hover:text-emerald-400'}`}
+          className={`relative transition-colors duration-200 cursor-pointer ${isActive('/cart') ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
         >
           <ShoppingCart size={20} />
           {cartCount > 0 && (
@@ -144,7 +144,7 @@ function Navbar() {
               <img
                 src={userData.profileImage}
                 alt={userData.name}
-                className='w-9 h-9 rounded-full object-cover border border-zinc-700'
+                className='w-9 h-9 rounded-full object-cover border border-[var(--color-input-border)]'
               />
             ) : (
               <div className='w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm font-semibold'>
@@ -153,17 +153,17 @@ function Navbar() {
             )}
             <ChevronDown
               size={16}
-              className={`text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+              className={`text-[var(--color-text-secondary)] transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
             />
           </button>
 
           {dropdownOpen && (
-            <div className='absolute right-0 mt-3 w-52 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/40 py-2 z-50'>
+            <div className='absolute right-0 mt-3 w-52 bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-2xl shadow-black/20 py-2 z-50'>
 
               {/* ── Profile — navigates to /profile ── */}
               <button
                 onClick={() => { setDropdownOpen(false); navigate('/profile') }}
-                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors duration-200 cursor-pointer'
+                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
               >
                 <User size={16} /> Profile
               </button>
@@ -171,25 +171,25 @@ function Navbar() {
               {/* ── My Orders — navigates to existing /orders route ── */}
               <button
                 onClick={() => { setDropdownOpen(false); navigate('/orders') }}
-                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors duration-200 cursor-pointer'
+                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
               >
                 <Package size={16} /> My Orders
               </button>
 
               {/* ── Settings — not functional yet ── */}
               <button
-                onClick={() => setDropdownOpen(false)}
-                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors duration-200 cursor-pointer'
+                onClick={() => {setDropdownOpen(false);navigate('/settings')}}
+                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
               >
                 <Settings size={16} /> Settings
               </button>
 
-              <div className='my-1.5 border-t border-zinc-800' />
+              <div className='my-1.5 border-t border-[var(--color-border)]' />
 
               {/* ── Logout ── */}
               <button
                 onClick={handleLogout}
-                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800 hover:text-red-300 transition-colors duration-200 cursor-pointer'
+                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-[var(--color-input-bg)] hover:text-red-300 transition-colors duration-200 cursor-pointer'
               >
                 <LogOut size={16} /> Logout
               </button>

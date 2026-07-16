@@ -132,11 +132,11 @@ function AddressesSection() {
                     {addresses.map(address => (
                         <div
                             key={address._id}
-                            className='bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col gap-3'
+                            className='bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col gap-3'
                         >
                             {/* ── Badges ── */}
                             <div className='flex items-center gap-2 flex-wrap'>
-                                <span className='text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300'>
+                                <span className='text-xs px-2 py-0.5 rounded-full bg-[var(--color-input-bg)] text-[var(--color-text-secondary)]'>
                                     {address.label}
                                 </span>
                                 {address.isDefault && (

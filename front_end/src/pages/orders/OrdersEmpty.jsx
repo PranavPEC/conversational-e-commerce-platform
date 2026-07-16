@@ -6,7 +6,7 @@ import { ShoppingBag } from 'lucide-react'
 
 function OrdersEmpty({ onBrowse }) {
     return (
-        <div className='w-full min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-4 px-6'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center gap-4 px-6'>
             <div className='w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center'>
                 <ShoppingBag size={28} className='text-zinc-600' />
             </div>

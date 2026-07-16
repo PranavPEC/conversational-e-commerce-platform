@@ -57,7 +57,7 @@ function Profile() {
     }, [])
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
             <div className='max-w-6xl mx-auto flex flex-col md:flex-row gap-8'>
 
                 {/* ── Left nav — shared component, also used by Orders.jsx ── */}
@@ -68,8 +68,8 @@ function Profile() {
 
                     {/* ── Page Heading ── */}
                     <div>
-                        <h1 className='text-white text-2xl font-bold tracking-tight'>Profile</h1>
-                        <p className='text-zinc-500 text-sm mt-1'>
+                        <h1 className='text-[var(--color-text-primary)] text-2xl font-bold tracking-tight'>Profile</h1>
+                        <p className='text-[var(--color-text-muted)] text-sm mt-1'>
                             Manage your personal information and account details
                         </p>
                     </div>

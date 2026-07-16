@@ -25,7 +25,7 @@ function Home() {
     const featured = products.slice(0, 4)
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)]'>
 
             <HeroSection
                 firstName={firstName}

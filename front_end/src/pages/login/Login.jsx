@@ -57,7 +57,7 @@ function Login() {
     }
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950 flex'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] flex'>
 
             <Toast
                 toast={toast}
@@ -69,7 +69,7 @@ function Login() {
 
             
 
-            <div className='w-full lg:w-[55%] bg-zinc-950 lg:bg-zinc-900 flex flex-col justify-center px-8 md:px-16 py-10'>
+            <div className='w-full lg:w-[55%] bg-[var(--color-bg)] lg:bg-[var(--color-card)] flex flex-col justify-center px-8 md:px-16 py-10'>
 
             <BrandLogo />
 

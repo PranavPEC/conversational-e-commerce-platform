@@ -45,7 +45,7 @@ function ProductDetail() {
 
     if (productLoading) {
         return (
-            <div className='w-full min-h-screen bg-zinc-950 flex justify-center items-center'>
+            <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
                 <p className='text-zinc-400 text-sm'>Loading product...</p>
             </div>
         )
@@ -53,7 +53,7 @@ function ProductDetail() {
 
     if (!product) {
         return (
-            <div className='w-full min-h-screen bg-zinc-950 flex flex-col justify-center items-center gap-4'>
+            <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
                 <p className='text-zinc-400 text-sm'>Product not found.</p>
                 <button onClick={() => navigate('/products')} className='text-emerald-400 text-sm hover:text-emerald-300 transition-colors duration-200'>
                     Back to products
@@ -63,7 +63,7 @@ function ProductDetail() {
     }
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
             <button
                 onClick={() => navigate('/products')}

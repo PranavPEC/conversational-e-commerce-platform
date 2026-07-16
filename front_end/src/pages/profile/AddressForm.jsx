@@ -148,7 +148,7 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                     <select
                         value={form.label}
                         onChange={handleChange('label')}
-                        className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors duration-200'
+                        className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     >
                         <option value='Home'>Home</option>
                         <option value='Work'>Work</option>
@@ -177,7 +177,7 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                         value={form.phone}
                         onChange={handlePhoneChange}
                         placeholder='10-digit mobile number'
-                        className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors duration-200'
+                        className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     />
                 </div>
 
@@ -212,6 +212,7 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                         <input
                             type='text'
                             value={form.city}
+                            placeholder='city'
                             onChange={handleChange('city')}
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
@@ -221,6 +222,7 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                         <input
                             type='text'
                             value={form.state}
+                            placeholder='state'
                             onChange={handleChange('state')}
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />

@@ -18,7 +18,7 @@ const NAV_ITEMS = [
     { key: 'profile',  label: 'Profile',    icon: User,     path: '/profile' },
     { key: 'orders',   label: 'My Orders',  icon: Package,  path: '/orders' },
     { key: 'wishlist', label: 'Wishlist',   icon: Heart,    path: null },
-    { key: 'settings', label: 'Settings',   icon: Settings, path: null },
+    { key: 'settings', label: 'Settings',   icon: Settings, path: '/settings' },
 ]
 
 function AccountSidebar() {
@@ -52,7 +52,7 @@ function AccountSidebar() {
                             className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                                 isActive
                                     ? 'bg-emerald-500/10 text-emerald-400 font-medium'
-                                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)]'
                             }`}
                         >
                             <Icon size={17} />
@@ -61,11 +61,11 @@ function AccountSidebar() {
                     )
                 })}
 
-                <div className='hidden md:block my-2 border-t border-zinc-800' />
+                <div className='hidden md:block my-2 border-t border-[var(--color-border)]' />
 
                 <button
                     onClick={handleLogout}
-                    className='flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-400 hover:bg-zinc-900 hover:text-red-300 transition-colors duration-200 cursor-pointer whitespace-nowrap'
+                    className='flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-400 hover:bg-[var(--color-input-bg)] hover:text-red-300 transition-colors duration-200 cursor-pointer whitespace-nowrap'
                 >
                     <LogOut size={17} />
                     Logout

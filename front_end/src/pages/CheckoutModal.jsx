@@ -109,7 +109,7 @@ function CheckoutModal({ onClose }) {
 
                     <div className='flex flex-col gap-2'>
                         <p className='text-zinc-400 text-xs font-medium uppercase tracking-widest'>Order Summary</p>
-                        <div className='bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col gap-2 max-h-40 overflow-y-auto'>
+                        <div className='bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col gap-2 max-h-40 overflow-y-auto'>
                             {cartItems.map(item => (
                                 <div key={item.product._id} className='flex items-center justify-between gap-3'>
                                     <span className='text-zinc-300 text-sm truncate flex-1'>{item.product.title}</span>

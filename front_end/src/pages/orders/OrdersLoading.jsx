@@ -5,7 +5,7 @@ import React from 'react'
 
 function OrdersLoading() {
     return (
-        <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
             <div className='max-w-3xl mx-auto'>
                 {/* Skeleton heading */}
                 <div className='h-7 w-40 bg-zinc-800 rounded-full animate-pulse mb-8' />

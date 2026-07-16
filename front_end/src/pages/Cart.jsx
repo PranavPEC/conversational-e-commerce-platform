@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchCart, updateCart, removeCartItem, clearEntireCart } from '../redux/reduxActions'
 import CheckoutModal from './CheckoutModal.jsx'
 import { calculateCartTotal } from '../utils/CommonFunctions.js'
 import { Loader } from 'lucide-react'
+import PrimaryButton from '../components/common_components/PrimaryButton.jsx'
 
 function Cart() {
     const navigate = useNavigate()
@@ -13,7 +14,7 @@ function Cart() {
     const { cartItems, cartLoading, itemLoading, error } = useSelector(state => state.cart)
 
     useEffect(() => {
-        fetchCart()   // plain call — no dispatch(), no silent flag needed from component
+        fetchCart()   // plain call â€” no dispatch(), no silent flag needed from component
     }, [])
 
     const handleQuantityChange = (productId, currentQty, change) => {
@@ -30,7 +31,7 @@ function Cart() {
 
     if (cartLoading) {
         return (
-            <div className='w-full min-h-screen bg-zinc-950 flex justify-center items-center'>
+            <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
                 <p className='text-zinc-400 text-sm'>Loading cart...</p>
             </div>
         )
@@ -38,7 +39,7 @@ function Cart() {
 
     if (cartItems.length === 0) {
         return (
-            <div className='w-full min-h-screen bg-zinc-950 flex flex-col justify-center items-center gap-4'>
+            <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
                 <p className='text-white text-lg font-medium'>Your cart is empty</p>
                 <p className='text-zinc-400 text-sm'>Looks like you haven't added anything yet.</p>
                 <button
@@ -52,7 +53,7 @@ function Cart() {
     }
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
             {showCheckout && <CheckoutModal onClose={() => setShowCheckout(false)} />}
 
@@ -112,7 +113,7 @@ function Cart() {
                                     disabled={isItemLoading}
                                     className='w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-white hover:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center'
                                 >
-                                    {isItemLoading ? <Loader size={10} className='animate-spin' /> : '−'}
+                                    {isItemLoading ? <Loader size={10} className='animate-spin' /> : '-'}
                                 </button>
                                 <span className='text-white font-medium w-5 text-center text-sm'>{item.quantity}</span>
                                 <button
@@ -153,17 +154,16 @@ function Cart() {
                         <span className='text-white font-semibold'>Total</span>
                         <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems).toLocaleString('en-IN')}</span>
                     </div>
-                    <button
+                    <PrimaryButton
+                        text='Proceed to Checkout'
                         onClick={() => setShowCheckout(true)}
-                        className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer mt-2'
-                    >
-                        Proceed to Checkout
-                    </button>
+                        className='w-full mt-2'
+                    />
                     <button
                         onClick={() => navigate('/products')}
                         className='w-full text-center text-zinc-400 hover:text-white text-sm transition-colors duration-200 cursor-pointer'
                     >
-                        ← Continue Shopping
+                        ← Continue Shopping
                     </button>
                 </div>
             </div>

@@ -95,7 +95,7 @@ function Admin() {
     }
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
             <div className='max-w-5xl mx-auto flex flex-col gap-8'>
 
                 <AdminHeader onAddClick={() => { handleResetForm(); setShowForm(true) }} />

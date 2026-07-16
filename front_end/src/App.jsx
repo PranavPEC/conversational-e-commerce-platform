@@ -19,6 +19,8 @@ import ResetPassword from './pages/forgot_password/ResetPassword.jsx';
 // ── New architecture: fetchUserData is a plain async function ──
 // It dispatches internally via store.dispatch — we do NOT wrap it in dispatch()
 import { fetchUserData } from './redux/reduxActions'
+import { initializeTheme } from './redux/reduxActions'
+import Settings from './pages/settings/Settings.jsx'
 
 function App() {
 
@@ -28,6 +30,7 @@ function App() {
     // Call directly — no dispatch() wrapper needed
     // fetchUserData() handles its own dispatching internally
     fetchUserData()
+    initializeTheme()
 
     // bfcache fix — re-validate auth when browser restores frozen page
     const handlePageShow = (event) => {
@@ -63,6 +66,7 @@ function App() {
         <Route path='/cart' element={userData ? <Cart /> : <Navigate to='/login' />} />
         <Route path='/orders' element={userData ? <Orders /> : <Navigate to='/login' />} />
         <Route path='/profile' element={userData ? <Profile /> : <Navigate to='/login' />} />
+        <Route path='/settings' element={userData ? <Settings /> : <Navigate to='/login' />} />
 
         {/* Admin — logged in AND role === admin */}
         <Route

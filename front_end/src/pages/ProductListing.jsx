@@ -14,7 +14,7 @@ function ProductListing() {
 
   if (productsLoading) {
     return (
-      <div className='w-full min-h-screen bg-zinc-950 flex justify-center items-center'>
+      <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>Loading products...</p>
       </div>
     )
@@ -22,14 +22,14 @@ function ProductListing() {
 
   if (products.length === 0) {
     return (
-      <div className='w-full min-h-screen bg-zinc-950 flex justify-center items-center'>
+      <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>No products found.</p>
       </div>
     )
   }
 
   return (
-    <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+    <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
       <h1 className='text-white text-2xl font-semibold tracking-tight mb-8'>All Products</h1>
 

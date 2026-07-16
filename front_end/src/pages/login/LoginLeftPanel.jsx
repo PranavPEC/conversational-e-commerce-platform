@@ -1,8 +1,8 @@
-
+﻿
 import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-// Static panel — no props, no logic
+// Static panel â€” no props, no logic
 // Same markup for Login and SignUp left panels
 // SignUp has different headline text so it gets its own SignUpLeftPanel
 
@@ -16,7 +16,7 @@ function LoginLeftPanel() {
     const navigate=useNavigate();
     return (
         <div
-            className='hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
+            className='theme-lock-dark hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
             style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #0d1f1a 50%, #0a0f0a 100%)' }}
         >
             {/* Decorative blobs */}
@@ -94,3 +94,4 @@ function LoginLeftPanel() {
 }
 
 export default LoginLeftPanel
+

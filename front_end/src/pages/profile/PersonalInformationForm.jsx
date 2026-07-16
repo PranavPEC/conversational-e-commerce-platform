@@ -107,7 +107,7 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                             value={form.name}
                             onChange={handleChange('name')}
                             disabled={!isEditing}
-                            className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
+                            className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] disabled:text-[var(--color-text-muted)] disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
                     </div>
 
@@ -118,7 +118,7 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                             type='email'
                             value={userData?.email || ''}
                             disabled
-                            className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-500 cursor-not-allowed'
+                            className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-muted)] cursor-not-allowed'
                         />
                     </div>
 
@@ -133,7 +133,7 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                             onChange={handlePhoneChange}
                             disabled={!isEditing}
                             placeholder='10-digit mobile number'
-                            className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
+                            className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] disabled:text-[var(--color-text-muted)] disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
                     </div>
 

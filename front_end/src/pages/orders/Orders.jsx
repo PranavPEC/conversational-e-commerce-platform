@@ -55,7 +55,7 @@ function Orders() {
     }
 
     return (
-        <div className='w-full min-h-screen bg-zinc-950 px-6 py-10'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
             {/* max-w-6xl matches Profile.jsx exactly — keeps AccountSidebar
                 aligned at the same horizontal position across both pages */}
             <div className='max-w-6xl mx-auto flex flex-col md:flex-row gap-8'>

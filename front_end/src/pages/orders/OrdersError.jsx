@@ -6,7 +6,7 @@ import React from 'react'
 
 function OrdersError({ error, onRetry }) {
     return (
-        <div className='w-full min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-3 px-6'>
+        <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center gap-3 px-6'>
             <p className='text-red-400 text-sm'>{error}</p>
             <button
                 onClick={onRetry}

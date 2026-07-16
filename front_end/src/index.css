@@ -1,5 +1,165 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
+
+/* â”€â”€ Theme CSS Variables â”€â”€ */
+/* These define the color palette for dark and light modes.
+   Components use var(--color-*) so they respond to theme changes
+   without needing conditional Tailwind classes everywhere. */
+
+:root,
+[data-theme="dark"] {
+    --color-bg: #09090b;           /* zinc-950 */
+    --color-card: #18181b;         /* zinc-900 */
+    --color-border: #27272a;       /* zinc-800 */
+    --color-input-bg: #27272a;     /* zinc-800 */
+    --color-input-border: #3f3f46; /* zinc-700 */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #a1a1aa; /* zinc-400 */
+    --color-text-muted: #71717a;     /* zinc-500 */
+    --color-accent: #10b981;         /* emerald-500 */
+    --color-accent-hover: #34d399;   /* emerald-400 */
+    --color-danger: #f87171;         /* red-400 */
+}
+
+[data-theme="light"] {
+    --color-bg: #f9fafb;           /* gray-50 */
+    --color-card: #ffffff;         /* white */
+    --color-border: #e5e7eb;       /* gray-200 */
+    --color-input-bg: #f3f4f6;     /* gray-100 */
+    --color-input-border: #d1d5db; /* gray-300 */
+    --color-text-primary: #18181b; /* zinc-900 */
+    --color-text-secondary: #52525b; /* zinc-600 */
+    --color-text-muted: #71717a;     /* zinc-500 */
+    --color-accent: #059669;         /* emerald-600 */
+    --color-accent-hover: #10b981;   /* emerald-500 */
+    --color-danger: #ef4444;         /* red-500 */
+}
+
+/* â”€â”€ Light-mode compatibility layer â”€â”€ */
+/* Existing pages still use hardcoded zinc/white classes. These overrides
+   let them respond to theme immediately while we progressively migrate
+   components to semantic var(--color-*) classes. */
+
+[data-theme="light"] .bg-zinc-950,
+[data-theme="light"] .bg-black {
+    background-color: var(--color-bg) !important;
+}
+
+[data-theme="light"] .bg-zinc-900 {
+    background-color: var(--color-card) !important;
+}
+
+[data-theme="light"] .bg-zinc-800 {
+    background-color: var(--color-input-bg) !important;
+}
+
+[data-theme="light"] .border-zinc-800 {
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .border-zinc-700 {
+    border-color: var(--color-input-border) !important;
+}
+
+[data-theme="light"] .text-white {
+    color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .text-zinc-300,
+[data-theme="light"] .text-zinc-400 {
+    color: var(--color-text-secondary) !important;
+}
+
+[data-theme="light"] .text-zinc-500,
+[data-theme="light"] .text-zinc-600 {
+    color: var(--color-text-muted) !important;
+}
+
+[data-theme="light"] .text-zinc-700,
+[data-theme="light"] .text-zinc-800,
+[data-theme="light"] .text-zinc-900,
+[data-theme="light"] .text-black {
+    color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .hover\:bg-zinc-900:hover,
+[data-theme="light"] .hover\:bg-zinc-800:hover {
+    background-color: #f3f4f6 !important;
+}
+
+[data-theme="light"] .hover\:text-white:hover {
+    color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .hover\:border-zinc-700:hover {
+    border-color: var(--color-input-border) !important;
+}
+
+[data-theme="light"] .from-zinc-950,
+[data-theme="light"] .from-zinc-900 {
+    --tw-gradient-from: #f9fafb var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(249 250 251 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+[data-theme="light"] .to-black,
+[data-theme="light"] .to-zinc-950,
+[data-theme="light"] .to-zinc-900 {
+    --tw-gradient-to: #ffffff var(--tw-gradient-to-position) !important;
+}
 
 body {
     font-family: "Plus Jakarta Sans", sans-serif;
+    background-color: var(--color-bg);
+    transition: background-color 0.3s ease;
+}
+/* ── Theme lock: dark-always zones ── */
+/* Applied to elements that must always render on a dark background
+   (LoginLeftPanel, SignUpLeftPanel). This undoes the light-mode
+   overrides inside those containers so text stays readable against
+   their fixed dark gradient background. */
+[data-theme="light"] .theme-lock-dark .text-white,
+[data-theme="light"] .theme-lock-dark .text-zinc-300,
+[data-theme="light"] .theme-lock-dark .text-zinc-400,
+[data-theme="light"] .theme-lock-dark .text-zinc-500,
+[data-theme="light"] .theme-lock-dark .text-zinc-600,
+[data-theme="light"] .theme-lock-dark .text-zinc-700 {
+    color: unset !important;
+}
+
+[data-theme="light"] .theme-lock-dark .bg-zinc-900,
+[data-theme="light"] .theme-lock-dark .bg-zinc-800,
+[data-theme="light"] .theme-lock-dark .bg-zinc-700 {
+    background-color: unset !important;
+}
+
+[data-theme="light"] .theme-lock-dark .border-zinc-800,
+[data-theme="light"] .theme-lock-dark .border-zinc-700 {
+    border-color: unset !important;
+}
+
+/* ── PrimaryButton text always stays white ── */
+/* bg-emerald-500 button background guarantees white text is readable
+   regardless of theme — don't let the light-mode text-white override
+   flip it to dark. */
+[data-theme="light"] .bg-emerald-500 {
+    color: #ffffff !important;
+}
+[data-theme="light"] .bg-emerald-500:hover {
+    color: #ffffff !important;
+}
+
+/* ── HeroSection: always-dark text and border ── */
+/* HeroSection has its own dark gradient/blob background (hero-section CSS class)
+   so greeting text and buttons must stay their original dark-theme colors. */
+[data-theme="light"] .hero-section .text-white {
+    color: #ffffff !important;
+}
+[data-theme="light"] .hero-section .text-zinc-400 {
+    color: #a1a1aa !important;
+}
+[data-theme="light"] .hero-section .border-zinc-700 {
+    border-color: #3f3f46 !important;
+}
+[data-theme="light"] .hero-section .hover\:border-zinc-700:hover {
+    border-color: #3f3f46 !important;
 }

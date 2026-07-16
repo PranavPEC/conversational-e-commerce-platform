@@ -8,7 +8,9 @@ import { fetchProducts } from '../../redux/reduxActions'
 // ── Child Components ──
 import HeroSection from './HeroSection.jsx'
 import CategoryNav from './CategoryNav.jsx'
+import DealBanner from './DealBanner.jsx'
 import PerksBar from './PerksBar.jsx'
+import PromoBannerGrid from './PromoBannerGrid.jsx'
 import SocialProofBanner from './SocialProofBanner.jsx'
 import ProductRail from '../../components/common_components/ProductRail.jsx'
 import useScrollReveal from '../../hooks/useScrollReveal'
@@ -58,6 +60,8 @@ function Home() {
 
             <CategoryNav />
 
+            <DealBanner />
+
             <PerksBar />
 
             <div
@@ -75,6 +79,8 @@ function Home() {
                     onSeeAll={() => navigate('/products')}
                 />
             </div>
+
+            <PromoBannerGrid />
 
             <div
                 ref={arrivalsRef}

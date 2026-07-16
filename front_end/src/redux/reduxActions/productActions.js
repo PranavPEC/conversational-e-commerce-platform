@@ -1,4 +1,4 @@
-// src/redux/reduxActions/productActions.js
+﻿// src/redux/reduxActions/productActions.js
 //
 // OLD: createAsyncThunk handled pending/fulfilled/rejected automatically
 //
@@ -8,8 +8,7 @@
 //      and what happens between API call and state update.
 
 import axios from "axios"
-import { SERVER_URL } from "../../utils/APIConfig"
-import { GET_ALL_PRODUCTS_URL,GET_PRODUCT_BY_ID_URL } from "../../config/urls"
+import { GET_ALL_PRODUCTS_URL, GET_PRODUCT_BY_ID_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
     setProducts,
@@ -21,14 +20,16 @@ import {
 
 const { dispatch } = store
 
-// ── Fetch all products ──
-// Used by: Home.jsx (featured section), ProductListing.jsx, Admin.jsx
-export const fetchProducts = async () => {
+// ── Fetch products ──
+// Used by:
+//   Home.jsx / Admin.jsx        → fetchProducts() for all products
+//   ProductListing.jsx         → fetchProducts(category) for category-specific pages
+export const fetchProducts = async (category = null) => {
     dispatch(setProductsLoading(true))
     dispatch(setProductsError(null))
 
     try {
-        const { data } = await axios.get(GET_ALL_PRODUCTS_URL)
+        const { data } = await axios.get(GET_ALL_PRODUCTS_URL(category))
         dispatch(setProducts(data.products))
         return data.products
     } catch (error) {

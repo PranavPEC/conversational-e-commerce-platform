@@ -1,4 +1,4 @@
-// src/utils/urls.js
+﻿// src/utils/urls.js
 // All API endpoint URLs in one place
 // Pattern from inspiration project's config/urls.ts
 //
@@ -21,7 +21,10 @@ export const RESET_PASSWORD_URL = SERVER_URL + "/reset-password";
 export const UPDATE_USER_URL = (id) => SERVER_URL + "/update/" + id
 
 // ── Products ──
-export const GET_ALL_PRODUCTS_URL = SERVER_URL + "/product/all"
+export const GET_ALL_PRODUCTS_URL = (category) => {
+    if (!category) return SERVER_URL + "/product/all"
+    return SERVER_URL + "/product/all?category=" + encodeURIComponent(category)
+}
 export const GET_PRODUCT_BY_ID_URL = (id) => SERVER_URL + "/product/" + id
 
 // ── Cart ──

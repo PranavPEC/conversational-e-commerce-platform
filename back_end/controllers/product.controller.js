@@ -40,9 +40,6 @@ export const createProduct = async (req, res) => {
             image
         });
 
-        // SOCKET.IO HOOK (Step 15):
-        // io.emit("product:created", newProduct);
-
         return res.status(201).json({
             message: "Product Created Successfully.",
             product: newProduct
@@ -57,7 +54,14 @@ export const createProduct = async (req, res) => {
 // Get All Products  (Public)
 export const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const category = req.query.category?.toLowerCase()
+
+        const query = {}
+        if (category) {
+            query.category = category
+        }
+
+        const products = await Product.find(query)
         return res.status(200).json({ message: "Products Fetched Successfully.", products });
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error });
@@ -113,9 +117,6 @@ export const updateProduct = async (req, res) => {
 
         await product.save();
 
-        // SOCKET.IO HOOK (Step 15):
-        // io.emit("product:updated", product);
-
         return res.status(200).json({
             message: "Product Updated Successfully.",
             product
@@ -134,9 +135,6 @@ export const deleteProduct = async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: "Product Not Found." });
         }
-
-        // SOCKET.IO HOOK (Step 15):
-        // io.emit("product:deleted", { productId: req.params.id });
 
         return res.status(200).json({ message: "Product Deleted Successfully." });
 

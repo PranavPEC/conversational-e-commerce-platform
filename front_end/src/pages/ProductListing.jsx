@@ -21,16 +21,12 @@ function ProductListing() {
 
   const { products, productsLoading } = useSelector(state => state.products)
 
-  useEffect(() => {
-    fetchProducts()   // plain call — no dispatch()
-  }, [])
-
   const categoryParam = new URLSearchParams(location.search).get('category')
   const normalizedCategory = categoryParam ? categoryParam.toLowerCase() : null
 
-  const visibleProducts = normalizedCategory
-    ? products.filter(product => (product.category || 'uncategorized').toLowerCase() === normalizedCategory)
-    : products
+  useEffect(() => {
+    fetchProducts(normalizedCategory)   // plain call — no dispatch()
+  }, [normalizedCategory])
 
   const heading = normalizedCategory
     ? (CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
@@ -44,7 +40,7 @@ function ProductListing() {
     )
   }
 
-  if (visibleProducts.length === 0) {
+  if (products.length === 0) {
     return (
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>
@@ -64,7 +60,7 @@ function ProductListing() {
       </h1>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-        {visibleProducts.map((product) => (
+        {products.map((product) => (
           <div
             key={product._id}
             onClick={() => navigate('/product/' + product._id)}

@@ -1,34 +1,22 @@
-import { ShoppingBag, ChevronRight, Eye } from 'lucide-react'
-import useScrollReveal from '../../hooks/useScrollReveal'
+﻿import { ShoppingBag, ChevronRight, Eye } from 'lucide-react'
 
-// Handles all three states: loading skeleton, product grid, empty state
-// Props:
-//   featured       — array of up to 4 products (sliced in Home.jsx)
-//   loading        — boolean from productsSlice
-//   onProductClick — navigate to /product/:id (called with product._id)
-//   onSeeAll       — navigate to /products
-
-function FeaturedProducts({ featured, loading, onProductClick, onSeeAll }) {
-    // ── Scroll Reveal ──
-    const [ref, isVisible] = useScrollReveal()
-
+// ── Reusable Product Rail ──
+// Generic rail component shared across Home sections (Featured, New Arrivals,
+// etc). Keeps the existing loading / populated / empty-state behavior exactly
+// the same as the old FeaturedProducts component.
+function ProductRail({ title, subtitle, products, loading, onProductClick, onSeeAll }) {
     return (
-        <section
-            ref={ref}
-            className={`w-full px-6 md:px-16 py-14 transition-all duration-700 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-        >
+        <section className='w-full px-6 md:px-16 py-14'>
             <div className='max-w-5xl mx-auto'>
 
                 {/* ── Section Header ── */}
                 <div className='flex items-center justify-between mb-8'>
                     <div>
                         <p className='text-emerald-400 text-xs font-medium tracking-widest uppercase mb-1'>
-                            Handpicked for you
+                            {subtitle}
                         </p>
                         <h2 className='text-white text-2xl font-bold tracking-tight'>
-                            Featured Products
+                            {title}
                         </h2>
                     </div>
                     <button
@@ -55,9 +43,9 @@ function FeaturedProducts({ featured, loading, onProductClick, onSeeAll }) {
                 )}
 
                 {/* ── Product Grid ── */}
-                {!loading && featured.length > 0 && (
+                {!loading && products.length > 0 && (
                     <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                        {featured.map(product => (
+                        {products.map(product => (
                             <div
                                 key={product._id}
                                 onClick={() => onProductClick(product._id)}
@@ -109,7 +97,7 @@ function FeaturedProducts({ featured, loading, onProductClick, onSeeAll }) {
                 )}
 
                 {/* ── Empty State ── */}
-                {!loading && featured.length === 0 && (
+                {!loading && products.length === 0 && (
                     <div className='flex flex-col items-center justify-center py-16 gap-3'>
                         <ShoppingBag size={32} className='text-zinc-700' />
                         <p className='text-zinc-400 text-sm'>No products available right now.</p>
@@ -121,4 +109,4 @@ function FeaturedProducts({ featured, loading, onProductClick, onSeeAll }) {
     )
 }
 
-export default FeaturedProducts
+export default ProductRail

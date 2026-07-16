@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+﻿import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css'
 
 import SignUp from './pages/signup/SignUp.jsx';
@@ -11,6 +11,7 @@ import Orders from './pages/orders/Orders.jsx';
 import Admin from './pages/admin/Admin.jsx';
 import Profile from './pages/profile/Profile.jsx';
 import Navbar from './components/Navbar.jsx';
+import Footer from './components/common_components/Footer.jsx';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import ForgotPassword from './pages/forgot_password/ForgotPassword.jsx';
@@ -83,6 +84,8 @@ function App() {
         <Route path='/*' element={userData ? <Home /> : <ProductListing />} />
 
       </Routes>
+
+      {!hideNavbar && <Footer />}
     </>
   )
 }

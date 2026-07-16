@@ -1,5 +1,4 @@
-
-import { Pencil, Trash2, Package } from 'lucide-react'
+﻿import { Pencil, Trash2, Package } from 'lucide-react'
 
 // Props:
 //   products      — array of product objects from adminSlice
@@ -53,6 +52,11 @@ function ProductTable({ products, onEdit, onDeleteClick }) {
                     <div className='flex-1 min-w-0'>
                         <p className='text-white text-sm font-medium truncate'>{product.title}</p>
                         <p className='text-zinc-500 text-xs mt-0.5 truncate'>{product.description}</p>
+                        {product.category && (
+                            <span className='inline-flex mt-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] uppercase tracking-wide'>
+                                {product.category}
+                            </span>
+                        )}
                     </div>
 
                     {/* Price + stock */}

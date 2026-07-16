@@ -1,14 +1,20 @@
-import Product from "../models/user.product.js";
+﻿import Product, { PRODUCT_CATEGORIES } from "../models/user.product.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
 
 // Create Product  (Admin Only)
 export const createProduct = async (req, res) => {
     try {
-        const { title, description, price, stock } = req.body;
+        const { title, description, price, stock, category } = req.body;
 
-        if (!title || !description || !price || !stock) {
+        if (!title || !description || !price || !stock || !category) {
             return res.status(400).json({
-                message: "Please provide all required fields: title, description, price, stock."
+                message: "Please provide all required fields: title, description, price, stock, category."
+            });
+        }
+
+        if (!PRODUCT_CATEGORIES.includes(category)) {
+            return res.status(400).json({
+                message: "Invalid category provided."
             });
         }
 
@@ -30,6 +36,7 @@ export const createProduct = async (req, res) => {
             description,
             price: Number(price),   // req.body values from FormData come as strings — convert
             stock: Number(stock),
+            category,
             image
         });
 
@@ -75,7 +82,7 @@ export const getProductById = async (req, res) => {
 // Update Product  (Admin Only)
 export const updateProduct = async (req, res) => {
     try {
-        const { title, description, price, stock } = req.body;
+        const { title, description, price, stock, category } = req.body;
 
         const product = await Product.findById(req.params.id);
         if (!product) {
@@ -88,12 +95,16 @@ export const updateProduct = async (req, res) => {
         if (stock !== undefined && Number(stock) < 0) {
             return res.status(400).json({ message: "Stock cannot be negative." });
         }
+        if (category !== undefined && !PRODUCT_CATEGORIES.includes(category)) {
+            return res.status(400).json({ message: "Invalid category provided." });
+        }
 
         // Only update fields that were actually sent
         if (title)       product.title       = title;
         if (description) product.description = description;
-        if (price)       product.price       = Number(price);   // FormData sends strings
+        if (price !== undefined) product.price = Number(price);   // FormData sends strings
         if (stock !== undefined) product.stock = Number(stock);
+        if (category !== undefined) product.category = category;
 
         // If a new image was uploaded, replace the old one
         if (req.file) {

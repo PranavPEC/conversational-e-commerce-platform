@@ -1,16 +1,40 @@
-import  { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+﻿import { useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchProducts } from '../redux/reduxActions'
 
+const CATEGORY_LABELS = {
+  electronics: 'Electronics',
+  fashion: 'Fashion',
+  home: 'Home',
+  beauty: 'Beauty',
+  accessories: 'Accessories',
+  audio: 'Audio',
+  laptops: 'Laptops',
+  premium: 'Premium',
+  uncategorized: 'Uncategorized',
+}
+
 function ProductListing() {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { products, productsLoading } = useSelector(state => state.products)
 
   useEffect(() => {
     fetchProducts()   // plain call — no dispatch()
   }, [])
+
+  const categoryParam = new URLSearchParams(location.search).get('category')
+  const normalizedCategory = categoryParam ? categoryParam.toLowerCase() : null
+
+  const visibleProducts = normalizedCategory
+    ? products.filter(product => (product.category || 'uncategorized').toLowerCase() === normalizedCategory)
+    : products
+
+  const heading = normalizedCategory
+    ? (CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
+    : 'All Products'
 
   if (productsLoading) {
     return (
@@ -20,10 +44,14 @@ function ProductListing() {
     )
   }
 
-  if (products.length === 0) {
+  if (visibleProducts.length === 0) {
     return (
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
-        <p className='text-zinc-400 text-sm'>No products found.</p>
+        <p className='text-zinc-400 text-sm'>
+          {normalizedCategory
+            ? 'No products found in this category.'
+            : 'No products found.'}
+        </p>
       </div>
     )
   }
@@ -31,10 +59,12 @@ function ProductListing() {
   return (
     <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
-      <h1 className='text-white text-2xl font-semibold tracking-tight mb-8'>All Products</h1>
+      <h1 className='text-white text-2xl font-semibold tracking-tight mb-8'>
+        {heading}
+      </h1>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-        {products.map((product) => (
+        {visibleProducts.map((product) => (
           <div
             key={product._id}
             onClick={() => navigate('/product/' + product._id)}

@@ -1,4 +1,16 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
+
+export const PRODUCT_CATEGORIES = [
+  "electronics",
+  "fashion",
+  "home",
+  "beauty",
+  "accessories",
+  "audio",
+  "laptops",
+  "premium",
+  "uncategorized",
+];
 
 const productSchema = new mongoose.Schema({
   title: String,
@@ -6,6 +18,13 @@ const productSchema = new mongoose.Schema({
   price: Number,
   stock: Number,
   image: String,
+  category: {
+    type: String,
+    enum: PRODUCT_CATEGORIES,
+    default: "uncategorized",
+    trim: true,
+    lowercase: true,
+  },
 },{
     timestamps:true
 });

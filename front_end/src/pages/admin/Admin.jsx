@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
     createProduct,
@@ -16,7 +16,7 @@ import ProductTable from './ProductTable.jsx'
 import DeleteModal from '../../components/common_components/DeleteModal.jsx'
 import { buildFormData } from '../../utils/CommonFunctions.js'
 
-const EMPTY_FORM = { title: '', description: '', price: '', stock: '' }
+const EMPTY_FORM = { title: '', description: '', price: '', stock: '', category: '' }
 
 function Admin() {
     // New state keys from adminReducers — adminLoading/adminError/adminSuccess
@@ -61,6 +61,7 @@ function Admin() {
             description: product.description || '',
             price: product.price || '',
             stock: product.stock || '',
+            category: product.category || 'uncategorized',
         })
         setImageFile(null)
         setImagePreview(product.image || null)
@@ -77,7 +78,7 @@ function Admin() {
     }
 
     const handleSubmit = async () => {
-        if (!form.title || !form.description || !form.price || !form.stock) return
+        if (!form.title || !form.description || !form.price || !form.stock || !form.category) return
         const formData = buildFormData(form, imageFile)
 
         if (editingProduct) {

@@ -7,7 +7,6 @@ import { fetchProducts } from '../../redux/reduxActions'
 
 // ── Child Components ──
 import HeroSection from './HeroSection.jsx'
-import CategoryNav from './CategoryNav.jsx'
 import DealBanner from './DealBanner.jsx'
 import PerksBar from './PerksBar.jsx'
 import PromoBannerGrid from './PromoBannerGrid.jsx'
@@ -57,8 +56,6 @@ function Home() {
                 onBrowse={() => navigate('/products')}
                 onCart={() => navigate('/cart')}
             />
-
-            <CategoryNav />
 
             <DealBanner />
 

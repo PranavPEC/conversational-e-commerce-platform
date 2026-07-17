@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import PrimaryButton from './common_components/PrimaryButton.jsx'
-import { Heart, ShoppingCart, User, Package, Settings, LogOut, ChevronDown, Search } from 'lucide-react'
+import { Heart, ShoppingCart, User, Package, Settings, LogOut, ChevronDown, Search, Menu } from 'lucide-react'
 
 // ── New architecture: logoutUser is a plain async function, call directly ──
 import { logoutUser } from '../redux/reduxActions'
@@ -14,6 +14,17 @@ import { clearCart } from '../redux/reduxActions'
 import { GET_ALL_PRODUCTS_URL } from '../config/urls'
 
 import { getInitial } from '../utils/CommonFunctions.js'
+
+const NAV_CATEGORIES = [
+  { key: 'electronics', label: 'Electronics' },
+  { key: 'fashion', label: 'Fashion' },
+  { key: 'home', label: 'Home' },
+  { key: 'beauty', label: 'Beauty' },
+  { key: 'accessories', label: 'Accessories' },
+  { key: 'audio', label: 'Audio' },
+  { key: 'laptops', label: 'Laptops' },
+  { key: 'premium', label: 'Premium' },
+]
 
 function Navbar() {
   const dispatch = useDispatch()    // still needed for clearCart (RTK action)
@@ -111,6 +122,7 @@ function Navbar() {
   }
 
   const isActive = (path) => location.pathname === path
+  const activeCategory = new URLSearchParams(location.search).get('category')?.toLowerCase() || null
 
   const handleSearchSubmit = () => {
     const query = searchInput.trim()
@@ -129,6 +141,14 @@ function Navbar() {
     setSuggestionsOpen(false)
     setMobileSearchOpen(false)
     navigate('/product/' + id)
+  }
+
+  const handleCategoryNav = (category = null) => {
+    if (!category) {
+      navigate('/products')
+      return
+    }
+    navigate('/products?category=' + encodeURIComponent(category))
   }
 
   const renderSearchBar = (searchRef, mobile = false) => (
@@ -194,6 +214,47 @@ function Navbar() {
     </div>
   )
 
+  const renderCategoryStrip = () => (
+    <div className='mt-3 pt-3 border-t border-[var(--color-border)]'>
+      <div
+        className='overflow-x-auto whitespace-nowrap [&::-webkit-scrollbar]:hidden'
+        style={{ scrollbarWidth: 'none' }}
+      >
+        <div className='w-max min-w-full flex items-center justify-center gap-2 md:gap-3'>
+          <div className='hidden md:flex items-center gap-2 px-2 py-1.5 rounded-xl text-xs font-semibold text-[var(--color-text-primary)] bg-[var(--color-input-bg)] border border-[var(--color-input-border)]'>
+            <Menu size={14} />
+            Shop by Categories
+          </div>
+
+          <button
+            onClick={() => handleCategoryNav(null)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${
+              !activeCategory
+                ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+                : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
+            }`}
+          >
+            All
+          </button>
+
+          {NAV_CATEGORIES.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => handleCategoryNav(key)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${
+                activeCategory === key
+                  ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+                  : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
   // ── Guest Navbar ──
   if (!userData) {
     return (
@@ -241,6 +302,8 @@ function Navbar() {
             {renderSearchBar(mobileSearchRef, true)}
           </div>
         )}
+
+        {renderCategoryStrip()}
       </nav>
     )
   }
@@ -377,6 +440,8 @@ function Navbar() {
           {renderSearchBar(mobileSearchRef, true)}
         </div>
       )}
+
+      {renderCategoryStrip()}
 
     </nav>
   )

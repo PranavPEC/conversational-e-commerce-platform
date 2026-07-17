@@ -23,13 +23,13 @@ const { dispatch } = store
 // ── Fetch products ──
 // Used by:
 //   Home.jsx / Admin.jsx        → fetchProducts() for all products
-//   ProductListing.jsx         → fetchProducts(category) for category-specific pages
-export const fetchProducts = async (category = null) => {
+//   ProductListing.jsx          → fetchProducts(category, search) for filtered pages
+export const fetchProducts = async (category = null, search = null) => {
     dispatch(setProductsLoading(true))
     dispatch(setProductsError(null))
 
     try {
-        const { data } = await axios.get(GET_ALL_PRODUCTS_URL(category))
+        const { data } = await axios.get(GET_ALL_PRODUCTS_URL(category, search))
         dispatch(setProducts(data.products))
         return data.products
     } catch (error) {

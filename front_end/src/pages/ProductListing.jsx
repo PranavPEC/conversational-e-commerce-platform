@@ -21,16 +21,22 @@ function ProductListing() {
 
   const { products, productsLoading } = useSelector(state => state.products)
 
-  const categoryParam = new URLSearchParams(location.search).get('category')
+  const searchParams = new URLSearchParams(location.search)
+  const categoryParam = searchParams.get('category')
+  const searchParam = searchParams.get('search')
+
   const normalizedCategory = categoryParam ? categoryParam.toLowerCase() : null
+  const normalizedSearch = searchParam ? searchParam.trim() : null
 
   useEffect(() => {
-    fetchProducts(normalizedCategory)   // plain call — no dispatch()
-  }, [normalizedCategory])
+    fetchProducts(normalizedCategory, normalizedSearch)   // plain call — no dispatch()
+  }, [normalizedCategory, normalizedSearch])
 
-  const heading = normalizedCategory
-    ? (CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
-    : 'All Products'
+  const heading = normalizedSearch
+    ? `Search results for "${normalizedSearch}"`
+    : normalizedCategory
+      ? (CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
+      : 'All Products'
 
   if (productsLoading) {
     return (
@@ -44,9 +50,11 @@ function ProductListing() {
     return (
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>
-          {normalizedCategory
-            ? 'No products found in this category.'
-            : 'No products found.'}
+          {normalizedSearch
+            ? 'No products match your search.'
+            : normalizedCategory
+              ? 'No products found in this category.'
+              : 'No products found.'}
         </p>
       </div>
     )

@@ -25,6 +25,7 @@ const productSlice = createSlice({
 
     reducers: {
         // Called after fetchProducts API succeeds
+        // (all products or category/search-filtered results)
         setProducts: (state, action) => {
             state.products = action.payload
         },

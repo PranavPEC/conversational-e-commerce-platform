@@ -21,9 +21,14 @@ export const RESET_PASSWORD_URL = SERVER_URL + "/reset-password";
 export const UPDATE_USER_URL = (id) => SERVER_URL + "/update/" + id
 
 // ── Products ──
-export const GET_ALL_PRODUCTS_URL = (category) => {
-    if (!category) return SERVER_URL + "/product/all"
-    return SERVER_URL + "/product/all?category=" + encodeURIComponent(category)
+export const GET_ALL_PRODUCTS_URL = (category = null, search = null) => {
+    const params = new URLSearchParams()
+    if (category) params.set("category", category)
+    if (search) params.set("search", search)
+
+    const queryString = params.toString()
+    if (!queryString) return SERVER_URL + "/product/all"
+    return SERVER_URL + "/product/all?" + queryString
 }
 export const GET_PRODUCT_BY_ID_URL = (id) => SERVER_URL + "/product/" + id
 

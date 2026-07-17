@@ -55,10 +55,31 @@ export const createProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
     try {
         const category = req.query.category?.toLowerCase()
+        const search = req.query.search?.trim()
 
-        const query = {}
+        const queryConditions = []
         if (category) {
-            query.category = category
+            queryConditions.push({ category })
+        }
+
+        if (search) {
+            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+            const searchRegex = new RegExp(escapedSearch, "i")
+
+            queryConditions.push({
+                $or: [
+                    { title: searchRegex },
+                    { description: searchRegex },
+                    { category: searchRegex },
+                ],
+            })
+        }
+
+        let query = {}
+        if (queryConditions.length === 1) {
+            query = queryConditions[0]
+        } else if (queryConditions.length > 1) {
+            query = { $and: queryConditions }
         }
 
         const products = await Product.find(query)

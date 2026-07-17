@@ -69,6 +69,55 @@
 }
 
 /* ==========================================================
+   Product Showcase Container & Grid
+========================================================== */
+
+.hero-showcase-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+}
+
+.hero-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+}
+
+/* ── Individual Card Staggered Entrance Animation ── */
+.hero-showcase-card {
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: none;
+}
+
+.hero-showcase-card.hero-card-visible {
+    animation: heroCardFadeUp 500ms ease-out forwards;
+}
+
+/* ── Stagger each card with increasing delay ── */
+.hero-showcase-card-0.hero-card-visible {
+    animation-delay: 0ms;
+}
+
+.hero-showcase-card-1.hero-card-visible {
+    animation-delay: 100ms;
+}
+
+.hero-showcase-card-2.hero-card-visible {
+    animation-delay: 200ms;
+}
+
+.hero-showcase-card-3.hero-card-visible {
+    animation-delay: 300ms;
+}
+
+/* ==========================================================
    Keyframes
 ========================================================== */
 
@@ -118,5 +167,19 @@
 
     50% {
         width: 96px;
+    }
+}
+
+/* ── Staggered Card Entrance: Fade + Scale Up ── */
+@keyframes heroCardFadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0px) scale(1);
     }
 }

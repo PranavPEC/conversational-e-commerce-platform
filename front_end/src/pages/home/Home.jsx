@@ -43,6 +43,15 @@ function Home() {
         .sort((a, b) => (a?.price ?? 0) - (b?.price ?? 0))
         .slice(0, 4)
 
+    // ── Hero showcase: top 4 by newest createdAt, for product cards in hero ──
+    const heroShowcaseProducts = [...products]
+        .sort((a, b) => {
+            const aTime = a?.createdAt ? new Date(a.createdAt).getTime() : 0
+            const bTime = b?.createdAt ? new Date(b.createdAt).getTime() : 0
+            return bTime - aTime
+        })
+        .slice(0, 4)
+
     // ── Independent scroll reveals for each rail ──
     const [featuredRef, featuredVisible] = useScrollReveal()
     const [arrivalsRef, arrivalsVisible] = useScrollReveal()
@@ -55,6 +64,8 @@ function Home() {
                 firstName={firstName}
                 onBrowse={() => navigate('/products')}
                 onCart={() => navigate('/cart')}
+                heroShowcaseProducts={heroShowcaseProducts}
+                onProductClick={(id) => navigate('/product/' + id)}
             />
 
             <DealBanner />

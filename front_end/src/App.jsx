@@ -17,8 +17,7 @@ import { useEffect } from 'react';
 import ForgotPassword from './pages/forgot_password/ForgotPassword.jsx';
 import VerifyOTP from './pages/forgot_password/VerifyOTP.jsx';
 import ResetPassword from './pages/forgot_password/ResetPassword.jsx';
-// ── New architecture: fetchUserData is a plain async function ──
-// It dispatches internally via store.dispatch — we do NOT wrap it in dispatch()
+
 import { fetchUserData } from './redux/reduxActions'
 import { initializeTheme } from './redux/reduxActions'
 import Settings from './pages/settings/Settings.jsx'
@@ -28,12 +27,11 @@ function App() {
   const { userData, authLoading } = useSelector(state => state.auth)
 
   useEffect(() => {
-    // Call directly — no dispatch() wrapper needed
-    // fetchUserData() handles its own dispatching internally
+
     fetchUserData()
     initializeTheme()
 
-    // bfcache fix — re-validate auth when browser restores frozen page
+
     const handlePageShow = (event) => {
       if (event.persisted) fetchUserData()
     }
@@ -42,7 +40,7 @@ function App() {
   }, [])
 
   const location = useLocation()
-  const hideNavbar = ['/login', '/signup','/forgot-password','/verify-otp','/reset-password'].includes(location.pathname)
+  const hideNavbar = ['/login', '/signup', '/forgot-password', '/verify-otp', '/reset-password'].includes(location.pathname)
 
   if (authLoading) return null
 

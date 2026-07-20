@@ -12,6 +12,7 @@ import { logoutUser } from '../redux/reduxActions'
 // Will be swapped to ../redux/reduxActions once cartActions.js is migrated
 import { clearCart } from '../redux/reduxActions'
 import { GET_ALL_PRODUCTS_URL } from '../config/urls'
+import useDebounce from '../hooks/useDebounce'
 
 import { getInitial } from '../utils/CommonFunctions.js'
 
@@ -42,7 +43,7 @@ function Navbar() {
 
   // ── Search state ──
   const [searchInput, setSearchInput] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const debouncedSearch = useDebounce(searchInput.trim(), 300)
   const [searchSuggestions, setSearchSuggestions] = useState([])
   const [suggestionsOpen, setSuggestionsOpen] = useState(false)
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
@@ -65,15 +66,6 @@ function Navbar() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  // ── Debounce search input for quick suggestions ──
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedSearch(searchInput.trim())
-    }, 300)
-
-    return () => clearTimeout(timerId)
-  }, [searchInput])
 
   // ── Fetch search suggestions (max 5) ──
   useEffect(() => {

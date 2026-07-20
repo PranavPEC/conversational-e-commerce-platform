@@ -16,7 +16,8 @@ import ProductTable from './ProductTable.jsx'
 import DeleteModal from '../../components/common_components/DeleteModal.jsx'
 import { buildFormData } from '../../utils/CommonFunctions.js'
 
-const EMPTY_FORM = { title: '', description: '', price: '', stock: '', category: '' }
+// category is now an array of strings — default to empty array, not empty string
+const EMPTY_FORM = { title: '', description: '', price: '', stock: '', category: [] }
 
 function Admin() {
     // New state keys from adminReducers — adminLoading/adminError/adminSuccess
@@ -61,7 +62,11 @@ function Admin() {
             description: product.description || '',
             price: product.price || '',
             stock: product.stock || '',
-            category: product.category || 'uncategorized',
+            // product.category is an array after migration; fall back gracefully
+            // if somehow it's still a string (pre-migration legacy document)
+            category: Array.isArray(product.category)
+                ? product.category
+                : [product.category || 'uncategorized'],
         })
         setImageFile(null)
         setImagePreview(product.image || null)
@@ -78,8 +83,13 @@ function Admin() {
     }
 
     const handleSubmit = async () => {
-        if (!form.title || !form.description || !form.price || !form.stock || !form.category) return
-        const formData = buildFormData(form, imageFile)
+        if (!form.title || !form.description || !form.price || !form.stock || form.category.length === 0) return
+
+        // buildFormData does formData.append(key, value) for each field.
+        // Appending a JS array directly would coerce it to "val1,val2" string.
+        // JSON.stringify here so the controller can JSON.parse it back to an array.
+        const serializedForm = { ...form, category: JSON.stringify(form.category) }
+        const formData = buildFormData(serializedForm, imageFile)
 
         if (editingProduct) {
             await updateProduct({ id: editingProduct._id, formData })   // plain call

@@ -19,11 +19,9 @@ const productSchema = new mongoose.Schema({
   stock: Number,
   image: String,
   category: {
-    type: String,
+    type: [String],
     enum: PRODUCT_CATEGORIES,
-    default: "uncategorized",
-    trim: true,
-    lowercase: true,
+    default: ["uncategorized"],
   },
 },{
     timestamps:true

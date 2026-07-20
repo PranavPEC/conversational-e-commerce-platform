@@ -28,60 +28,77 @@ function ProductTable({ products, onEdit, onDeleteClick }) {
             )}
 
             {/* Product rows */}
-            {products.map(product => (
-                <div
-                    key={product._id}
-                    className='flex items-center gap-4 px-5 py-4 border-b border-zinc-800 last:border-b-0 hover:bg-zinc-800 transition-colors duration-150'
-                >
-                    {/* Image */}
-                    <div className='w-12 h-12 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700'>
-                        {product.image ? (
-                            <img
-                                src={product.image}
-                                alt={product.title}
-                                className='w-full h-full object-cover'
-                            />
-                        ) : (
-                            <div className='w-full h-full flex items-center justify-center'>
-                                <Package size={16} className='text-zinc-600' />
-                            </div>
-                        )}
-                    </div>
+            {products.map(product => {
+                // Normalize: category may still be a plain string on pre-migration documents
+                const categories = Array.isArray(product.category)
+                    ? product.category
+                    : product.category
+                        ? [product.category]
+                        : []
 
-                    {/* Info */}
-                    <div className='flex-1 min-w-0'>
-                        <p className='text-white text-sm font-medium truncate'>{product.title}</p>
-                        <p className='text-zinc-500 text-xs mt-0.5 truncate'>{product.description}</p>
-                        {product.category && (
-                            <span className='inline-flex mt-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] uppercase tracking-wide'>
-                                {product.category}
-                            </span>
-                        )}
-                    </div>
+                return (
+                    <div
+                        key={product._id}
+                        className='flex items-center gap-4 px-5 py-4 border-b border-zinc-800 last:border-b-0 hover:bg-zinc-800 transition-colors duration-150'
+                    >
+                        {/* Image */}
+                        <div className='w-12 h-12 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700'>
+                            {product.image ? (
+                                <img
+                                    src={product.image}
+                                    alt={product.title}
+                                    className='w-full h-full object-cover'
+                                />
+                            ) : (
+                                <div className='w-full h-full flex items-center justify-center'>
+                                    <Package size={16} className='text-zinc-600' />
+                                </div>
+                            )}
+                        </div>
 
-                    {/* Price + stock */}
-                    <div className='text-right flex-shrink-0 hidden sm:block'>
-                        <p className='text-emerald-400 text-sm font-semibold'>₹{product.price}</p>
-                        <p className='text-zinc-500 text-xs'>{product.stock} in stock</p>
-                    </div>
+                        {/* Info */}
+                        <div className='flex-1 min-w-0'>
+                            <p className='text-white text-sm font-medium truncate'>{product.title}</p>
+                            <p className='text-zinc-500 text-xs mt-0.5 truncate'>{product.description}</p>
+                            {/* Render one pill per category */}
+                            {categories.length > 0 && (
+                                <div className='flex flex-wrap gap-1 mt-2'>
+                                    {categories.map(cat => (
+                                        <span
+                                            key={cat}
+                                            className='inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] uppercase tracking-wide'
+                                        >
+                                            {cat}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
-                    {/* Action buttons */}
-                    <div className='flex items-center gap-2 flex-shrink-0'>
-                        <button
-                            onClick={() => onEdit(product)}
-                            className='w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 flex items-center justify-center text-zinc-300 hover:text-white transition-colors duration-200 cursor-pointer'
-                        >
-                            <Pencil size={14} />
-                        </button>
-                        <button
-                            onClick={() => onDeleteClick(product)}
-                            className='w-8 h-8 rounded-lg bg-zinc-700 hover:bg-red-500 flex items-center justify-center text-zinc-300 hover:text-white transition-colors duration-200 cursor-pointer'
-                        >
-                            <Trash2 size={14} />
-                        </button>
+                        {/* Price + stock */}
+                        <div className='text-right flex-shrink-0 hidden sm:block'>
+                            <p className='text-emerald-400 text-sm font-semibold'>&#8377;{product.price}</p>
+                            <p className='text-zinc-500 text-xs'>{product.stock} in stock</p>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className='flex items-center gap-2 flex-shrink-0'>
+                            <button
+                                onClick={() => onEdit(product)}
+                                className='w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 flex items-center justify-center text-zinc-300 hover:text-white transition-colors duration-200 cursor-pointer'
+                            >
+                                <Pencil size={14} />
+                            </button>
+                            <button
+                                onClick={() => onDeleteClick(product)}
+                                className='w-8 h-8 rounded-lg bg-zinc-700 hover:bg-red-500 flex items-center justify-center text-zinc-300 hover:text-white transition-colors duration-200 cursor-pointer'
+                            >
+                                <Trash2 size={14} />
+                            </button>
+                        </div>
                     </div>
-                </div>
-            ))}
+                )
+            })}
 
         </div>
     )

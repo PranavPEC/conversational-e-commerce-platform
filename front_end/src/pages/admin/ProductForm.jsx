@@ -17,7 +17,7 @@ const CATEGORY_OPTIONS = [
 // editingProduct !== null  → Edit mode (form pre-filled by Admin.jsx)
 //
 // Props:
-//   form, setForm          — controlled form state (title, description, price, stock, category)
+//   form, setForm          — controlled form state (title, description, price, stock, category[])
 //   imagePreview           — blob URL or existing Cloudinary URL for preview
 //   handleImageChange      — file input onChange handler (defined in Admin.jsx)
 //   handleSubmit           — dispatches createProduct or updateProduct
@@ -35,7 +35,20 @@ function ProductForm({
     editingProduct,
     loading
 }) {
-    const isFormValid = form.title && form.description && form.price && form.stock && form.category
+    // category is now an array — valid if at least one item is checked
+    const isFormValid = form.title && form.description && form.price && form.stock && form.category.length > 0
+
+    const toggleCategory = (value) => {
+        setForm(f => {
+            const already = f.category.includes(value)
+            return {
+                ...f,
+                category: already
+                    ? f.category.filter(c => c !== value)   // uncheck: remove
+                    : [...f.category, value],               // check: add
+            }
+        })
+    }
 
     return (
         <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col gap-5'>
@@ -68,24 +81,9 @@ function ProductForm({
                     />
                 </div>
 
-                {/* Category */}
-                <div className='flex flex-col gap-1.5'>
-                    <label className='text-zinc-300 text-sm font-medium'>Category</label>
-                    <select
-                        value={form.category}
-                        onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                        className='w-full h-11 bg-zinc-800 text-white outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl px-4 text-sm transition-colors duration-200'
-                    >
-                        <option value=''>Select category</option>
-                        {CATEGORY_OPTIONS.map(option => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
-                    </select>
-                </div>
-
                 {/* Price */}
                 <div className='flex flex-col gap-1.5'>
-                    <label className='text-zinc-300 text-sm font-medium'>Price (₹)</label>
+                    <label className='text-zinc-300 text-sm font-medium'>Price (&#8377;)</label>
                     <input
                         type='number'
                         placeholder='0'
@@ -110,7 +108,7 @@ function ProductForm({
                 </div>
 
                 {/* Image upload */}
-                <div className='flex flex-col gap-1.5 md:col-span-2'>
+                <div className='flex flex-col gap-1.5'>
                     <label className='text-zinc-300 text-sm font-medium'>Image</label>
                     <input
                         type='file'
@@ -130,6 +128,37 @@ function ProductForm({
                         onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                         className='w-full bg-zinc-800 text-white placeholder-zinc-500 outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm transition-colors duration-200 resize-none'
                     />
+                </div>
+
+                {/* Categories — checkbox group, full width */}
+                <div className='flex flex-col gap-3 md:col-span-2'>
+                    <label className='text-zinc-300 text-sm font-medium'>
+                        Categories
+                        <span className='text-zinc-500 font-normal ml-1.5'>(select one or more)</span>
+                    </label>
+                    <div className='flex flex-wrap gap-2'>
+                        {CATEGORY_OPTIONS.map(option => {
+                            const checked = form.category.includes(option.value)
+                            return (
+                                <button
+                                    key={option.value}
+                                    type='button'
+                                    onClick={() => toggleCategory(option.value)}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200 cursor-pointer ${
+                                        checked
+                                            ? 'bg-emerald-500/15 border-emerald-500/60 text-emerald-400'
+                                            : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-300'
+                                    }`}
+                                >
+                                    {checked && <span className='mr-1'>✓</span>}
+                                    {option.label}
+                                </button>
+                            )
+                        })}
+                    </div>
+                    {form.category.length === 0 && (
+                        <p className='text-zinc-500 text-xs'>At least one category is required.</p>
+                    )}
                 </div>
 
             </div>

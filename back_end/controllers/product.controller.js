@@ -1,6 +1,21 @@
 ﻿import Product, { PRODUCT_CATEGORIES } from "../models/user.product.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
 
+// ── Parse and normalize a categories value from FormData ──
+// FormData sends arrays as JSON strings (Admin.jsx stringifies before appending).
+// Falls back gracefully to a plain string for legacy callers.
+const parseCategories = (raw) => {
+    if (!raw) return null
+    let arr
+    try {
+        arr = JSON.parse(raw)               // expect JSON array string from frontend
+    } catch {
+        arr = [raw]                         // legacy fallback: treat as single value
+    }
+    if (!Array.isArray(arr)) arr = [arr]
+    return arr.map(c => String(c).trim().toLowerCase()).filter(Boolean)
+}
+
 // Create Product  (Admin Only)
 export const createProduct = async (req, res) => {
     try {
@@ -12,10 +27,13 @@ export const createProduct = async (req, res) => {
             });
         }
 
-        if (!PRODUCT_CATEGORIES.includes(category)) {
-            return res.status(400).json({
-                message: "Invalid category provided."
-            });
+        const categories = parseCategories(category)
+        if (!categories || categories.length === 0) {
+            return res.status(400).json({ message: "At least one category is required." })
+        }
+        const invalidCategory = categories.find(c => !PRODUCT_CATEGORIES.includes(c))
+        if (invalidCategory) {
+            return res.status(400).json({ message: `Invalid category: ${invalidCategory}` })
         }
 
         if (price < 0 || stock < 0) {
@@ -36,7 +54,7 @@ export const createProduct = async (req, res) => {
             description,
             price: Number(price),   // req.body values from FormData come as strings — convert
             stock: Number(stock),
-            category,
+            category: categories,
             image
         });
 
@@ -59,7 +77,9 @@ export const getAllProducts = async (req, res) => {
 
         const queryConditions = []
         if (category) {
-            queryConditions.push({ category })
+            // category is now an array field — $in matches any product whose
+            // category array CONTAINS the requested category string
+            queryConditions.push({ category: { $in: [category] } })
         }
 
         if (search) {
@@ -70,7 +90,7 @@ export const getAllProducts = async (req, res) => {
                 $or: [
                     { title: searchRegex },
                     { description: searchRegex },
-                    { category: searchRegex },
+                    { category: searchRegex },   // regex on array field checks any element
                 ],
             })
         }
@@ -120,8 +140,17 @@ export const updateProduct = async (req, res) => {
         if (stock !== undefined && Number(stock) < 0) {
             return res.status(400).json({ message: "Stock cannot be negative." });
         }
-        if (category !== undefined && !PRODUCT_CATEGORIES.includes(category)) {
-            return res.status(400).json({ message: "Invalid category provided." });
+
+        if (category !== undefined) {
+            const categories = parseCategories(category)
+            if (!categories || categories.length === 0) {
+                return res.status(400).json({ message: "At least one category is required." })
+            }
+            const invalidCategory = categories.find(c => !PRODUCT_CATEGORIES.includes(c))
+            if (invalidCategory) {
+                return res.status(400).json({ message: `Invalid category: ${invalidCategory}` })
+            }
+            product.category = categories
         }
 
         // Only update fields that were actually sent
@@ -129,7 +158,6 @@ export const updateProduct = async (req, res) => {
         if (description) product.description = description;
         if (price !== undefined) product.price = Number(price);   // FormData sends strings
         if (stock !== undefined) product.stock = Number(stock);
-        if (category !== undefined) product.category = category;
 
         // If a new image was uploaded, replace the old one
         if (req.file) {

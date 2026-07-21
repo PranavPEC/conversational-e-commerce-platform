@@ -21,6 +21,7 @@ import ResetPassword from './pages/forgot_password/ResetPassword.jsx';
 import { fetchUserData } from './redux/reduxActions'
 import { initializeTheme } from './redux/reduxActions'
 import Settings from './pages/settings/Settings.jsx'
+import navigationStrings from './constants/navigationStrings/navigationStrings.js';
 
 function App() {
 
@@ -51,8 +52,8 @@ function App() {
       <Routes>
 
         {/* ── Public routes ── */}
-        <Route path='/signup' element={<SignUp />} />
-        <Route path='/login' element={<Login />} />
+        <Route path={navigationStrings.SIGNUP} element={<SignUp />} />
+        <Route path={navigationStrings.LOGIN} element={<Login />} />
         <Route path='/' element={<Home />} />
         <Route path='/products' element={<ProductListing />} />
         <Route path='/product/:id' element={<ProductDetail />} />

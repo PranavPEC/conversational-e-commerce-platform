@@ -16,19 +16,8 @@ function LoginLeftPanel() {
     const navigate=useNavigate();
     return (
         <div
-            className='theme-lock-dark hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-10'
-            style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #0d1f1a 50%, #0a0f0a 100%)' }}
+            className='theme-lock-dark hidden lg:flex lg:w-[45%] bg-zinc-950 relative overflow-hidden flex-col justify-between p-10'
         >
-            {/* Decorative blobs */}
-            <div
-                className='absolute top-[-80px] left-[-80px] w-[300px] h-[300px] rounded-full opacity-10'
-                style={{ background: 'radial-gradient(circle, #10b981, transparent)' }}
-            />
-            <div
-                className='absolute bottom-[100px] right-[-60px] w-[250px] h-[250px] rounded-full opacity-10'
-                style={{ background: 'radial-gradient(circle, #10b981, transparent)' }}
-            />
-
             {/* Logo */}
             <div className='flex items-center gap-2 z-10' onClick={() => navigate('/')}>
                 <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center cursor-pointer'>
@@ -94,4 +83,3 @@ function LoginLeftPanel() {
 }
 
 export default LoginLeftPanel
-

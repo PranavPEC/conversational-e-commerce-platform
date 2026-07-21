@@ -1,185 +1,40 @@
-/* ==========================================================
-   Hero Background
+﻿/* ==========================================================
+   Hero Section
+   Theme-aware background — uses CSS variables so it responds
+   correctly to both light and dark themes.
 ========================================================== */
 
 .hero-section {
-    background: linear-gradient(
-        135deg,
-        #0a0a0a 0%,
-        #0d1f1a 55%,
-        #0a0f0a 100%
-    );
+    background-color: var(--color-bg);
 }
 
 /* ==========================================================
-   Floating Blobs
-========================================================== */
-
-.hero-blob {
-    position: absolute;
-    border-radius: 9999px;
-    pointer-events: none;
-    opacity: 0.1;
-    background: radial-gradient(circle, #10b981, transparent);
-}
-
-.hero-blob-one {
-    width: 400px;
-    height: 400px;
-
-    top: -100px;
-    right: -80px;
-
-    animation: floatBlobOne 20s ease-in-out infinite;
-}
-
-.hero-blob-two {
-    width: 300px;
-    height: 300px;
-
-    bottom: -60px;
-    left: -60px;
-
-    animation: floatBlobTwo 18s ease-in-out infinite;
-}
-
-/* ==========================================================
-   Hero Content Animation
+   Content entrance animation
 ========================================================== */
 
 .hero-content {
-    animation: heroFade 700ms ease-out;
+    animation: heroFade 600ms ease-out both;
 }
 
-/* ==========================================================
-   Animated Divider
-========================================================== */
-
-.hero-divider {
-    width: 64px;
-    height: 4px;
-
-    border-radius: 9999px;
-
-    background: #10b981;
-
-    margin-bottom: 24px;
-
-    animation: dividerPulse 4s ease-in-out infinite;
+.hero-headline {
+    color: var(--color-text-primary);
 }
 
-/* ==========================================================
-   Product Showcase Container & Grid
-========================================================== */
-
-.hero-showcase-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 400px;
-}
-
-.hero-showcase-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    width: 100%;
-}
-
-/* ── Individual Card Staggered Entrance Animation ── */
-.hero-showcase-card {
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: none;
-}
-
-.hero-showcase-card.hero-card-visible {
-    animation: heroCardFadeUp 500ms ease-out forwards;
-}
-
-/* ── Stagger each card with increasing delay ── */
-.hero-showcase-card-0.hero-card-visible {
-    animation-delay: 0ms;
-}
-
-.hero-showcase-card-1.hero-card-visible {
-    animation-delay: 100ms;
-}
-
-.hero-showcase-card-2.hero-card-visible {
-    animation-delay: 200ms;
-}
-
-.hero-showcase-card-3.hero-card-visible {
-    animation-delay: 300ms;
+.hero-subtext {
+    color: var(--color-text-secondary);
 }
 
 /* ==========================================================
    Keyframes
 ========================================================== */
 
-@keyframes floatBlobOne {
-
-    0%,
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-
-    50% {
-        transform: translate(-35px, 30px) scale(1.08);
-    }
-}
-
-@keyframes floatBlobTwo {
-
-    0%,
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-
-    50% {
-        transform: translate(35px, -25px) scale(0.95);
-    }
-}
-
 @keyframes heroFade {
-
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(16px);
     }
-
     to {
         opacity: 1;
-        transform: translateY(0px);
-    }
-}
-
-@keyframes dividerPulse {
-
-    0%,
-    100% {
-        width: 64px;
-    }
-
-    50% {
-        width: 96px;
-    }
-}
-
-/* ── Staggered Card Entrance: Fade + Scale Up ── */
-@keyframes heroCardFadeUp {
-
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0px) scale(1);
+        transform: translateY(0);
     }
 }

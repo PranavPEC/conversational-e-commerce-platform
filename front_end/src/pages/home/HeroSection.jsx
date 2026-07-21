@@ -1,19 +1,25 @@
-import { useEffect, useState } from 'react'
-import { ShoppingBag, ArrowRight } from 'lucide-react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowRight, ShoppingBag, ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import './HeroSection.css'
 
-const HERO_CATEGORIES = [
-    'Electronics',
-    'Fashion',
-    'Home',
-    'Beauty',
-    'Accessories',
-    'Audio',
-    'Laptops',
-    'Premium',
-]
+const AUTO_ADVANCE_MS = 4500
+const MANUAL_PAUSE_MS = 3500
 
+const getVisibleCount = () => {
+    if (typeof window === 'undefined') return 4
+    return window.innerWidth >= 768 ? 4 : 2
+}
+
+// ── HeroSection ──
+// Two-part layout:
+//   1. Short banner — headline, subtext, CTA buttons
+//   2. Infinite product carousel (same clone + double-RAF technique as ProductRail)
+//      so visitors see real products immediately on page load.
+//
+// heroShowcaseProducts — passed from Home.jsx (top 8 newest products).
+// onProductClick, onBrowse, onCart — navigation callbacks from Home.jsx.
+// firstName — kept in signature for backward compat, not used in headline.
 function HeroSection({
     firstName,
     onBrowse,
@@ -21,97 +27,130 @@ function HeroSection({
     heroShowcaseProducts = [],
     onProductClick = () => {},
 }) {
-    const [categoryIndex, setCategoryIndex] = useState(0)
-    const [categoryVisible, setCategoryVisible] = useState(true)
-    const [cardsVisible, setCardsVisible] = useState(false)
+    const products = heroShowcaseProducts
 
-    // ── Category cycler ──
+    // ── Carousel state (mirrors ProductRail exactly) ──
+    const [visibleCount, setVisibleCount] = useState(getVisibleCount)
+    const [currentIndex, setCurrentIndex] = useState(visibleCount)
+    const [isTransitionEnabled, setIsTransitionEnabled] = useState(true)
+    const [isHovered, setIsHovered] = useState(false)
+    const [isManualPaused, setIsManualPaused] = useState(false)
+    const manualPauseTimeoutRef = useRef(null)
+
     useEffect(() => {
-        const fadeMs = 300
-        let fadeTimeoutId = null
+        const handleResize = () => setVisibleCount(getVisibleCount())
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
-        const intervalId = setInterval(() => {
-            setCategoryVisible(false)
-            fadeTimeoutId = setTimeout(() => {
-                setCategoryIndex(prev => (prev + 1) % HERO_CATEGORIES.length)
-                setCategoryVisible(true)
-            }, fadeMs)
-        }, 2800)
+    const canCarousel = products.length > visibleCount
 
-        return () => {
-            clearInterval(intervalId)
-            if (fadeTimeoutId) clearTimeout(fadeTimeoutId)
+    // ── Reset on breakpoint / product list change ──
+    useEffect(() => {
+        setIsTransitionEnabled(false)
+        setCurrentIndex(canCarousel ? visibleCount : 0)
+        const outerRaf = requestAnimationFrame(() => {
+            const innerRaf = requestAnimationFrame(() => setIsTransitionEnabled(true))
+            return () => cancelAnimationFrame(innerRaf)
+        })
+        return () => cancelAnimationFrame(outerRaf)
+    }, [visibleCount, canCarousel, products.length])
+
+    // ── Clone list: leading clones prepended, trailing clones appended ──
+    const displayProducts = useMemo(() => {
+        if (!canCarousel) return products
+        return [
+            ...products.slice(-visibleCount),
+            ...products,
+            ...products.slice(0, visibleCount),
+        ]
+    }, [products, canCarousel, visibleCount])
+
+    const pauseAfterManualInteraction = () => {
+        setIsManualPaused(true)
+        if (manualPauseTimeoutRef.current) clearTimeout(manualPauseTimeoutRef.current)
+        manualPauseTimeoutRef.current = setTimeout(() => setIsManualPaused(false), MANUAL_PAUSE_MS)
+    }
+
+    useEffect(() => {
+        return () => { if (manualPauseTimeoutRef.current) clearTimeout(manualPauseTimeoutRef.current) }
+    }, [])
+
+    const moveNext = (fromManual = false) => {
+        if (!canCarousel) return
+        if (fromManual) pauseAfterManualInteraction()
+        setCurrentIndex(prev => prev + visibleCount)
+    }
+
+    const movePrev = () => {
+        if (!canCarousel) return
+        pauseAfterManualInteraction()
+        setCurrentIndex(prev => prev - visibleCount)
+    }
+
+    // ── Auto-advance ──
+    useEffect(() => {
+        if (!canCarousel || isHovered || isManualPaused) return
+        const id = setInterval(() => setCurrentIndex(prev => prev + visibleCount), AUTO_ADVANCE_MS)
+        return () => clearInterval(id)
+    }, [canCarousel, isHovered, isManualPaused, visibleCount])
+
+    // ── Seamless loop: same double-RAF technique as ProductRail ──
+    const handleTransitionEnd = (e) => {
+        if (e.target !== e.currentTarget || e.propertyName !== 'transform') return
+        if (!canCarousel) return
+        const count = products.length
+        if (count === 0) return
+        if (currentIndex >= count + visibleCount || currentIndex < visibleCount) {
+            const normalized =
+                ((currentIndex - visibleCount) % count + count) % count + visibleCount
+            setIsTransitionEnabled(false)
+            setCurrentIndex(normalized)
+            requestAnimationFrame(() => requestAnimationFrame(() => setIsTransitionEnabled(true)))
         }
-    }, [])
+    }
 
-    // ── Product cards entrance animation: trigger after brief delay ──
-    useEffect(() => {
-        const timeout = setTimeout(() => setCardsVisible(true), 200)
-        return () => clearTimeout(timeout)
-    }, [])
+    const slideWidth = 100 / visibleCount
+    const trackTranslate = `translateX(-${currentIndex * slideWidth}%)`
 
-    // ── Check if product is newest (first in sorted array) ──
-    const isNewProduct = (product, index) => index === 0 && heroShowcaseProducts.length > 0
+    const productCount = products.length
+    const logicalIndex = canCarousel
+        ? ((currentIndex - visibleCount) % Math.max(productCount, 1) + Math.max(productCount, 1)) % Math.max(productCount, 1)
+        : 0
+    const pageCount = productCount > 0 ? Math.ceil(productCount / visibleCount) : 0
+    const activePage = pageCount > 0 ? Math.floor(logicalIndex / visibleCount) % pageCount : 0
 
     return (
-        <section className='hero-section relative w-full overflow-hidden px-6 md:px-16 py-20 md:py-28'>
+        <section className='hero-section w-full border-b border-[var(--color-border)]'>
+            <div className='max-w-5xl mx-auto px-6 md:px-16 py-12 md:py-16'>
 
-            {/* ── Floating Blobs ── */}
-            <div className='hero-blob hero-blob-one' />
-            <div className='hero-blob hero-blob-two' />
-
-            {/* ── Hero Layout: Two columns (desktop) or stacked (mobile) ── */}
-            <div className='relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center'>
-
-                {/* ── Left Content ── */}
-                <div className='hero-content'>
-
-                    {/* ── Eyebrow ── */}
-                    <div className='flex items-center gap-2 mb-5'>
-                        <div className='w-1.5 h-1.5 rounded-full bg-emerald-400' />
-                        <span className='text-emerald-400 text-xs font-medium tracking-widest uppercase'>
-                            Smart Shopping Starts Here
+                {/* ── Banner text + CTAs ── */}
+                <div className='hero-content mb-10'>
+                    <div className='flex items-center gap-2 mb-4'>
+                        <div className='w-1.5 h-1.5 rounded-full bg-emerald-500' />
+                        <span className='text-emerald-500 text-xs font-semibold tracking-widest uppercase'>
+                            ShopAI
                         </span>
                     </div>
 
-                    {/* ── Main Headline ── */}
-                    <h1 className='text-white text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-3'>
-                        Your curated storefront, ready
+                    <h1 className='hero-headline text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-3'>
+                        Find Everything You Need
                     </h1>
 
-                    {/* ── Category Cycler ── */}
-                    <h2 className='text-emerald-400 text-3xl md:text-5xl font-bold leading-tight mb-6'>
-                        {/* Show simple "Ready to shop for {category}?" to respect real data availability */}
-                        Ready to shop for{' '}
-                        <span
-                            className={`hero-category-cycler inline-block min-w-[10ch] transition-opacity duration-300 ${
-                                categoryVisible ? 'opacity-100' : 'opacity-0'
-                            }`}
-                        >
-                            {HERO_CATEGORIES[categoryIndex]}
-                        </span>
-                        ?
-                    </h2>
-
-                    {/* ── Animated Divider ── */}
-                    <div className='hero-divider' />
-
-                    {/* ── Subtext with actual features ── */}
-                    <p className='text-zinc-400 text-sm md:text-base leading-relaxed max-w-md mb-10'>
-                        Browse 8 categories, find your favorites. Secure checkout, order tracking, and instant payment via Razorpay.
+                    <p className='hero-subtext text-base leading-relaxed max-w-xl mb-8'>
+                        Electronics, Fashion, Home, Beauty &amp; more — all in one place.
+                        Secure checkout and real-time order tracking.
                     </p>
 
-                    {/* ── CTA Buttons ── */}
                     <div className='flex flex-col sm:flex-row gap-3'>
                         <PrimaryButton
-                            text='Browse Products'
+                            text='Shop Now'
                             icon={<ArrowRight size={16} />}
                             onClick={onBrowse}
                         />
-
                         <button
                             onClick={onCart}
-                            className='flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent border border-zinc-700 hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-white rounded-xl text-sm transition-all duration-300 cursor-pointer'
+                            className='flex items-center justify-center gap-2 px-7 py-3.5 border border-[var(--color-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm bg-transparent transition-all duration-300 cursor-pointer'
                         >
                             <ShoppingBag size={15} />
                             View Cart
@@ -119,60 +158,142 @@ function HeroSection({
                     </div>
                 </div>
 
-                {/* ── Right Content: Product Showcase Collage ── */}
-                {heroShowcaseProducts.length > 0 && (
-                    <div className='hero-showcase-container'>
-                        <div className='hero-showcase-grid'>
-                            {heroShowcaseProducts.map((product, index) => (
-                                <div
-                                    key={product._id}
-                                    className={`hero-showcase-card hero-showcase-card-${index} ${
-                                        cardsVisible ? 'hero-card-visible' : ''
-                                    }`}
-                                    onClick={() => onProductClick(product._id)}
-                                >
-                                    {/* ── Product Image ── */}
-                                    <div className='relative w-full h-40 md:h-48 bg-zinc-800 rounded-2xl overflow-hidden mb-3 group'>
-                                        {product.image ? (
-                                            <img
-                                                src={product.image}
-                                                alt={product.title}
-                                                className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-300'
-                                            />
-                                        ) : (
-                                            <div className='w-full h-full flex items-center justify-center text-zinc-500'>
-                                                No Image
-                                            </div>
-                                        )}
-
-                                        {/* ── "New" Badge (only on newest product) ── */}
-                                        {isNewProduct(product, index) && (
-                                            <div className='absolute top-2 right-2 bg-emerald-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full'>
-                                                New
-                                            </div>
-                                        )}
-
-                                        {/* ── Hover Glow Effect ── */}
-                                        <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none border-2 border-emerald-500 rounded-2xl' />
-                                    </div>
-
-                                    {/* ── Product Info ── */}
-                                    <div>
-                                        <h3 className='text-white text-sm font-semibold line-clamp-2 mb-1'>
-                                            {product.title}
-                                        </h3>
-                                        <p className='text-emerald-400 text-base font-bold'>
-                                            ₹{product.price?.toLocaleString('en-IN') || 'N/A'}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
+                {/* ── Product carousel — visible immediately on load ── */}
+                {products.length > 0 && (
+                    <>
+                        {/* Rail header */}
+                        <div className='flex items-center justify-between mb-4'>
+                            <div>
+                                <p className='text-emerald-500 text-xs font-semibold tracking-widest uppercase mb-0.5'>
+                                    New in
+                                </p>
+                                <h2 className='hero-headline text-xl font-bold tracking-tight'>
+                                    Trending Now
+                                </h2>
+                            </div>
+                            <button
+                                onClick={onBrowse}
+                                className='flex items-center gap-1 text-[var(--color-text-muted)] hover:text-emerald-500 text-sm transition-colors duration-200 cursor-pointer'
+                            >
+                                See all <ChevronRight size={15} />
+                            </button>
                         </div>
-                    </div>
+
+                        {/* Track + arrows */}
+                        <div
+                            className='relative'
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                            {canCarousel && (
+                                <>
+                                    <button
+                                        onClick={movePrev}
+                                        aria-label='Previous'
+                                        className='absolute left-2 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-emerald-500 hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center cursor-pointer'
+                                    >
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => moveNext(true)}
+                                        aria-label='Next'
+                                        className='absolute right-2 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-emerald-500 hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center cursor-pointer'
+                                    >
+                                        <ChevronRight size={18} />
+                                    </button>
+                                </>
+                            )}
+
+                            <div className='overflow-hidden'>
+                                <div
+                                    className='flex'
+                                    style={{
+                                        transform: trackTranslate,
+                                        transition: isTransitionEnabled ? 'transform 520ms ease-in-out' : 'none',
+                                    }}
+                                    onTransitionEnd={handleTransitionEnd}
+                                >
+                                    {displayProducts.map((product, index) => (
+                                        <div
+                                            key={`${product._id}-${index}`}
+                                            style={{ flex: `0 0 ${slideWidth}%`, maxWidth: `${slideWidth}%` }}
+                                            className='px-2'
+                                        >
+                                            <div
+                                                onClick={() => onProductClick(product._id)}
+                                                className='group bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl overflow-hidden cursor-pointer flex flex-col transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-500/20 h-full'
+                                            >
+                                                {/* Image */}
+                                                <div className='relative w-full h-44 overflow-hidden bg-[var(--color-input-bg)]'>
+                                                    {product.image ? (
+                                                        <img
+                                                            src={product.image}
+                                                            alt={product.title}
+                                                            className='w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110'
+                                                        />
+                                                    ) : (
+                                                        <div className='w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-xs'>
+                                                            No Image
+                                                        </div>
+                                                    )}
+                                                    <div className='absolute inset-0 bg-black/10 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center'>
+                                                        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300'>
+                                                            <Eye size={16} /> View Details
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Product info */}
+                                                <div className='p-4 flex flex-col gap-1.5 flex-1'>
+                                                    <h3 className='text-[var(--color-text-primary)] text-sm font-medium leading-tight line-clamp-2 transition-colors duration-300 group-hover:text-emerald-500'>
+                                                        {product.title}
+                                                    </h3>
+                                                    <div className='mt-auto pt-2 flex items-center justify-between'>
+                                                        <span className='text-emerald-500 font-semibold text-sm'>
+                                                            {product.price != null
+                                                                ? '\u20B9' + product.price.toLocaleString('en-IN')
+                                                                : 'N/A'}
+                                                        </span>
+                                                        {product.stock === 0 ? (
+                                                            <span className='text-xs text-red-400'>Out of stock</span>
+                                                        ) : (
+                                                            <span className='text-xs text-[var(--color-text-muted)]'>
+                                                                {product.stock} left
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Dot indicators */}
+                            {canCarousel && pageCount > 1 && (
+                                <div className='flex items-center justify-center gap-2 mt-5'>
+                                    {Array.from({ length: pageCount }).map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => {
+                                                pauseAfterManualInteraction()
+                                                setCurrentIndex(visibleCount + i * visibleCount)
+                                            }}
+                                            aria-label={`Go to slide ${i + 1}`}
+                                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                                activePage === i
+                                                    ? 'w-6 bg-emerald-500'
+                                                    : 'w-2 bg-[var(--color-border)] hover:bg-[var(--color-text-muted)]'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </>
                 )}
 
             </div>
-
         </section>
     )
 }

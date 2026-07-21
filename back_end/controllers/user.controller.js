@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import generateToken from "../config/token.js";
@@ -48,6 +48,7 @@ export const createNewUser = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error", error });
     }
 }
+
 export const getUserById = async (req, res) => {
     try {
         if (req.params.id !== req.userId) {
@@ -67,33 +68,59 @@ export const getUserById = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error", error });
     }
 }
+
 export const updateUser = async (req, res) => {
     try {
         if (req.params.id !== req.userId) {
-            return res.status(403).json({
-                message: "Unauthorize Access."
-            });
-        }
-        const { name, email, phone, dateOfBirth, gender } = req.body;
-        let profileImage;
-        if (req.file) {
-            profileImage = await uploadOnCloudinary(req.file.path);
+            return res.status(403).json({ message: "Unauthorize Access." });
         }
 
-        const user = await User.findByIdAndUpdate(
-            req.params.id,
-            { name, email, profileImage, phone, dateOfBirth, gender },
-            { returnDocument: 'after' }
-        ).select("-password");
+        const { name, email, phone, dateOfBirth, gender } = req.body;
+
+        // ── Fetch first so we can enforce the gender-lock rule before saving ──
+        // findByIdAndUpdate would blindly overwrite; we need the current value.
+        const user = await User.findById(req.params.id).select("-password");
         if (!user) {
             return res.status(404).json({ message: "User Not Found." });
         }
+
+        // ── Gender lock: set-once, never change ──
+        // We return a 400 rather than silently dropping the value because silent
+        // discarding is deceptive — the caller (including a direct API client
+        // bypassing the UI) would think the save succeeded while the change was
+        // quietly ignored. A 400 makes the contract explicit and honest.
+        const currentGenderIsSet = user.gender && user.gender.trim() !== ''
+        if (currentGenderIsSet && gender !== undefined && gender !== user.gender) {
+            return res.status(400).json({
+                message: "Gender can only be set once and cannot be changed."
+            });
+        }
+
+        // ── Apply all updatable fields ──
+        if (name !== undefined)        user.name        = name;
+        if (email !== undefined)       user.email       = email;
+        if (phone !== undefined)       user.phone       = phone;
+        if (dateOfBirth !== undefined) user.dateOfBirth = dateOfBirth;
+
+        // Only write gender when it isn't already locked
+        // (if locked and same value was sent, the guard above already passed, no need to reassign)
+        if (!currentGenderIsSet && gender !== undefined) {
+            user.gender = gender;
+        }
+
+        if (req.file) {
+            user.profileImage = await uploadOnCloudinary(req.file.path);
+        }
+
+        await user.save();
+
         return res.status(200).json(user);
     }
     catch (error) {
         return res.status(500).json({ message: "Internal Server Error", error });
     }
 }
+
 export const deleteUser = async (req, res) => {
     try {
         if (req.params.id !== req.userId) {

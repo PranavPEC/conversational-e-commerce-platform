@@ -1,6 +1,6 @@
 ﻿@import "tailwindcss";
 
-/* â”€â”€ Theme CSS Variables â”€â”€ */
+/* ── Theme CSS Variables ── */
 /* These define the color palette for dark and light modes.
    Components use var(--color-*) so they respond to theme changes
    without needing conditional Tailwind classes everywhere. */
@@ -21,20 +21,20 @@
 }
 
 [data-theme="light"] {
-    --color-bg: #f9fafb;           /* gray-50 */
-    --color-card: #ffffff;         /* white */
-    --color-border: #e5e7eb;       /* gray-200 */
-    --color-input-bg: #f3f4f6;     /* gray-100 */
-    --color-input-border: #d1d5db; /* gray-300 */
-    --color-text-primary: #18181b; /* zinc-900 */
-    --color-text-secondary: #52525b; /* zinc-600 */
-    --color-text-muted: #71717a;     /* zinc-500 */
-    --color-accent: #059669;         /* emerald-600 */
-    --color-accent-hover: #10b981;   /* emerald-500 */
-    --color-danger: #ef4444;         /* red-500 */
+    --color-bg: #f6f8fb;
+    --color-card: #ffffff;
+    --color-border: #d7dee8;
+    --color-input-bg: #eef2f7;
+    --color-input-border: #c7d0dd;
+    --color-text-primary: #111827;
+    --color-text-secondary: #334155;
+    --color-text-muted: #64748b;
+    --color-accent: #059669;
+    --color-accent-hover: #10b981;
+    --color-danger: #dc2626;
 }
 
-/* â”€â”€ Light-mode compatibility layer â”€â”€ */
+/* ── Light-mode compatibility layer ── */
 /* Existing pages still use hardcoded zinc/white classes. These overrides
    let them respond to theme immediately while we progressively migrate
    components to semantic var(--color-*) classes. */
@@ -52,12 +52,25 @@
     background-color: var(--color-input-bg) !important;
 }
 
+[data-theme="light"] .bg-zinc-700 {
+    background-color: var(--color-input-border) !important;
+}
+
+[data-theme="light"] .bg-zinc-300 {
+    background-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .border-zinc-900,
 [data-theme="light"] .border-zinc-800 {
     border-color: var(--color-border) !important;
 }
 
 [data-theme="light"] .border-zinc-700 {
     border-color: var(--color-input-border) !important;
+}
+
+[data-theme="light"] .border-zinc-200 {
+    border-color: #e2e8f0 !important;
 }
 
 [data-theme="light"] .text-white {
@@ -77,33 +90,40 @@
 [data-theme="light"] .text-zinc-700,
 [data-theme="light"] .text-zinc-800,
 [data-theme="light"] .text-zinc-900,
+[data-theme="light"] .text-zinc-950,
 [data-theme="light"] .text-black {
     color: var(--color-text-primary) !important;
 }
 
 [data-theme="light"] .hover\:bg-zinc-900:hover,
-[data-theme="light"] .hover\:bg-zinc-800:hover {
-    background-color: #f3f4f6 !important;
+[data-theme="light"] .hover\:bg-zinc-800:hover,
+[data-theme="light"] .hover\:bg-zinc-700:hover,
+[data-theme="light"] .hover\:bg-zinc-600:hover,
+[data-theme="light"] .hover\:bg-zinc-500:hover {
+    background-color: #e8edf5 !important;
 }
 
-[data-theme="light"] .hover\:text-white:hover {
+[data-theme="light"] .hover\:text-white:hover,
+[data-theme="light"] .hover\:text-zinc-300:hover {
     color: var(--color-text-primary) !important;
 }
 
-[data-theme="light"] .hover\:border-zinc-700:hover {
+[data-theme="light"] .hover\:border-zinc-700:hover,
+[data-theme="light"] .hover\:border-zinc-500:hover {
     border-color: var(--color-input-border) !important;
 }
 
 [data-theme="light"] .from-zinc-950,
 [data-theme="light"] .from-zinc-900 {
-    --tw-gradient-from: #f9fafb var(--tw-gradient-from-position) !important;
-    --tw-gradient-to: rgb(249 250 251 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-from: #f6f8fb var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(246 248 251 / 0) var(--tw-gradient-to-position) !important;
     --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 [data-theme="light"] .to-black,
 [data-theme="light"] .to-zinc-950,
-[data-theme="light"] .to-zinc-900 {
+[data-theme="light"] .to-zinc-900,
+[data-theme="light"] .to-zinc-100 {
     --tw-gradient-to: #ffffff var(--tw-gradient-to-position) !important;
 }
 
@@ -133,7 +153,8 @@ body {
 }
 
 [data-theme="light"] .theme-lock-dark .border-zinc-800,
-[data-theme="light"] .theme-lock-dark .border-zinc-700 {
+[data-theme="light"] .theme-lock-dark .border-zinc-700,
+[data-theme="light"] .theme-lock-dark .border-zinc-900 {
     border-color: unset !important;
 }
 
@@ -148,18 +169,3 @@ body {
     color: #ffffff !important;
 }
 
-/* ── HeroSection: always-dark text and border ── */
-/* HeroSection has its own dark gradient/blob background (hero-section CSS class)
-   so greeting text and buttons must stay their original dark-theme colors. */
-[data-theme="light"] .hero-section .text-white {
-    color: #ffffff !important;
-}
-[data-theme="light"] .hero-section .text-zinc-400 {
-    color: #a1a1aa !important;
-}
-[data-theme="light"] .hero-section .border-zinc-700 {
-    border-color: #3f3f46 !important;
-}
-[data-theme="light"] .hero-section .hover\:border-zinc-700:hover {
-    border-color: #3f3f46 !important;
-}

@@ -1,4 +1,5 @@
-﻿import { X, Loader } from 'lucide-react'
+﻿import { X } from 'lucide-react'
+import PrimaryButton from '../../components/common_components/PrimaryButton.jsx'
 
 const CATEGORY_OPTIONS = [
     { value: 'electronics', label: 'Electronics' },
@@ -176,20 +177,18 @@ function ProductForm({
             )}
 
             {/* Submit */}
-            <button
+            <PrimaryButton
+                text={editingProduct ? 'Update Product' : 'Create Product'}
                 onClick={handleSubmit}
-                disabled={loading || !isFormValid}
-                className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
-            >
-                {loading ? (
-                    <><Loader size={16} className='animate-spin' /> Processing...</>
-                ) : (
-                    editingProduct ? 'Update Product' : 'Create Product'
-                )}
-            </button>
+                loading={loading}
+                disabled={!isFormValid}
+                LoadingText='Processing...'
+                className='w-full h-12'
+            />
 
         </div>
     )
 }
 
 export default ProductForm
+

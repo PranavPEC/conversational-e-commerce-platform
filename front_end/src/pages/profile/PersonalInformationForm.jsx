@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { updateUserProfile } from '../../redux/reduxActions'
 import useToast from '../../utils/useToast'
 import Toast from '../../components/common_components/Toast'
@@ -17,6 +17,11 @@ const formatDOB = (value) => (value ? value.slice(0, 10) : '')
 
 function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, onSaved }) {
     const { toast, toastVisible, showToast, dismissToast } = useToast()
+
+    // ── Gender lock: true once any non-empty value has been saved ──
+    // Derived from the persisted userData (server source of truth), not from
+    // local form state — so it can never be tricked by local edits.
+    const genderLocked = Boolean(userData?.gender && userData.gender.trim() !== '')
 
     // ── Local form state ──
     const [form, setForm] = useState({
@@ -150,12 +155,15 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                     </div>
 
                     {/* ── Gender ── */}
+                    {/* genderLocked overrides isEditing — once a value is persisted the
+                        field becomes permanently read-only regardless of edit mode, so
+                        users never fill it in expecting it to save and get a confusing 400. */}
                     <div>
                         <label className='block text-zinc-400 text-xs mb-1.5'>Gender</label>
                         <select
                             value={form.gender}
                             onChange={handleChange('gender')}
-                            disabled={!isEditing}
+                            disabled={genderLocked || !isEditing}
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         >
                             <option value=''>Select</option>
@@ -163,6 +171,11 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                             <option value='female'>Female</option>
                             <option value='other'>Other</option>
                         </select>
+                        {genderLocked && (
+                            <p className='mt-1.5 text-xs text-zinc-500'>
+                                Gender cannot be changed once set.
+                            </p>
+                        )}
                     </div>
 
                 </div>

@@ -27,7 +27,7 @@ function Home() {
     const firstName = userData?.name?.split(' ')[0] || 'there'
 
     // ── Rail datasets ──
-    const featuredProducts = products.slice(0, 4)
+    const featuredProducts = products.slice(0, 8)
 
     // Use real creation time for New Arrivals when available (timestamps: true)
     // and gracefully fall back to array order if createdAt is missing.
@@ -37,20 +37,20 @@ function Home() {
             const bTime = b?.createdAt ? new Date(b.createdAt).getTime() : 0
             return bTime - aTime
         })
-        .slice(0, 4)
+        .slice(0, 8)
 
     const topDeals = [...products]
         .sort((a, b) => (a?.price ?? 0) - (b?.price ?? 0))
-        .slice(0, 4)
+        .slice(0, 8)
 
-    // ── Hero showcase: top 4 by newest createdAt, for product cards in hero ──
+    // ── Hero showcase: top 8 newest products — passed to the hero carousel ──
     const heroShowcaseProducts = [...products]
         .sort((a, b) => {
             const aTime = a?.createdAt ? new Date(a.createdAt).getTime() : 0
             const bTime = b?.createdAt ? new Date(b.createdAt).getTime() : 0
             return bTime - aTime
         })
-        .slice(0, 4)
+        .slice(0, 8)
 
     // ── Independent scroll reveals for each rail ──
     const [featuredRef, featuredVisible] = useScrollReveal()
@@ -132,3 +132,4 @@ function Home() {
 
 export default Home
 //This is home page
+

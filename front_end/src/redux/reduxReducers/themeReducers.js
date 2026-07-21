@@ -1,9 +1,9 @@
-// src/redux/reduxReducers/themeReducers.js
+﻿// src/redux/reduxReducers/themeReducers.js
 
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
-    theme: 'dark',   // 'dark' | 'light'
+    theme: 'light',   // 'dark' | 'light'
 }
 
 const themeSlice = createSlice({
@@ -20,3 +20,4 @@ const themeSlice = createSlice({
 export const { setTheme } = themeSlice.actions
 
 export default themeSlice.reducer
+

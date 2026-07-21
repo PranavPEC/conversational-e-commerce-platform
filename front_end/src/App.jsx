@@ -57,9 +57,9 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/products' element={<ProductListing />} />
         <Route path='/product/:id' element={<ProductDetail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-otp" element={<VerifyOTP />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path={navigationStrings.FORGOT_PASSWORD} element={<ForgotPassword />} />
+        <Route path={navigationStrings.VERIFY_OTP} element={<VerifyOTP />} />
+        <Route path={navigationStrings.RESET_PASSWORD} element={<ResetPassword />} />
 
 
         {/* ── Protected routes ── */}

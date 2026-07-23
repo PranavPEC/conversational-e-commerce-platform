@@ -8,6 +8,7 @@ import { verifyOTP, forgotPassword } from "../../redux/reduxActions/authActions.
 import Toast from "../../components/common_components/Toast.jsx";
 import BrandLogo from "../../components/common_components/BrandLogo.jsx";
 import VerifyOTPForm from "./VerifyOTPForm.jsx";
+import navigationStrings from "../../constants/navigationStrings/navigationStrings.js";
 
 function VerifyOTP() {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ function VerifyOTP() {
 
     useEffect(() => {
         if (!email) {
-            navigate("/forgot-password");
+            navigate(navigationStrings.FORGOT_PASSWORD);
         }
     }, [email, navigate]);
 
@@ -78,7 +79,7 @@ function VerifyOTP() {
 
 
             setTimeout(() => {
-                navigate("/reset-password", {
+                navigate(navigationStrings.RESET_PASSWORD, {
                     state: {
                         resetToken: response.resetToken,
                         successMessage: response.message,
@@ -182,7 +183,7 @@ function VerifyOTP() {
                 />
 
                 <p
-                    onClick={() => navigate("/forgot-password")}
+                    onClick={() => navigate(navigationStrings.FORGOT_PASSWORD)}
                     className="text-center text-sm text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 mt-6"
                 >
                     ← Back

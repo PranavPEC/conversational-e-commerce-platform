@@ -21,6 +21,7 @@ import AvatarPicker from '../../components/common_components/AvatarPicker.jsx'
 // ── SignUp-specific components ──
 import SignUpLeftPanel from './SignUpLeftPanel.jsx'
 import SignUpForm from './SignUpForm.jsx'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 
 function SignUp() {
@@ -79,7 +80,7 @@ function SignUp() {
             try {
                 await signupUser(formData);
                 await fetchUserData()
-                navigate('/')
+                navigate(navigationStrings.HOME)
             }
             catch (error) {
                 if (error.response) {
@@ -123,7 +124,7 @@ function SignUp() {
                     <p className='text-zinc-400 text-sm'>
                         Already have an account?{' '}
                         <span
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate(navigationStrings.LOGIN)}
                             className='text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 font-medium'
                         >
                             Login

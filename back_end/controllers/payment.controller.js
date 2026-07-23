@@ -3,6 +3,7 @@ import crypto from "crypto";
 import Cart from "../models/user.cart.js";
 import Order from "../models/order.model.js";
 import Product from "../models/user.product.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 // Razorpay instance — reads keys from .env
 const razorpay = new Razorpay({
@@ -18,22 +19,20 @@ export const createRazorpayOrder = async (req, res) => {
         const { address } = req.body;
 
         if (!address) {
-            return res.status(400).json({ message: "Please provide a delivery address." });
+            return sendError(res, 400, "Please provide a delivery address.");
         }
 
         // Get user's cart with product details
         const cart = await Cart.findOne({ user: req.userId }).populate("products.product");
 
         if (!cart || cart.products.length === 0) {
-            return res.status(400).json({ message: "Your cart is empty." });
+            return sendError(res, 400, "Your cart is empty.");
         }
 
         // Check stock for every item before creating the payment
         for (let item of cart.products) {
             if (item.product.stock < item.quantity) {
-                return res.status(400).json({
-                    message: `Only ${item.product.stock} unit(s) of "${item.product.title}" available.`
-                });
+                return sendError(res, 400, `Only ${item.product.stock} unit(s) of "${item.product.title}" available.`);
             }
         }
 
@@ -72,17 +71,18 @@ export const createRazorpayOrder = async (req, res) => {
 
         // Send Razorpay order details to the frontend
         // Frontend needs: id, amount, currency to open the payment modal
-        return res.status(201).json({
+        return sendSuccess(res, 201, "Razorpay Order Created Successfully.", {
             razorpayOrderId: razorpayOrder.id,
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
             orderId: newOrder._id,
-            keyId: process.env.RAZORPAY_KEY_ID
+            keyId: process.env.RAZORPAY_KEY_ID,
         });
 
     } catch (error) {
-         console.log("PAYMENT ERROR:", error)  // add this
-    return res.status(500).json({ message: "Internal Server Error", error });
+        console.log("PAYMENT ERROR:", error)
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -112,7 +112,7 @@ export const verifyPayment = async (req, res) => {
         if (!isValid) {
             // Signature mismatch — mark order as failed
             await Order.findByIdAndUpdate(orderId, { paymentStatus: "failed" });
-            return res.status(400).json({ message: "Payment verification failed." });
+            return sendError(res, 400, "Payment verification failed.");
         }
 
         // Signature matched — payment is genuine
@@ -120,7 +120,7 @@ export const verifyPayment = async (req, res) => {
         const order = await Order.findById(orderId).populate("products.product");
 
         if (!order) {
-            return res.status(404).json({ message: "Order not found." });
+            return sendError(res, 404, "Order not found.");
         }
 
         order.paymentStatus = "paid";
@@ -150,13 +150,11 @@ export const verifyPayment = async (req, res) => {
             await cart.save();
         }
 
-        return res.status(200).json({
-            message: "Payment Verified. Order Placed Successfully.",
-            order
-        });
+        return sendSuccess(res, 200, "Payment Verified. Order Placed Successfully.", { order });
 
     } catch (error) {
-         console.log("PAYMENT ERROR:", error)  // add this
-    return res.status(500).json({ message: "Internal Server Error", error });
+        console.log("PAYMENT ERROR:", error)
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };

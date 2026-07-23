@@ -6,9 +6,11 @@ import CheckoutModal from './CheckoutModal.jsx'
 import { calculateCartTotal } from '../utils/CommonFunctions.js'
 import { Loader } from 'lucide-react'
 import PrimaryButton from '../components/common_components/PrimaryButton.jsx'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 function Cart() {
     const navigate = useNavigate()
+    const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const [showCheckout, setShowCheckout] = useState(false)
 
     const { cartItems, cartLoading, itemLoading, error } = useSelector(state => state.cart)
@@ -43,7 +45,7 @@ function Cart() {
                 <p className='text-white text-lg font-medium'>Your cart is empty</p>
                 <p className='text-zinc-400 text-sm'>Looks like you haven't added anything yet.</p>
                 <button
-                    onClick={() => navigate('/products')}
+                    onClick={() => navigate(navigationStrings.PRODUCTS)}
                     className='mt-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer'
                 >
                     Browse Products
@@ -87,7 +89,7 @@ function Cart() {
                         <div key={item.product._id} className='bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex gap-4 items-center'>
 
                             <div
-                                onClick={() => navigate('/product/' + item.product._id)}
+                                onClick={() => navigate(getProductDetailRoute(item.product._id))}
                                 className='w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 cursor-pointer'
                             >
                                 {item.product.image ? (
@@ -99,7 +101,7 @@ function Cart() {
 
                             <div className='flex-1 flex flex-col gap-1'>
                                 <h2
-                                    onClick={() => navigate('/product/' + item.product._id)}
+                                    onClick={() => navigate(getProductDetailRoute(item.product._id))}
                                     className='text-white text-sm font-medium cursor-pointer hover:text-emerald-400 transition-colors duration-200'
                                 >
                                     {item.product.title}
@@ -160,7 +162,7 @@ function Cart() {
                         className='w-full mt-2'
                     />
                     <button
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='w-full text-center text-zinc-400 hover:text-white text-sm transition-colors duration-200 cursor-pointer'
                     >
                         ← Continue Shopping

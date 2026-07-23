@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react'
-import { fetchUserData, loginUser } from '../../redux/reduxActions/authActions.js'
+import { loginUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
 
 
@@ -14,6 +14,7 @@ import LoginLeftPanel from './LoginLeftPanel.jsx'
 import LoginForm from './LoginForm.jsx'
 import SocialButtons from '../../components/common_components/SocialButtons.jsx'
 import BrandLogo from '../../components/common_components/BrandLogo.jsx'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Login() {
     const navigate = useNavigate()
@@ -23,7 +24,7 @@ function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
-    const [loading,setLoading]=useState(false);
+    const [loading, setLoading] = useState(false);
 
     // ── Validations ──
     const _checkValidations = () => {
@@ -41,9 +42,8 @@ function Login() {
 
         setLoading(true);
         try {
-            await loginUser({email,password});
-            await fetchUserData()
-            navigate('/')
+            await loginUser({ email, password });
+            navigate(navigationStrings.HOME)
         } catch (error) {
             if (error.response) {
                 showToast(error.response.data.message)
@@ -51,7 +51,7 @@ function Login() {
                 showToast('Server not reachable.')
             }
         }
-        finally{
+        finally {
             setLoading(false);
         }
     }
@@ -67,17 +67,17 @@ function Login() {
 
             <LoginLeftPanel />
 
-            
+
 
             <div className='w-full lg:w-[55%] bg-[var(--color-bg)] lg:bg-[var(--color-card)] flex flex-col justify-center px-8 md:px-16 py-10'>
 
-            <BrandLogo />
+                <BrandLogo />
 
                 <div className='flex justify-end mb-6'>
                     <p className='text-zinc-400 text-sm'>
                         New here?{' '}
                         <span
-                            onClick={() => navigate('/signup')}
+                            onClick={() => navigate(navigationStrings.SIGNUP)}
                             className='text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 font-medium'
                         >
                             Create an account

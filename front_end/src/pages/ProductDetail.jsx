@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchProductById, addCartItem } from '../redux/reduxActions'
 import PrimaryButton from '../components/common_components/PrimaryButton'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 function ProductDetail() {
     const { id } = useParams()
@@ -21,7 +22,7 @@ function ProductDetail() {
 
     const handleAddToCart = async () => {
         if (!userData) {
-            navigate('/login')
+            navigate(navigationStrings.LOGIN)
             return
         }
 
@@ -35,9 +36,8 @@ function ProductDetail() {
             } else {
                 setFeedback({ success: false, msg: result.message || 'Failed to add to cart.' })
             }
-        } catch (err) {
-            setFeedback({ success: false, msg: 'Something went wrong.' })
-        } finally {
+        }
+         finally {
             setAdding(false)
             setTimeout(() => setFeedback(null), 3000)
         }
@@ -55,7 +55,7 @@ function ProductDetail() {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
                 <p className='text-zinc-400 text-sm'>Product not found.</p>
-                <button onClick={() => navigate('/products')} className='text-emerald-400 text-sm hover:text-emerald-300 transition-colors duration-200'>
+                <button onClick={() => navigate(navigationStrings.PRODUCTS)} className='text-emerald-400 text-sm hover:text-emerald-300 transition-colors duration-200'>
                     Back to products
                 </button>
             </div>
@@ -66,7 +66,7 @@ function ProductDetail() {
         <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
             <button
-                onClick={() => navigate('/products')}
+                onClick={() => navigate(navigationStrings.PRODUCTS)}
                 className='text-zinc-400 text-sm hover:text-white transition-colors duration-200 mb-8 flex items-center gap-2 cursor-pointer'
             >
                 ← Back to products

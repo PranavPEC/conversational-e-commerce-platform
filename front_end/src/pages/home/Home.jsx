@@ -13,9 +13,11 @@ import PromoBannerGrid from './PromoBannerGrid.jsx'
 import SocialProofBanner from './SocialProofBanner.jsx'
 import ProductRail from '../../components/common_components/ProductRail.jsx'
 import useScrollReveal from '../../hooks/useScrollReveal'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Home() {
     const navigate = useNavigate()
+    const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
     const { userData } = useSelector(state => state.auth)
     const { products, productsLoading } = useSelector(state => state.products)
@@ -62,10 +64,10 @@ function Home() {
 
             <HeroSection
                 firstName={firstName}
-                onBrowse={() => navigate('/products')}
-                onCart={() => navigate('/cart')}
+                onBrowse={() => navigate(navigationStrings.PRODUCTS)}
+                onCart={() => navigate(navigationStrings.CART)}
                 heroShowcaseProducts={heroShowcaseProducts}
-                onProductClick={(id) => navigate('/product/' + id)}
+                onProductClick={(id) => navigate(getProductDetailRoute(id))}
             />
 
             <DealBanner />
@@ -83,8 +85,8 @@ function Home() {
                     subtitle='Handpicked for you'
                     products={featuredProducts}
                     loading={productsLoading}
-                    onProductClick={(id) => navigate('/product/' + id)}
-                    onSeeAll={() => navigate('/products')}
+                    onProductClick={(id) => navigate(getProductDetailRoute(id))}
+                    onSeeAll={() => navigate(navigationStrings.PRODUCTS)}
                 />
             </div>
 
@@ -101,8 +103,8 @@ function Home() {
                     subtitle='Freshly added'
                     products={newArrivals}
                     loading={productsLoading}
-                    onProductClick={(id) => navigate('/product/' + id)}
-                    onSeeAll={() => navigate('/products')}
+                    onProductClick={(id) => navigate(getProductDetailRoute(id))}
+                    onSeeAll={() => navigate(navigationStrings.PRODUCTS)}
                 />
             </div>
 
@@ -117,13 +119,13 @@ function Home() {
                     subtitle='Best prices right now'
                     products={topDeals}
                     loading={productsLoading}
-                    onProductClick={(id) => navigate('/product/' + id)}
-                    onSeeAll={() => navigate('/products')}
+                    onProductClick={(id) => navigate(getProductDetailRoute(id))}
+                    onSeeAll={() => navigate(navigationStrings.PRODUCTS)}
                 />
             </div>
 
             <SocialProofBanner
-                onShopNow={() => navigate('/products')}
+                onShopNow={() => navigate(navigationStrings.PRODUCTS)}
             />
 
         </div>
@@ -132,4 +134,3 @@ function Home() {
 
 export default Home
 //This is home page
-

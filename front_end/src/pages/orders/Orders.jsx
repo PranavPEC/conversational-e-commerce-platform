@@ -10,9 +10,11 @@ import OrdersEmpty from './OrdersEmpty.jsx'
 import OrdersError from './OrdersError.jsx'
 import OrdersHeader from './OrdersHeader.jsx'
 import OrderCard from './OrderCard.jsx'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Orders() {
     const navigate = useNavigate()
+    const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const { orders, ordersLoading, ordersError } = useSelector(state => state.order)
 
     useEffect(() => {
@@ -23,7 +25,7 @@ function Orders() {
     // regardless of state, so AccountSidebar never flickers in/out.
     const renderContent = () => {
         if (ordersLoading) return <OrdersLoading />
-        if (!ordersLoading && orders.length === 0) return <OrdersEmpty onBrowse={() => navigate('/products')} />
+        if (!ordersLoading && orders.length === 0) return <OrdersEmpty onBrowse={() => navigate(navigationStrings.PRODUCTS)} />
         if (ordersError) return <OrdersError error={ordersError} onRetry={() => fetchUserOrders()} />
 
         return (
@@ -35,7 +37,7 @@ function Orders() {
                         <OrderCard
                             key={order._id}
                             order={order}
-                            onProductClick={(id) => navigate('/product/' + id)}
+                            onProductClick={(id) => navigate(getProductDetailRoute(id))}
                             onCancel={(id) => cancelOrder(id)}   // plain call
                         />
                     ))}
@@ -43,7 +45,7 @@ function Orders() {
 
                 <div className='mt-8 flex justify-center'>
                     <button
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='flex items-center gap-2 text-zinc-400 hover:text-emerald-400 text-sm transition-colors duration-200 cursor-pointer'
                     >
                         Continue Shopping

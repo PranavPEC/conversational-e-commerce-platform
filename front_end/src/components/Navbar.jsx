@@ -13,6 +13,7 @@ import { logoutUser } from '../redux/reduxActions'
 import { clearCart } from '../redux/reduxActions'
 import { GET_ALL_PRODUCTS_URL } from '../config/urls'
 import useDebounce from '../hooks/useDebounce'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 import { getInitial } from '../utils/CommonFunctions.js'
 
@@ -85,7 +86,7 @@ function Navbar() {
         const { data } = await axios.get(GET_ALL_PRODUCTS_URL(null, debouncedSearch))
         if (!isActive) return
 
-        const suggestions = (data.products || []).slice(0, 5)
+        const suggestions = (data.data.products || []).slice(0, 5)
         setSearchSuggestions(suggestions)
         setSuggestionsOpen(true)
       } catch {
@@ -110,7 +111,7 @@ function Navbar() {
     // clearCart is still an RTK action — needs dispatch() until cart is migrated
     dispatch(clearCart())
     setDropdownOpen(false)
-    navigate('/login', { replace: true })
+    navigate(navigationStrings.LOGIN, { replace: true })
   }
 
   const isActive = (path) => location.pathname === path
@@ -122,25 +123,25 @@ function Navbar() {
     setMobileSearchOpen(false)
 
     if (!query) {
-      navigate('/products')
+      navigate(navigationStrings.PRODUCTS)
       return
     }
 
-    navigate('/products?search=' + encodeURIComponent(query))
+    navigate(navigationStrings.PRODUCTS + '?search=' + encodeURIComponent(query))
   }
 
   const handleSuggestionClick = (id) => {
     setSuggestionsOpen(false)
     setMobileSearchOpen(false)
-    navigate('/product/' + id)
+    navigate(getProductDetailRoute(id))
   }
 
   const handleCategoryNav = (category = null) => {
     if (!category) {
-      navigate('/products')
+      navigate(navigationStrings.PRODUCTS)
       return
     }
-    navigate('/products?category=' + encodeURIComponent(category))
+    navigate(navigationStrings.PRODUCTS + '?category=' + encodeURIComponent(category))
   }
 
   const renderSearchBar = (searchRef, mobile = false) => (
@@ -253,7 +254,7 @@ function Navbar() {
       <nav className='w-full bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 md:px-6 py-3 md:py-4 sticky top-0 z-50'>
         <div className='flex items-center justify-between gap-3'>
           <div
-            onClick={() => navigate('/')}
+            onClick={() => navigate(navigationStrings.HOME)}
             className='text-[var(--color-text-primary)] font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
           >
             Shop<span className='text-emerald-400'>AI</span>
@@ -274,7 +275,7 @@ function Navbar() {
 
             {/* ── Login — outline/secondary style, sized to match the navbar's natural height ── */}
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate(navigationStrings.LOGIN)}
               className='flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 bg-transparent border border-[var(--color-input-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm transition-all duration-300 cursor-pointer'
             >
               Login
@@ -283,7 +284,7 @@ function Navbar() {
             {/* ── Sign Up — reuses PrimaryButton, opted into the compact "sm" size for Navbar ── */}
             <PrimaryButton
               text='Sign Up'
-              onClick={() => navigate('/signup')}
+              onClick={() => navigate(navigationStrings.SIGNUP)}
               size='sm'
             />
           </div>
@@ -306,7 +307,7 @@ function Navbar() {
 
       <div className='flex items-center justify-between gap-3'>
         <div
-          onClick={() => navigate('/')}
+          onClick={() => navigate(navigationStrings.HOME)}
           className='text-[var(--color-text-primary)] font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
         >
           Shop<span className='text-emerald-400'>AI</span>
@@ -327,8 +328,8 @@ function Navbar() {
           </button>
 
           <button
-            onClick={() => navigate('/products')}
-            className={`text-sm transition-colors duration-200 ${isActive('/products') ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
+            onClick={() => navigate(navigationStrings.PRODUCTS)}
+            className={`text-sm transition-colors duration-200 ${isActive(navigationStrings.PRODUCTS) ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
           >
             Products
           </button>
@@ -344,9 +345,9 @@ function Navbar() {
 
           {/* ── Cart — icon only, stays outside the dropdown ── */}
           <button
-            onClick={() => navigate('/cart')}
+            onClick={() => navigate(navigationStrings.CART)}
             aria-label='Cart'
-            className={`relative transition-colors duration-200 cursor-pointer ${isActive('/cart') ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
+            className={`relative transition-colors duration-200 cursor-pointer ${isActive(navigationStrings.CART) ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
           >
             <ShoppingCart size={20} />
             {cartCount > 0 && (
@@ -383,14 +384,14 @@ function Navbar() {
               <div className='absolute right-0 mt-3 w-52 bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-2xl shadow-black/20 py-2 z-50'>
 
                 <button
-                  onClick={() => { setDropdownOpen(false); navigate('/profile') }}
+                  onClick={() => { setDropdownOpen(false); navigate(navigationStrings.PROFILE) }}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
                   <User size={16} /> Profile
                 </button>
 
                 <button
-                  onClick={() => { setDropdownOpen(false); navigate('/orders') }}
+                  onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ORDERS) }}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
                   <Package size={16} /> My Orders
@@ -398,7 +399,7 @@ function Navbar() {
 
                 {userData?.role === 'admin' && (
                   <button
-                    onClick={() => { setDropdownOpen(false); navigate('/admin') }}
+                    onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ADMIN) }}
                     className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                   >
                     <Package size={16} /> Admin
@@ -406,7 +407,7 @@ function Navbar() {
                 )}
 
                 <button
-                  onClick={() => { setDropdownOpen(false); navigate('/settings') }}
+                  onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SETTINGS) }}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
                   <Settings size={16} /> Settings
@@ -440,3 +441,4 @@ function Navbar() {
 }
 
 export default Navbar
+  const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)

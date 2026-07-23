@@ -6,7 +6,6 @@
 // The reducer is completely unaware of the silent concept.
 
 import axios from "axios"
-import { SERVER_URL } from "../../utils/APIConfig"
 import { GET_CART_URL,ADD_TO_CART_URL,UPDATE_CART_URL,REMOVE_CART_ITEM_URL,CLEAR_CART_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
@@ -28,7 +27,7 @@ const _fetchCartFromAPI = async (silent = false) => {
 
     try {
         const { data } = await axios.get(GET_CART_URL, { withCredentials: true })
-        dispatch(setCartItems(data.products || []))
+        dispatch(setCartItems(data.data.cart?.products || []))
     } catch (error) {
         dispatch(setCartError(
             error.response?.data?.message || "Failed to fetch cart"

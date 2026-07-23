@@ -2,6 +2,7 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchProducts } from '../redux/reduxActions'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 const CATEGORY_LABELS = {
   electronics: 'Electronics',
@@ -18,6 +19,7 @@ const CATEGORY_LABELS = {
 function ProductListing() {
   const navigate = useNavigate()
   const location = useLocation()
+  const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
   const { products, productsLoading } = useSelector(state => state.products)
 
@@ -71,7 +73,7 @@ function ProductListing() {
         {products.map((product) => (
           <div
             key={product._id}
-            onClick={() => navigate('/product/' + product._id)}
+            onClick={() => navigate(getProductDetailRoute(product._id))}
             className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
           >
             <div className='w-full h-48 overflow-hidden bg-zinc-800'>

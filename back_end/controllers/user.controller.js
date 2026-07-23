@@ -3,20 +3,21 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import generateToken from "../config/token.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const home = (req, res) => {
-    res.status(200).json({ message: "Welcome to Conversational E-Commerce Platform" })
+    return sendSuccess(res, 200, "Welcome to Conversational E-Commerce Platform");
 }
 
 export const createNewUser = async (req, res) => {
     try {
         let { name, email, password } = req.body;
         if (!name || !email || !password) {
-            return res.status(400).json({ message: "Please provide Complete Info" });
+            return sendError(res, 400, "Please provide Complete Info");
         }
         let existUser = await User.findOne({ email });
         if (existUser) {
-            return res.status(400).json({ message: "User Already Exists. Login In" });
+            return sendError(res, 400, "User Already Exists. Login In");
         }
         let profileImage;
         if (req.file) {
@@ -42,37 +43,35 @@ export const createNewUser = async (req, res) => {
         catch (error) {
             console.log("Error : ", error);
         }
-        return res.status(201).json({ message: "User Created Successfully" });
+        return sendSuccess(res, 201, "User Created Successfully");
     }
     catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 }
 
 export const getUserById = async (req, res) => {
     try {
         if (req.params.id !== req.userId) {
-            return res.status(403).json({
-                message: "Unauthorize Access."
-            });
+            return sendError(res, 403, "Unauthorize Access.");
         }
         const user = await User.findById(req.params.id).select("-password");
         if (!user) {
-            return res.status(404).json({
-                message: "User Not Found."
-            })
+            return sendError(res, 404, "User Not Found.")
         }
-        return res.status(200).json(user);
+        return sendSuccess(res, 200, "User Fetched Successfully.", { user });
     }
     catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 }
 
 export const updateUser = async (req, res) => {
     try {
         if (req.params.id !== req.userId) {
-            return res.status(403).json({ message: "Unauthorize Access." });
+            return sendError(res, 403, "Unauthorize Access.");
         }
 
         const { name, email, phone, dateOfBirth, gender } = req.body;
@@ -81,7 +80,7 @@ export const updateUser = async (req, res) => {
         // findByIdAndUpdate would blindly overwrite; we need the current value.
         const user = await User.findById(req.params.id).select("-password");
         if (!user) {
-            return res.status(404).json({ message: "User Not Found." });
+            return sendError(res, 404, "User Not Found.");
         }
 
         // ── Gender lock: set-once, never change ──
@@ -91,9 +90,7 @@ export const updateUser = async (req, res) => {
         // quietly ignored. A 400 makes the contract explicit and honest.
         const currentGenderIsSet = user.gender && user.gender.trim() !== ''
         if (currentGenderIsSet && gender !== undefined && gender !== user.gender) {
-            return res.status(400).json({
-                message: "Gender can only be set once and cannot be changed."
-            });
+            return sendError(res, 400, "Gender can only be set once and cannot be changed.");
         }
 
         // ── Apply all updatable fields ──
@@ -114,28 +111,28 @@ export const updateUser = async (req, res) => {
 
         await user.save();
 
-        return res.status(200).json(user);
+        return sendSuccess(res, 200, "User Fetched Successfully.", { user });
     }
     catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 }
 
 export const deleteUser = async (req, res) => {
     try {
         if (req.params.id !== req.userId) {
-            return res.status(403).json({
-                message: "Unauthorize Access."
-            });
+            return sendError(res, 403, "Unauthorize Access.");
         }
         const user = await User.findByIdAndDelete(req.params.id, { new: true }).select("-password");
         if (!user) {
-            return res.status(404).json({ message: "User Not Found." });
+            return sendError(res, 404, "User Not Found.");
         }
-        return res.status(200).json(user);
+        return sendSuccess(res, 200, "User Deleted Successfully.", { user });
     }
     catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 }
 
@@ -143,15 +140,15 @@ export const login = async (req, res) => {
     try {
         let { email, password } = req.body;
         if (!email || !password) {
-            return res.status(400).json({ message: "Please provide Complete Info" });
+            return sendError(res, 400, "Please provide Complete Info");
         }
         let existUser = await User.findOne({ email });
         if (!existUser) {
-            return res.status(404).json({ message: "User Does Not Exists." });
+            return sendError(res, 404, "User Does Not Exists.");
         }
         let match = await bcryptjs.compare(password, existUser.password);
         if (!match) {
-            return res.status(400).json({ message: "Invalid Password , Try Again." });
+            return sendError(res, 400, "Invalid Password , Try Again.");
         }
         try {
             let token = generateToken(existUser._id);
@@ -165,7 +162,7 @@ export const login = async (req, res) => {
         catch (error) {
             console.log("Error : ", error);
         }
-        return res.status(200).json({
+        return sendSuccess(res, 200, "User Logged In Successfully.", {
             user: {
                 _id: existUser._id,
                 name: existUser.name,
@@ -175,17 +172,19 @@ export const login = async (req, res) => {
         });
     }
     catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 }
 
 export const logout = async (req, res) => {
     try {
         res.clearCookie("token");
-        return res.status(200).json({ message: "User Successfully Logged Out." })
+        return sendSuccess(res, 200, "User Successfully Logged Out.")
     }
     catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 }
 
@@ -193,15 +192,16 @@ export const getCurrentUser = async (req, res) => {
     try {
         let userId = req.userId;
         if (!userId) {
-            return res.status(401).json({ message: "User not found." })
+            return sendError(res, 401, "User not found.")
         }
         let user = await User.findById(userId).select("-password");
         if (!user) {
-            return res.status(404).json({ message: "User not found." })
+            return sendError(res, 404, "User not found.")
         }
-        return res.status(200).json(user);
+        return sendSuccess(res, 200, "User Fetched Successfully.", { user });
     }
     catch (error) {
-        return res.status(500).json({ message: error })
+        console.error(error);
+        return sendError(res, 500, error?.message || "Internal Server Error", error?.message || "Internal Server Error")
     }
 }

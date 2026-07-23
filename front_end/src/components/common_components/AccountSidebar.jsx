@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { User, Package, Heart, Settings, LogOut } from 'lucide-react'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 import { logoutUser } from '../../redux/reduxActions'
 import { clearCart } from '../../redux/reduxActions'   // still an RTK action — needs dispatch()
@@ -15,10 +16,10 @@ import { clearCart } from '../../redux/reduxActions'   // still an RTK action �
 // Clicking them does nothing for now — same placeholder treatment as the
 // Wishlist heart icon in Navbar.jsx.
 const NAV_ITEMS = [
-    { key: 'profile',  label: 'Profile',    icon: User,     path: '/profile' },
-    { key: 'orders',   label: 'My Orders',  icon: Package,  path: '/orders' },
+    { key: 'profile',  label: 'Profile',    icon: User,     path: navigationStrings.PROFILE },
+    { key: 'orders',   label: 'My Orders',  icon: Package,  path: navigationStrings.ORDERS },
     { key: 'wishlist', label: 'Wishlist',   icon: Heart,    path: null },
-    { key: 'settings', label: 'Settings',   icon: Settings, path: '/settings' },
+    { key: 'settings', label: 'Settings',   icon: Settings, path: navigationStrings.SETTINGS },
 ]
 
 function AccountSidebar() {
@@ -35,7 +36,7 @@ function AccountSidebar() {
     const handleLogout = async () => {
         await logoutUser()
         dispatch(clearCart())
-        navigate('/login', { replace: true })
+        navigate(navigationStrings.LOGIN, { replace: true })
     }
 
     return (

@@ -1,6 +1,7 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
 import { isValidPassword } from "../utils/validations.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const resetPassword = async (req, res) => {
     try {
@@ -9,30 +10,21 @@ export const resetPassword = async (req, res) => {
 
         // ── Required Fields Validation ──
         if (!resetToken || !newPassword) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide complete information.",
-            });
+            return sendError(res, 400, "Please provide complete information.");
         }
 
         // ── Password Validation ──
         const passwordError = isValidPassword(newPassword);
 
         if (passwordError) {
-            return res.status(400).json({
-                success: false,
-                message: passwordError,
-            });
+            return sendError(res, 400, passwordError);
         }
 
         // ── Find User Using Reset Token ──
         const user = await User.findOne({ resetToken });
 
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Invalid or expired reset session.",
-            });
+            return sendError(res, 404, "Invalid or expired reset session.");
         }
 
         // ── Check Reset Token Expiry ──
@@ -43,10 +35,7 @@ export const resetPassword = async (req, res) => {
 
             await user.save();
 
-            return res.status(400).json({
-                success: false,
-                message: "Reset session has expired. Please start again.",
-            });
+            return sendError(res, 400, "Reset session has expired. Please start again.");
         }
 
         // ── Hash New Password ──
@@ -60,17 +49,12 @@ export const resetPassword = async (req, res) => {
 
         await user.save();
 
-        return res.status(200).json({
-            success: true,
-            message: "Password updated successfully.",
-        });
+        return sendSuccess(res, 200, "Password updated successfully.");
 
     } catch (error) {
 
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        console.error(error);
+        return sendError(res, 500, error.message, error.message);
 
     }
 };

@@ -17,6 +17,7 @@ import { resetPassword } from "../../redux/reduxActions/authActions.js";
 import Toast from "../../components/common_components/Toast.jsx";
 import BrandLogo from "../../components/common_components/BrandLogo.jsx";
 import ResetPasswordForm from "./ResetPasswordForm.jsx";
+import navigationStrings from "../../constants/navigationStrings/navigationStrings.js";
 
 function ResetPassword() {
 
@@ -40,7 +41,7 @@ function ResetPassword() {
 
     useEffect(() => {
         if (!resetToken) {
-            navigate("/forgot-password");
+            navigate(navigationStrings.FORGOT_PASSWORD);
         }
     }, [resetToken, navigate]);
 
@@ -105,7 +106,7 @@ function ResetPassword() {
             showToast(response.message,"success");
 
             setTimeout(() => {
-                navigate("/login");
+                navigate(navigationStrings.LOGIN);
             }, 1000);
 
         } catch (error) {
@@ -174,7 +175,7 @@ function ResetPassword() {
                 />
 
                 <p
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate(navigationStrings.LOGIN)}
                     className="text-center text-sm text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 mt-6"
                 >
                     ← Back to Login

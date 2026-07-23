@@ -1,6 +1,7 @@
 ﻿
 import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 // Signup-specific left panel
 // Same structure as LoginLeftPanel but different headline and description copy
@@ -19,7 +20,7 @@ function SignUpLeftPanel() {
             className='theme-lock-dark hidden lg:flex lg:w-[45%] bg-zinc-950 relative overflow-hidden flex-col justify-between p-10'
         >
             {/* Logo */}
-            <div className='flex items-center gap-2 z-10' onClick={() => navigate('/')}>
+            <div className='flex items-center gap-2 z-10' onClick={() => navigate(navigationStrings.HOME)}>
                 <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center cursor-pointer'>
                     <ShoppingBag size={18} className='text-zinc-950' />
                 </div>

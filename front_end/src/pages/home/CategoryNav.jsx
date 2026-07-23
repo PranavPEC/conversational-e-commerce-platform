@@ -1,6 +1,7 @@
 ﻿import { useNavigate } from 'react-router-dom'
 import { Smartphone, Shirt, Home, Sparkles, Watch, Headphones, Laptop, Gem } from 'lucide-react'
 import useScrollReveal from '../../hooks/useScrollReveal'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 const CATEGORIES = [
     { key: 'electronics', label: 'Electronics', icon: Smartphone },
@@ -42,7 +43,7 @@ function CategoryNav() {
                         {CATEGORIES.map(({ key, label, icon: Icon }) => (
                             <button
                                 key={key}
-                                onClick={() => navigate('/products?category=' + encodeURIComponent(key))}
+                                onClick={() => navigate(navigationStrings.PRODUCTS + '?category=' + encodeURIComponent(key))}
                                 className='group min-w-[76px] flex flex-col items-center gap-2 cursor-pointer'
                             >
                                 <div className='w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center transition-colors duration-200 group-hover:border-emerald-500'>

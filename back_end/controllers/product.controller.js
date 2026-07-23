@@ -1,5 +1,6 @@
 ﻿import Product, { PRODUCT_CATEGORIES } from "../models/user.product.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 // ── Parse and normalize a categories value from FormData ──
 // FormData sends arrays as JSON strings (Admin.jsx stringifies before appending).
@@ -22,24 +23,20 @@ export const createProduct = async (req, res) => {
         const { title, description, price, stock, category } = req.body;
 
         if (!title || !description || !price || !stock || !category) {
-            return res.status(400).json({
-                message: "Please provide all required fields: title, description, price, stock, category."
-            });
+            return sendError(res, 400, "Please provide all required fields: title, description, price, stock, category.");
         }
 
         const categories = parseCategories(category)
         if (!categories || categories.length === 0) {
-            return res.status(400).json({ message: "At least one category is required." })
+            return sendError(res, 400, "At least one category is required.")
         }
         const invalidCategory = categories.find(c => !PRODUCT_CATEGORIES.includes(c))
         if (invalidCategory) {
-            return res.status(400).json({ message: `Invalid category: ${invalidCategory}` })
+            return sendError(res, 400, `Invalid category: ${invalidCategory}`)
         }
 
         if (price < 0 || stock < 0) {
-            return res.status(400).json({
-                message: "Price and stock cannot be negative."
-            });
+            return sendError(res, 400, "Price and stock cannot be negative.");
         }
 
         // Upload image to Cloudinary if provided
@@ -58,13 +55,11 @@ export const createProduct = async (req, res) => {
             image
         });
 
-        return res.status(201).json({
-            message: "Product Created Successfully.",
-            product: newProduct
-        });
+        return sendSuccess(res, 201, "Product Created Successfully.", { product: newProduct });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -103,9 +98,10 @@ export const getAllProducts = async (req, res) => {
         }
 
         const products = await Product.find(query)
-        return res.status(200).json({ message: "Products Fetched Successfully.", products });
+        return sendSuccess(res, 200, "Products Fetched Successfully.", { products });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -115,11 +111,12 @@ export const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product Not Found." });
+            return sendError(res, 404, "Product Not Found.");
         }
-        return res.status(200).json({ message: "Product Fetched Successfully.", product });
+        return sendSuccess(res, 200, "Product Fetched Successfully.", { product });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -131,24 +128,24 @@ export const updateProduct = async (req, res) => {
 
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product Not Found." });
+            return sendError(res, 404, "Product Not Found.");
         }
 
         if (price !== undefined && Number(price) < 0) {
-            return res.status(400).json({ message: "Price cannot be negative." });
+            return sendError(res, 400, "Price cannot be negative.");
         }
         if (stock !== undefined && Number(stock) < 0) {
-            return res.status(400).json({ message: "Stock cannot be negative." });
+            return sendError(res, 400, "Stock cannot be negative.");
         }
 
         if (category !== undefined) {
             const categories = parseCategories(category)
             if (!categories || categories.length === 0) {
-                return res.status(400).json({ message: "At least one category is required." })
+                return sendError(res, 400, "At least one category is required.")
             }
             const invalidCategory = categories.find(c => !PRODUCT_CATEGORIES.includes(c))
             if (invalidCategory) {
-                return res.status(400).json({ message: `Invalid category: ${invalidCategory}` })
+                return sendError(res, 400, `Invalid category: ${invalidCategory}`)
             }
             product.category = categories
         }
@@ -166,13 +163,11 @@ export const updateProduct = async (req, res) => {
 
         await product.save();
 
-        return res.status(200).json({
-            message: "Product Updated Successfully.",
-            product
-        });
+        return sendSuccess(res, 200, "Product Updated Successfully.", { product });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -182,12 +177,13 @@ export const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product Not Found." });
+            return sendError(res, 404, "Product Not Found.");
         }
 
-        return res.status(200).json({ message: "Product Deleted Successfully." });
+        return sendSuccess(res, 200, "Product Deleted Successfully.");
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };

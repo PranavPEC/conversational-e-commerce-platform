@@ -1,7 +1,6 @@
 // src/redux/reduxActions/orderActions.js
 
 import axios from "axios"
-import { SERVER_URL } from "../../utils/APIConfig"
 import { CREATE_RAZORPAY_ORDER_URL,VERIFY_PAYMENT_URL,GET_MY_ORDERS_URL,CANCEL_ORDER_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
@@ -30,8 +29,8 @@ export const createRazorpayOrder = async ({ address }) => {
             { address },
             { withCredentials: true }
         )
-        dispatch(setPendingOrder(data))
-        return data
+        dispatch(setPendingOrder(data.data))
+        return data.data
     } catch (error) {
         const msg = error.response?.data?.message || "Failed to create order."
         dispatch(setOrderError(msg))
@@ -60,7 +59,7 @@ export const verifyRazorpayPayment = async ({
         )
         dispatch(setPaymentSuccess(true))
         dispatch(setPendingOrder(null))
-        return data
+        return data.data
     } catch (error) {
         const msg = error.response?.data?.message || "Payment verification failed."
         dispatch(setOrderError(msg))
@@ -80,8 +79,8 @@ export const fetchUserOrders = async () => {
             GET_MY_ORDERS_URL,
             { withCredentials: true }
         )
-        dispatch(setOrders(data.orders))
-        return data.orders
+        dispatch(setOrders(data.data.orders))
+        return data.data.orders
     } catch (error) {
         dispatch(setOrdersError(
             error.response?.data?.message || "Failed to fetch orders."
@@ -103,8 +102,8 @@ export const cancelOrder = async (orderId) => {
             { withCredentials: true }
         )
         // Patch just this one order in the list — no need to re-fetch all
-        dispatch(updateOrderInList(data.order))
-        return data.order
+        dispatch(updateOrderInList(data.data.order))
+        return data.data.order
     } catch (error) {
         dispatch(setOrdersError(
             error.response?.data?.message || "Failed to cancel order."

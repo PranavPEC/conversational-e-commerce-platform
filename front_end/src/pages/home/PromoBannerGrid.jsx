@@ -1,6 +1,7 @@
 ﻿import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import useScrollReveal from '../../hooks/useScrollReveal'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 const PROMO_CARDS = [
     {
@@ -35,7 +36,7 @@ function PromoBannerGrid() {
                 {PROMO_CARDS.map(card => (
                     <button
                         key={card.title}
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className={`rounded-2xl overflow-hidden relative h-48 p-6 text-left border cursor-pointer transition-colors duration-200 ${
                             isLight
                                 ? `border-zinc-200 hover:border-emerald-500 ${card.lightGradient}`

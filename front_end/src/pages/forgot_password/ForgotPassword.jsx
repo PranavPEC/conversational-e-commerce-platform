@@ -11,6 +11,7 @@ import { checkIsEmpty, isValidEmail } from "../../utils/validations.js";
 import Toast from "../../components/common_components/Toast.jsx";
 import BrandLogo from "../../components/common_components/BrandLogo.jsx";
 import ForgotPasswordForm from "./ForgotPasswordForm.jsx";
+import navigationStrings from "../../constants/navigationStrings/navigationStrings.js";
 
 function ForgotPassword() {
     const navigate = useNavigate();
@@ -50,7 +51,7 @@ function ForgotPassword() {
             showToast(response.message,"success");
 
             setTimeout(() => {
-                navigate("/verify-otp", {
+                navigate(navigationStrings.VERIFY_OTP, {
                     state: { email },
                 });
             }, 1500);
@@ -105,7 +106,7 @@ function ForgotPassword() {
                 />
 
                 <p
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate(navigationStrings.LOGIN)}
                     className="text-center text-sm text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 mt-6"
                 >
                     ← Back to Login

@@ -2,6 +2,7 @@
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import { useNavigate } from 'react-router-dom'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 // Props:
 //   email, setEmail           — email field state
@@ -61,7 +62,7 @@ function LoginForm({
                     </button>
                 </div>
             </div>
-            <span className='text-emerald-400 text-xs hover:text-emerald-300 cursor-pointer transition-colors duration-200' onClick={() => navigate("/forgot-password")}>
+            <span className='text-emerald-400 text-xs hover:text-emerald-300 cursor-pointer transition-colors duration-200' onClick={() => navigate(navigationStrings.FORGOT_PASSWORD)}>
                 Forgot password?
             </span>
             {/* Submit */}

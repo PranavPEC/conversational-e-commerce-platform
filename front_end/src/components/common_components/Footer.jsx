@@ -1,5 +1,6 @@
 ﻿import { useNavigate } from 'react-router-dom'
 import { ShoppingBag, Camera, Send, Users } from 'lucide-react'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Footer() {
     const navigate = useNavigate()
@@ -14,7 +15,7 @@ function Footer() {
                     {/* ── Brand ── */}
                     <div>
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate(navigationStrings.HOME)}
                             className='flex items-center gap-2 cursor-pointer'
                         >
                             <div className='w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center'>
@@ -46,9 +47,9 @@ function Footer() {
                     <div>
                         <h3 className='text-white text-sm font-semibold mb-4'>Shop</h3>
                         <div className='flex flex-col gap-2.5'>
-                            <button onClick={() => navigate('/products')} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Products</button>
-                            <button onClick={() => navigate('/cart')} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Cart</button>
-                            <button onClick={() => navigate('/orders')} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Orders</button>
+                            <button onClick={() => navigate(navigationStrings.PRODUCTS)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Products</button>
+                            <button onClick={() => navigate(navigationStrings.CART)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Cart</button>
+                            <button onClick={() => navigate(navigationStrings.ORDERS)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Orders</button>
                         </div>
                     </div>
 

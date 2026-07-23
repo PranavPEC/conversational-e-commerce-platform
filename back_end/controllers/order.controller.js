@@ -1,6 +1,7 @@
 import Order from "../models/order.model.js";
 import Cart from "../models/user.cart.js";
 import Product from "../models/user.product.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 // Place Order
 export const placeOrder = async (req, res) => {
@@ -8,22 +9,20 @@ export const placeOrder = async (req, res) => {
         const { address } = req.body;
 
         if (!address) {
-            return res.status(400).json({ message: "Please provide a delivery address." });
+            return sendError(res, 400, "Please provide a delivery address.");
         }
 
         // Step 1 — Get user's cart with product details populated
         const cart = await Cart.findOne({ user: req.userId }).populate("products.product");
 
         if (!cart || cart.products.length === 0) {
-            return res.status(400).json({ message: "Your cart is empty." });
+            return sendError(res, 400, "Your cart is empty.");
         }
 
         // Step 2 — Check stock for every product before doing anything
         for (let item of cart.products) {
             if (item.product.stock < item.quantity) {
-                return res.status(400).json({
-                    message: `Only ${item.product.stock} unit(s) of "${item.product.title}" available.`
-                });
+                return sendError(res, 400, `Only ${item.product.stock} unit(s) of "${item.product.title}" available.`);
             }
         }
 
@@ -70,13 +69,11 @@ export const placeOrder = async (req, res) => {
         cart.products = [];
         await cart.save();
 
-        return res.status(201).json({
-            message: "Order Placed Successfully.",
-            order: newOrder
-        });
+        return sendSuccess(res, 201, "Order Placed Successfully.", { order: newOrder });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -88,10 +85,11 @@ export const getUserOrders = async (req, res) => {
             .populate("products.product", "title image price")
             .sort({ createdAt: -1 }); // newest first
 
-        return res.status(200).json({ orders });
+        return sendSuccess(res, 200, "Orders Fetched Successfully.", { orders });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -103,18 +101,19 @@ export const getOrderById = async (req, res) => {
             .populate("products.product", "title image price");
 
         if (!order) {
-            return res.status(404).json({ message: "Order Not Found." });
+            return sendError(res, 404, "Order Not Found.");
         }
 
         // Only the owner can see their order
         if (order.user.toString() !== req.userId) {
-            return res.status(403).json({ message: "Unauthorized Access." });
+            return sendError(res, 403, "Unauthorized Access.");
         }
 
-        return res.status(200).json({ order });
+        return sendSuccess(res, 200, "Order Fetched Successfully.", { order });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -126,7 +125,7 @@ export const updateOrderStatus = async (req, res) => {
 
         const validStatuses = ["placed", "shipped", "delivered", "cancelled"];
         if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: "Invalid status value." });
+            return sendError(res, 400, "Invalid status value.");
         }
 
         const order = await Order.findByIdAndUpdate(
@@ -136,13 +135,14 @@ export const updateOrderStatus = async (req, res) => {
         );
 
         if (!order) {
-            return res.status(404).json({ message: "Order Not Found." });
+            return sendError(res, 404, "Order Not Found.");
         }
 
-        return res.status(200).json({ message: "Order Status Updated.", order });
+        return sendSuccess(res, 200, "Order Status Updated.", { order });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -154,17 +154,15 @@ export const cancelOrder = async (req, res) => {
             .populate("products.product");
 
         if (!order) {
-            return res.status(404).json({ message: "Order Not Found." });
+            return sendError(res, 404, "Order Not Found.");
         }
 
         if (order.user.toString() !== req.userId) {
-            return res.status(403).json({ message: "Unauthorized Access." });
+            return sendError(res, 403, "Unauthorized Access.");
         }
 
         if (order.status !== "placed") {
-            return res.status(400).json({
-                message: "Only placed orders can be cancelled."
-            });
+            return sendError(res, 400, "Only placed orders can be cancelled.");
         }
 
         // Restore stock for each product
@@ -180,9 +178,10 @@ export const cancelOrder = async (req, res) => {
         order.status = "cancelled";
         await order.save();
 
-        return res.status(200).json({ message: "Order Cancelled Successfully.", order });
+        return sendSuccess(res, 200, "Order Cancelled Successfully.", { order });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };

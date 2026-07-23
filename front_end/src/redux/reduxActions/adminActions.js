@@ -1,7 +1,6 @@
 // src/redux/reduxActions/adminActions.js
 
 import axios from "axios"
-import { SERVER_URL } from "../../utils/APIConfig"
 import { CREATE_PRODUCT_URL,UPDATE_PRODUCT_URL,DELETE_PRODUCT_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
@@ -29,9 +28,9 @@ export const createProduct = async (formData) => {
             formData,
             { withCredentials: true }
         )
-        dispatch(addAdminProduct(data.product))
+        dispatch(addAdminProduct(data.data.product))
         dispatch(setAdminSuccess("Product created successfully."))
-        return data.product
+        return data.data.product
     } catch (error) {
         dispatch(setAdminError(
             error.response?.data?.message || "Failed to create product."
@@ -54,9 +53,9 @@ export const updateProduct = async ({ id, formData }) => {
             formData,
             { withCredentials: true }
         )
-        dispatch(updateAdminProduct(data.product))
+        dispatch(updateAdminProduct(data.data.product))
         dispatch(setAdminSuccess("Product updated successfully."))
-        return data.product
+        return data.data.product
     } catch (error) {
         dispatch(setAdminError(
             error.response?.data?.message || "Failed to update product."

@@ -3,6 +3,7 @@ import { Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import useScrollReveal from '../../hooks/useScrollReveal'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 const getTimeLeftToMidnight = () => {
     const now = new Date()
@@ -71,7 +72,7 @@ function DealBanner() {
 
                     <PrimaryButton
                         text='Shop Deals'
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='w-full lg:w-auto'
                     />
                 </div>

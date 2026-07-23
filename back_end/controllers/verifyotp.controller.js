@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import crypto from "crypto";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const verifyOTP = async (req, res) => {
     try {
@@ -8,28 +9,19 @@ export const verifyOTP = async (req, res) => {
 
         // ── Validation ──
         if (!email || !otp) {
-            return res.status(400).json({
-                success: false,
-                message: "Email and OTP are required."
-            });
+            return sendError(res, 400, "Email and OTP are required.");
         }
 
         // ── Find User ──
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found."
-            });
+            return sendError(res, 404, "User not found.");
         }
 
         // ── Check if OTP Exists ──
         if (!user.otp || !user.otpExpiry) {
-            return res.status(400).json({
-                success: false,
-                message: "No active OTP found. Please request a new OTP."
-            });
+            return sendError(res, 400, "No active OTP found. Please request a new OTP.");
         }
 
         // ── Check OTP Expiry ──
@@ -42,10 +34,7 @@ export const verifyOTP = async (req, res) => {
 
             await user.save();
 
-            return res.status(400).json({
-                success: false,
-                message: "OTP has expired. Please request a new OTP."
-            });
+            return sendError(res, 400, "OTP has expired. Please request a new OTP.");
         }
 
         // ── Verify OTP ──
@@ -63,21 +52,14 @@ export const verifyOTP = async (req, res) => {
 
                 await user.save();
 
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Too many incorrect attempts. Your OTP has been invalidated. Please request a new OTP."
-                });
+                return sendError(res, 400, "Too many incorrect attempts. Your OTP has been invalidated. Please request a new OTP.");
             }
 
             await user.save();
 
             const attemptsLeft = 5 - user.otpAttempts;
 
-            return res.status(400).json({
-                success: false,
-                message: `Invalid OTP. ${attemptsLeft} attempt${attemptsLeft > 1 ? "s" : ""} remaining.`
-            });
+            return sendError(res, 400, `Invalid OTP. ${attemptsLeft} attempt${attemptsLeft > 1 ? "s" : ""} remaining.`);
         }
 
         // ── OTP Verified Successfully ──
@@ -98,18 +80,14 @@ export const verifyOTP = async (req, res) => {
 
         await user.save();
 
-        return res.status(200).json({
-            success: true,
-            message: "OTP verified successfully.",
+        return sendSuccess(res, 200, "OTP verified successfully.", {
             resetToken,
         });
 
     } catch (error) {
 
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        console.error(error);
+        return sendError(res, 500, error.message, error.message);
 
     }
 };

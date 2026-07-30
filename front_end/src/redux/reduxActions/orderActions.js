@@ -19,14 +19,14 @@ const { dispatch } = store
 
 // ── Create Razorpay order ──
 // Returns the pendingOrder object that CheckoutModal uses to open Razorpay SDK
-export const createRazorpayOrder = async ({ address }) => {
+export const createRazorpayOrder = async ({ addressId }) => {
     dispatch(setOrderLoading(true))
     dispatch(setOrderError(null))
 
     try {
         const { data } = await axios.post(
             CREATE_RAZORPAY_ORDER_URL,
-            { address },
+            { addressId },
             { withCredentials: true }
         )
         dispatch(setPendingOrder(data.data))

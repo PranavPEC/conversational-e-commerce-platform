@@ -16,20 +16,42 @@ function Cart() {
     const { cartItems, cartLoading, itemLoading, error } = useSelector(state => state.cart)
 
     useEffect(() => {
-        fetchCart()   // plain call â€” no dispatch(), no silent flag needed from component
+        fetchCart().catch(() => {
+            // Intentionally ignored here — cart error state is already rendered inline below.
+        })
     }, [])
 
-    const handleQuantityChange = (productId, currentQty, change) => {
+    const handleQuantityChange = async (productId, currentQty, change) => {
         const newQty = currentQty + change
         if (newQty < 1) {
-            removeCartItem(productId)
+            try {
+                await removeCartItem(productId)
+            } catch {
+                // Intentionally ignored here — cart error state is already rendered inline below.
+            }
             return
         }
-        updateCart({ productId, quantity: newQty })
+        try {
+            await updateCart({ productId, quantity: newQty })
+        } catch {
+            // Intentionally ignored here — cart error state is already rendered inline below.
+        }
     }
 
-    const handleRemove = (productId) => removeCartItem(productId)
-    const handleClearCart = () => clearEntireCart()
+    const handleRemove = async (productId) => {
+        try {
+            await removeCartItem(productId)
+        } catch {
+            // Intentionally ignored here — cart error state is already rendered inline below.
+        }
+    }
+    const handleClearCart = async () => {
+        try {
+            await clearEntireCart()
+        } catch {
+            // Intentionally ignored here — cart error state is already rendered inline below.
+        }
+    }
 
     if (cartLoading) {
         return (

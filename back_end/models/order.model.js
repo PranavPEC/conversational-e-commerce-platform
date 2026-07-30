@@ -35,9 +35,17 @@ const orderSchema = new mongoose.Schema({
     },
 
     address: {
-        type: String,
-        required: true
+        label: String,
+        fullName: { type: String, required: true },
+        phone: { type: String, required: true },
+        line1: { type: String, required: true },
+        line2: String,
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        pincode: { type: String, required: true },
     },
+
+    addressId: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
 
     status: {
         type: String,

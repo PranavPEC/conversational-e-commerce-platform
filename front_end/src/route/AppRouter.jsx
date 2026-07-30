@@ -54,7 +54,7 @@ const resolveElement = (route, userData) => {
 }
 
 function AppRouter() {
-    const { userData } = useSelector((state) => state.auth)
+    const { userData } = useSelector((state) => state?.auth)
     const location = useLocation()
     const hideNavbar = HIDE_NAVBAR_PATHS.includes(location.pathname)
 

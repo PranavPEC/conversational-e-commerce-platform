@@ -30,14 +30,12 @@ function ProductDetail() {
         setFeedback(null)
 
         try {
-            const result = await addCartItem({ productId: product._id, quantity })
-            if (result.success) {
-                setFeedback({ success: true, msg: 'Added to cart successfully!' })
-            } else {
-                setFeedback({ success: false, msg: result.message || 'Failed to add to cart.' })
-            }
+            await addCartItem({ productId: product._id, quantity })
+            setFeedback({ success: true, msg: 'Added to cart successfully!' })
+        } catch (err) {
+            setFeedback({ success: false, msg: err.response?.data?.message || 'Something went wrong.' })
         }
-         finally {
+        finally {
             setAdding(false)
             setTimeout(() => setFeedback(null), 3000)
         }

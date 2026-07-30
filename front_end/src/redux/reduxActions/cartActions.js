@@ -32,6 +32,7 @@ const _fetchCartFromAPI = async (silent = false) => {
         dispatch(setCartError(
             error.response?.data?.message || "Failed to fetch cart"
         ))
+        throw error
     } finally {
         if (!silent) dispatch(setCartLoading(false))
     }
@@ -58,7 +59,7 @@ export const addCartItem = async ({ productId, quantity }) => {
     } catch (error) {
         const msg = error.response?.data?.message || "Failed to add to cart."
         dispatch(setCartError(msg))
-        return { success: false, message: msg }
+        throw error
     }
 }
 
@@ -77,6 +78,7 @@ export const updateCart = async ({ productId, quantity }) => {
         dispatch(setCartError(
             error.response?.data?.message || "Failed to update cart"
         ))
+        throw error
     } finally {
         dispatch(setItemLoading({ productId, value: false }))
     }
@@ -96,6 +98,7 @@ export const removeCartItem = async (productId) => {
         dispatch(setCartError(
             error.response?.data?.message || "Failed to remove item"
         ))
+        throw error
     } finally {
         dispatch(setItemLoading({ productId, value: false }))
     }
@@ -110,6 +113,7 @@ export const clearEntireCart = async () => {
         dispatch(setCartError(
             error.response?.data?.message || "Failed to clear cart"
         ))
+        throw error
     }
 }
 

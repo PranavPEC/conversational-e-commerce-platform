@@ -1,16 +1,18 @@
-import  { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-react'
 import {
     createRazorpayOrder,
     verifyRazorpayPayment,
     resetOrder,
-    clearCart,
+    fetchUserAddresses,
+    fetchCart,
 } from '../redux/reduxActions'
 import { calculateCartTotal } from '../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
-    const [address, setAddress] = useState('')
+    const [selectedAddressId, setSelectedAddressId] = useState(null)
+    const { addresses, addressesLoading, addressesError } = useSelector(state => state.address)
 
     // New state keys from orderReducers — orderLoading/orderError instead of loading/error
     const { pendingOrder, orderLoading, orderError, paymentSuccess } = useSelector(state => state.order)
@@ -22,9 +24,30 @@ function CheckoutModal({ onClose }) {
     }
 
     const handleProceedToPayment = async () => {
-        if (!address.trim()) return
-        await createRazorpayOrder({ address })   // plain call
+        if (!selectedAddressId) return
+        try {
+            await createRazorpayOrder({ addressId: selectedAddressId })   // plain call
+        } catch {
+            // Intentionally ignored here — orderError is already rendered in this modal.
+        }
     }
+
+    // Ensure addresses are available when checkout opens.
+    useEffect(() => {
+        fetchUserAddresses().catch(() => {
+            // Intentionally ignored here — addressesError / orderError are already rendered in this modal.
+        })
+    }, [])
+
+    // Auto-select default address (or first address) once list is loaded.
+    useEffect(() => {
+        if (!addresses || addresses.length === 0) {
+            setSelectedAddressId(null)
+            return
+        }
+        const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0]
+        setSelectedAddressId(defaultAddress._id)
+    }, [addresses])
 
     // Open Razorpay SDK when pendingOrder is set
     useEffect(() => {
@@ -39,11 +62,13 @@ function CheckoutModal({ onClose }) {
             order_id: pendingOrder.razorpayOrderId,
 
             handler: function (response) {
-                verifyRazorpayPayment({   // plain call
+                verifyRazorpayPayment({
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_signature: response.razorpay_signature,
                     orderId: pendingOrder.orderId
+                }).catch(() => {
+                    // Intentionally ignored here — orderError is already rendered in this modal.
                 })
             },
 
@@ -66,7 +91,7 @@ function CheckoutModal({ onClose }) {
     // Clear cart after successful payment
     useEffect(() => {
         if (paymentSuccess) {
-            clearCart()   // plain call
+            fetchCart()   // plain call
         }
     }, [paymentSuccess])
 
@@ -128,14 +153,28 @@ function CheckoutModal({ onClose }) {
                         <label className='text-zinc-300 text-sm font-medium'>Delivery Address</label>
                         <div className='relative'>
                             <MapPin size={16} className='absolute left-3.5 top-3.5 text-zinc-500' />
-                            <textarea
-                                value={address}
-                                onChange={e => setAddress(e.target.value)}
-                                placeholder='Enter your full delivery address...'
-                                rows={3}
-                                className='w-full bg-zinc-800 text-white placeholder-zinc-500 outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-3 text-sm transition-colors duration-200 resize-none'
-                            />
+                            <select
+                                value={selectedAddressId || ''}
+                                onChange={(e) => setSelectedAddressId(e.target.value)}
+                                disabled={addressesLoading || addresses.length === 0}
+                                className='w-full h-12 bg-zinc-800 text-white outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl pl-10 pr-4 text-sm transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed'
+                            >
+                                {addresses.length === 0 ? (
+                                    <option value=''>
+                                        {addressesLoading ? 'Loading addresses...' : 'No saved address found'}
+                                    </option>
+                                ) : (
+                                    addresses.map((address) => (
+                                        <option key={address._id} value={address._id}>
+                                            {address.fullName}, {address.line1}, {address.city}
+                                        </option>
+                                    ))
+                                )}
+                            </select>
                         </div>
+                        {addressesError && (
+                            <p className='text-red-400 text-xs'>{addressesError}</p>
+                        )}
                     </div>
 
                     {orderError && (
@@ -147,7 +186,7 @@ function CheckoutModal({ onClose }) {
 
                     <button
                         onClick={handleProceedToPayment}
-                        disabled={orderLoading || !address.trim()}
+                        disabled={orderLoading || !selectedAddressId}
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
                     >
                         {orderLoading ? (

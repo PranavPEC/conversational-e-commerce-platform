@@ -91,18 +91,26 @@ function Admin() {
         const serializedForm = { ...form, category: JSON.stringify(form.category) }
         const formData = buildFormData(serializedForm, imageFile)
 
-        if (editingProduct) {
-            await updateProduct({ id: editingProduct._id, formData })   // plain call
-        } else {
-            await createProduct(formData)   // plain call
+        try {
+            if (editingProduct) {
+                await updateProduct({ id: editingProduct._id, formData })   // plain call
+            } else {
+                await createProduct(formData)   // plain call
+            }
+            handleResetForm()
+        } catch {
+            // Intentionally ignored here — adminError is already surfaced via AdminToast.
         }
-        handleResetForm()
     }
 
     const handleDeleteConfirm = async () => {
         if (!deleteTarget) return
-        await deleteProduct(deleteTarget._id)   // plain call
-        setDeleteTarget(null)
+        try {
+            await deleteProduct(deleteTarget._id)   // plain call
+            setDeleteTarget(null)
+        } catch {
+            // Intentionally ignored here — adminError is already surfaced via AdminToast.
+        }
     }
 
     return (

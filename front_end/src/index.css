@@ -168,4 +168,6 @@ body {
 [data-theme="light"] .bg-emerald-500:hover {
     color: #ffffff !important;
 }
-
+[data-theme="light"] .bg-red-500 {
+    color: #ffffff !important;
+}

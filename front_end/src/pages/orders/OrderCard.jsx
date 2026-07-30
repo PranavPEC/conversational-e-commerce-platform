@@ -1,4 +1,3 @@
-import React from 'react'
 import { Package, Clock, CheckCircle, Truck, XCircle } from 'lucide-react'
 import { formatDate } from '../../utils/CommonFunctions.js'
 
@@ -43,6 +42,10 @@ const STATUS_CONFIG = {
 function OrderCard({ order, onProductClick, onCancel }) {
     const statusCfg = STATUS_CONFIG[order.status] || STATUS_CONFIG.placed
     const StatusIcon = statusCfg.icon
+    const hasStructuredAddress = !!order?.address?.fullName
+    const addressText = hasStructuredAddress
+        ? `${order.address.fullName}, ${order.address.line1}${order.address.line2 ? `, ${order.address.line2}` : ''}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}`
+        : (typeof order.address === 'string' ? order.address : 'Address not available')
 
     return (
         <div className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors duration-200'>
@@ -116,7 +119,7 @@ function OrderCard({ order, onProductClick, onCancel }) {
                 {/* Address + payment status */}
                 <div className='flex flex-col gap-0.5'>
                     <p className='text-zinc-500 text-xs truncate max-w-xs'>
-                        📍 {order.address}
+                        📍 {addressText}
                     </p>
                     <p className='text-zinc-600 text-xs'>
                         Payment:{' '}
@@ -124,8 +127,8 @@ function OrderCard({ order, onProductClick, onCancel }) {
                             order.paymentStatus === 'paid'
                                 ? 'text-emerald-400'
                                 : order.paymentStatus === 'failed'
-                                ? 'text-red-400'
-                                : 'text-amber-400'
+                                    ? 'text-red-400'
+                                    : 'text-amber-400'
                         }>
                             {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                         </span>

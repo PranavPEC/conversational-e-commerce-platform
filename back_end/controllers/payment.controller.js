@@ -4,7 +4,7 @@ import Cart from "../models/user.cart.js";
 import Order from "../models/order.model.js";
 import Product from "../models/user.product.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
-
+import Address from "../models/address.model.js";
 // Razorpay instance — reads keys from .env
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -16,10 +16,15 @@ const razorpay = new Razorpay({
 // POST /payment/create-order
 export const createRazorpayOrder = async (req, res) => {
     try {
-        const { address } = req.body;
+        const { addressId } = req.body;
 
-        if (!address) {
-            return sendError(res, 400, "Please provide a delivery address.");
+        if (!addressId) {
+            return sendError(res, 400, "Please select a delivery address.");
+        }
+
+        const savedAddress = await Address.findOne({ _id: addressId, user: req.userId });
+        if (!savedAddress) {
+            return sendError(res, 404, "Selected address not found.");
         }
 
         // Get user's cart with product details
@@ -63,7 +68,17 @@ export const createRazorpayOrder = async (req, res) => {
             user: req.userId,
             products: orderProducts,
             totalAmount,
-            address,
+            address: {
+                label: savedAddress.label,
+                fullName: savedAddress.fullName,
+                phone: savedAddress.phone,
+                line1: savedAddress.line1,
+                line2: savedAddress.line2,
+                city: savedAddress.city,
+                state: savedAddress.state,
+                pincode: savedAddress.pincode,
+            },
+            addressId: savedAddress._id,
             status: "placed",
             paymentStatus: "pending",
             razorpayOrderId: razorpayOrder.id

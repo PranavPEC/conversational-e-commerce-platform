@@ -18,8 +18,18 @@ function Orders() {
     const { orders, ordersLoading, ordersError } = useSelector(state => state.order)
 
     useEffect(() => {
-        fetchUserOrders()   // plain call — no dispatch()
+        fetchUserOrders().catch(() => {
+            // Intentionally ignored here — ordersError is already surfaced in OrdersError.
+        })
     }, [])
+
+    const handleCancelOrder = async (id) => {
+        try {
+            await cancelOrder(id)
+        } catch {
+            // Intentionally ignored here — ordersError is already surfaced in OrdersError.
+        }
+    }
 
     // ── Decide which content to show — sidebar + wrapper stay constant ──
     // regardless of state, so AccountSidebar never flickers in/out.
@@ -38,7 +48,7 @@ function Orders() {
                             key={order._id}
                             order={order}
                             onProductClick={(id) => navigate(getProductDetailRoute(id))}
-                            onCancel={(id) => cancelOrder(id)}   // plain call
+                            onCancel={handleCancelOrder}
                         />
                     ))}
                 </div>

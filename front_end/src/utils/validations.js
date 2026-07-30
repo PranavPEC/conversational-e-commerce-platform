@@ -112,7 +112,10 @@ export const isValidPassword = (password) => {
 // Optional field on Profile — blank is allowed (user may not have added it
 // yet), but if something is entered, it must be exactly 10 digits.
 export const checkPhoneValidation = (phone, showToast) => {
-    if (checkIsEmpty(phone)) return true
+    if (checkIsEmpty(phone)){
+        showToast("Phone number must be exactly 10 digits.")
+        return false
+    }
 
     if (!/^\d{10}$/.test(phone)) {
         showToast("Phone number must be exactly 10 digits.")
@@ -127,7 +130,10 @@ export const checkPhoneValidation = (phone, showToast) => {
 // Also optional — blank is allowed. If a date is entered, it must be a
 // real date and can't be in the future.
 export const checkDateOfBirthValidation = (dob, showToast) => {
-    if (checkIsEmpty(dob)) return true
+    if (checkIsEmpty(dob)){
+        showToast("Please enter a valid date of birth.")
+        return false
+    }
 
     const enteredDate = new Date(dob)
     const today = new Date()

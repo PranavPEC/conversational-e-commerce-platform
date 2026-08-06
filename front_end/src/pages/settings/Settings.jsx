@@ -1,7 +1,7 @@
 import AccountSidebar from '../../components/common_components/AccountSidebar'
 import SettingsHeader from './SettingsHeader'
 import ThemeToggleCard from './ThemeToggleCard'
-
+import LanguageToggleCard from './LanguageToggleCard'
 // ── Settings Page ──
 // Same layout pattern as Profile.jsx and Orders.jsx:
 // max-w-6xl wrapper → AccountSidebar on left → content on right.
@@ -19,6 +19,7 @@ function Settings() {
                 <div className='flex-1 flex flex-col gap-6 min-w-0'>
                     <SettingsHeader />
                     <ThemeToggleCard />
+                    <LanguageToggleCard />
                 </div>
 
             </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { fetchUserOrders } from '../../redux/reduxActions'
-
+import { useTranslation } from 'react-i18next'
 import AccountSidebar from '../../components/common_components/AccountSidebar'
 import ProfileSummaryCard from './ProfileSummaryCard'
 import ProfileStatsGrid from './ProfileStatsGrid'
@@ -9,6 +9,7 @@ import PersonalInformationForm from './PersonalInformationForm'
 import AddressesSection from './AddressesSection'
 
 function Profile() {
+    const { t } = useTranslation('profile')
     const { userData } = useSelector(state => state.auth)
     const { orders } = useSelector(state => state.order)
 
@@ -68,9 +69,9 @@ function Profile() {
 
                     {/* ── Page Heading ── */}
                     <div>
-                        <h1 className='text-[var(--color-text-primary)] text-2xl font-bold tracking-tight'>Profile</h1>
+                        <h1 className='text-[var(--color-text-primary)] text-2xl font-bold tracking-tight'>{t('profile')}</h1>
                         <p className='text-[var(--color-text-muted)] text-sm mt-1'>
-                            Manage your personal information and account details
+                            {t('profile_page_description')}
                         </p>
                     </div>
 

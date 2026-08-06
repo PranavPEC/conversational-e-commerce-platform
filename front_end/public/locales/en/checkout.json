@@ -1,0 +1,15 @@
+{
+    "payment_successful": "Payment Successful!",
+    "order_placed_processing": "Your order has been placed and is being processed.",
+    "order_confirmation": "You'll receive a confirmation shortly. Track your orders in Order History.",
+    "done": "Done",
+    "checkout": "Checkout",
+    "order_summary": "Order Summary",
+    "total": "Total",
+    "delivery_address": "Delivery Address",
+    "loading_addresses": "Loading addresses...",
+    "no_saved_address": "No saved address found",
+    "processing": "Processing...",
+    "pay": "Pay",
+    "razorpay_secure": "Secured by Razorpay · 100% safe & encrypted"
+}

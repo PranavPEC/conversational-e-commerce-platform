@@ -3,6 +3,7 @@ import { Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import useScrollReveal from '../../hooks/useScrollReveal'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
+import { useTranslation } from 'react-i18next'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 const getTimeLeftToMidnight = () => {
@@ -23,7 +24,7 @@ function DealBanner() {
     const navigate = useNavigate()
     const [ref, isVisible] = useScrollReveal()
     const [timeLeft, setTimeLeft] = useState(getTimeLeftToMidnight)
-
+    const { t } = useTranslation('home')
     useEffect(() => {
         // Client-side placeholder countdown for UI only.
         // Real timed promotions should come from backend promotion windows.
@@ -47,31 +48,31 @@ function DealBanner() {
                     <div className='flex flex-col gap-3'>
                         <p className='inline-flex items-center gap-1.5 text-emerald-400 text-xs font-semibold tracking-widest uppercase'>
                             <Zap size={14} />
-                            Deal of the Day
+                            {t('deal_of_the_day')}
                         </p>
 
                         <h3 className='text-white text-sm md:text-base font-semibold'>
-                            Up to 40% off Electronics
+                            {t('electronics_deal')}
                         </h3>
 
                         <div className='flex items-center gap-2'>
                             <div className='bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 min-w-[52px] text-center'>
                                 <p className='text-white text-sm font-bold'>{timeLeft.hours}</p>
-                                <p className='text-zinc-500 text-[10px] mt-0.5'>HH</p>
+                                <p className='text-zinc-500 text-[10px] mt-0.5'>{t('hours_short')}</p>
                             </div>
                             <div className='bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 min-w-[52px] text-center'>
                                 <p className='text-white text-sm font-bold'>{timeLeft.minutes}</p>
-                                <p className='text-zinc-500 text-[10px] mt-0.5'>MM</p>
+                                <p className='text-zinc-500 text-[10px] mt-0.5'>{t('minutes_short')}</p>
                             </div>
                             <div className='bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 min-w-[52px] text-center'>
                                 <p className='text-white text-sm font-bold'>{timeLeft.seconds}</p>
-                                <p className='text-zinc-500 text-[10px] mt-0.5'>SS</p>
+                                <p className='text-zinc-500 text-[10px] mt-0.5'>{t('seconds_short')}</p>
                             </div>
                         </div>
                     </div>
 
                     <PrimaryButton
-                        text='Shop Deals'
+                        text={t('shop_deals')}
                         onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='w-full lg:w-auto'
                     />

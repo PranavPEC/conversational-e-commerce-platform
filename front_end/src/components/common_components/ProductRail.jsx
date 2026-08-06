@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { ShoppingBag, ChevronRight, Eye, ChevronLeft } from 'lucide-react'
-
+import { useTranslation } from "react-i18next";
 const AUTO_ADVANCE_MS = 4500
 const MANUAL_PAUSE_MS = 3500
 
@@ -19,7 +19,9 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
     const [isTransitionEnabled, setIsTransitionEnabled] = useState(true)
     const [isHovered, setIsHovered] = useState(false)
     const [isManualPaused, setIsManualPaused] = useState(false)
-
+    const { i18n } = useTranslation();
+    const { t } = useTranslation('home');
+    const isRTL = i18n.dir() === 'rtl'
     const manualPauseTimeoutRef = useRef(null)
 
     useEffect(() => {
@@ -128,7 +130,7 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
     }
 
     const slideWidth = 100 / visibleCount
-    const trackTranslate = `translateX(-${currentIndex * slideWidth}%)`
+    const trackTranslate = isRTL ? `translateX(${currentIndex * slideWidth}%)` : `translateX(-${currentIndex * slideWidth}%)`
 
     const productCount = products.length
     const logicalIndex = canCarousel
@@ -136,7 +138,6 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
         : 0
     const pageCount = productCount > 0 ? Math.ceil(productCount / visibleCount) : 0
     const activePage = pageCount > 0 ? Math.floor(logicalIndex / visibleCount) % pageCount : 0
-
     return (
         <section className='w-full px-6 md:px-16 py-14'>
             <div className='max-w-5xl mx-auto'>
@@ -155,7 +156,7 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                         onClick={onSeeAll}
                         className='flex items-center gap-1 text-zinc-400 hover:text-emerald-400 text-sm transition-colors duration-200 cursor-pointer'
                     >
-                        See all <ChevronRight size={15} />
+                        {t('see_all')} <ChevronRight size={15} />
                     </button>
                 </div>
 
@@ -185,14 +186,14 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                             <>
                                 <button
                                     onClick={movePrev}
-                                    aria-label='Previous products'
+                                    aria-label={t('previous_products')}
                                     className='absolute left-2 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center cursor-pointer'
                                 >
                                     <ChevronLeft size={18} />
                                 </button>
                                 <button
                                     onClick={() => moveNext(true)}
-                                    aria-label='Next products'
+                                    aria-label={t('next_products')}
                                     className='absolute right-2 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center cursor-pointer'
                                 >
                                     <ChevronRight size={18} />
@@ -229,14 +230,14 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                                                     />
                                                 ) : (
                                                     <div className='w-full h-full flex items-center justify-center text-zinc-600 text-xs'>
-                                                        No Image
+                                                        {t('no_image')}
                                                     </div>
                                                 )}
 
                                                 {/* Hover Overlay */}
                                                 <div className='absolute inset-0 bg-black/10 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center'>
                                                     <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300'>
-                                                        <Eye size={16} /> View Details
+                                                        <Eye size={16} /> {t('view_details')}
                                                     </div>
                                                 </div>
                                             </div>
@@ -248,13 +249,13 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                                                 </h3>
                                                 <div className='mt-auto pt-2 flex items-center justify-between'>
                                                     <span className='text-emerald-400 font-semibold text-sm transition-all duration-300 group-hover:tracking-wide'>
-                                                        {product.price != null ? '\u20B9' + product.price.toLocaleString('en-IN') : 'N/A'}
+                                                        {product.price != null ? '\u20B9' + product.price.toLocaleString('en-IN') : t('not_available')}
                                                     </span>
                                                     {product.stock === 0 ? (
-                                                        <span className='text-xs text-red-400'>Out of stock</span>
+                                                        <span className='text-xs text-red-400'>{t('out_of_stock')}</span>
                                                     ) : (
                                                         <span className='text-xs text-zinc-500 transition-colors duration-300 group-hover:text-zinc-300'>
-                                                            {product.stock} left
+                                                            {t('items_left', { count: product.stock })}
                                                         </span>
                                                     )}
                                                 </div>
@@ -274,12 +275,11 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                                             pauseAfterManualInteraction()
                                             setCurrentIndex(visibleCount + index * visibleCount)
                                         }}
-                                        aria-label={`Go to slide ${index + 1}`}
-                                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                                            activePage === index
-                                                ? 'w-6 bg-emerald-400'
-                                                : 'w-2 bg-zinc-700 hover:bg-zinc-500'
-                                        }`}
+                                        aria-label={`${t('go_to_slide', { number: index + 1 })}`}
+                                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${activePage === index
+                                            ? 'w-6 bg-emerald-400'
+                                            : 'w-2 bg-zinc-700 hover:bg-zinc-500'
+                                            }`}
                                     />
                                 ))}
                             </div>
@@ -291,7 +291,7 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                 {!loading && products.length === 0 && (
                     <div className='flex flex-col items-center justify-center py-16 gap-3'>
                         <ShoppingBag size={32} className='text-zinc-700' />
-                        <p className='text-zinc-400 text-sm'>No products available right now.</p>
+                        <p className='text-zinc-400 text-sm'>{t('no_products_available')}</p>
                     </div>
                 )}
 

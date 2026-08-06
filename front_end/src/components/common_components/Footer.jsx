@@ -1,9 +1,11 @@
 ﻿import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ShoppingBag, Camera, Send, Users } from 'lucide-react'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Footer() {
     const navigate = useNavigate()
+    const { t } = useTranslation('common')
 
     return (
         <footer className='w-full bg-zinc-950 border-t border-zinc-800 px-6 md:px-16 pt-12 pb-6'>
@@ -25,7 +27,7 @@ function Footer() {
                         </button>
 
                         <p className='text-zinc-400 text-sm mt-3 max-w-xs'>
-                            Smarter shopping with products picked just for you.
+                            {t('footer_tagline')}
                         </p>
 
                         {/* Lucide doesn't expose brand logos in this version,
@@ -45,31 +47,31 @@ function Footer() {
 
                     {/* ── Shop ── */}
                     <div>
-                        <h3 className='text-white text-sm font-semibold mb-4'>Shop</h3>
+                        <h3 className='text-white text-sm font-semibold mb-4'>{t('footer_shop_heading')}</h3>
                         <div className='flex flex-col gap-2.5'>
-                            <button onClick={() => navigate(navigationStrings.PRODUCTS)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Products</button>
-                            <button onClick={() => navigate(navigationStrings.CART)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Cart</button>
-                            <button onClick={() => navigate(navigationStrings.ORDERS)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Orders</button>
+                            <button onClick={() => navigate(navigationStrings.PRODUCTS)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_products')}</button>
+                            <button onClick={() => navigate(navigationStrings.CART)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_cart')}</button>
+                            <button onClick={() => navigate(navigationStrings.ORDERS)} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_orders')}</button>
                         </div>
                     </div>
 
                     {/* ── Company ── */}
                     <div>
-                        <h3 className='text-white text-sm font-semibold mb-4'>Company</h3>
+                        <h3 className='text-white text-sm font-semibold mb-4'>{t('footer_company_heading')}</h3>
                         <div className='flex flex-col gap-2.5'>
-                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>About</button>
-                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Careers</button>
-                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Contact</button>
+                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_about')}</button>
+                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_careers')}</button>
+                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_contact')}</button>
                         </div>
                     </div>
 
                     {/* ── Help ── */}
                     <div>
-                        <h3 className='text-white text-sm font-semibold mb-4'>Help</h3>
+                        <h3 className='text-white text-sm font-semibold mb-4'>{t('footer_help_heading')}</h3>
                         <div className='flex flex-col gap-2.5'>
-                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>FAQs</button>
-                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Returns Policy</button>
-                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>Shipping Info</button>
+                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_faqs')}</button>
+                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_returns_policy')}</button>
+                            <button onClick={() => { }} className='text-zinc-400 hover:text-emerald-400 text-sm text-left transition-colors duration-200 cursor-pointer'>{t('footer_shipping_info')}</button>
                         </div>
                     </div>
 
@@ -77,7 +79,7 @@ function Footer() {
 
                 {/* ── Bottom row ── */}
                 <div className='mt-10 pt-5 border-t border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3'>
-                    <p className='text-zinc-500 text-xs'>© 2026 ShopAI. All rights reserved.</p>
+                    <p className='text-zinc-500 text-xs'>{t('footer_copyright', { year: new Date().getFullYear() })}</p>
 
                     <div className='flex items-center gap-2'>
                         <span className='px-2.5 py-1 text-[10px] font-semibold tracking-wide text-zinc-300 border border-zinc-700 rounded-md'>VISA</span>

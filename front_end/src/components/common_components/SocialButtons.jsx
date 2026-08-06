@@ -1,18 +1,19 @@
 
 import colors from '../../constants/colors/colors'
-import { localStrings } from '../../constants/lang'
+import { useTranslation } from 'react-i18next'
 
 // UI only — no props, no logic
 // Shared by Login.jsx and SignUp.jsx
 // Social auth is not yet implemented — buttons are placeholders
 
 function SocialButtons() {
+    const { t } = useTranslation('common');
     return (
         <>
             {/* Divider */}
             <div className='flex items-center gap-3 my-5'>
                 <div className='flex-1 h-px bg-zinc-800' />
-                <span className='text-zinc-500 text-xs'>{localStrings.or_continue_with}</span>
+                <span className='text-zinc-500 text-xs'>{t('or_continue_with')}</span>
                 <div className='flex-1 h-px bg-zinc-800' />
             </div>
 

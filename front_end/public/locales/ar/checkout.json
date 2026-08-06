@@ -1,0 +1,15 @@
+{
+    "payment_successful": "تم الدفع بنجاح!",
+    "order_placed_processing": "تم تقديم طلبك وهو قيد المعالجة.",
+    "order_confirmation": "ستتلقى تأكيدًا قريبًا. يمكنك متابعة طلباتك من سجل الطلبات.",
+    "done": "تم",
+    "checkout": "إتمام الشراء",
+    "order_summary": "ملخص الطلب",
+    "total": "الإجمالي",
+    "delivery_address": "عنوان التوصيل",
+    "loading_addresses": "جارٍ تحميل العناوين...",
+    "no_saved_address": "لا يوجد عنوان محفوظ",
+    "processing": "جارٍ المعالجة...",
+    "pay": "ادفع",
+    "razorpay_secure": "محمي بواسطة Razorpay · آمن ومشفر بنسبة 100٪"
+}

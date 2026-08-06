@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import {useTranslation} from "react-i18next"
 import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-react'
 import {
     createRazorpayOrder,
@@ -11,6 +12,7 @@ import {
 import { calculateCartTotal } from '../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
+    const { t } = useTranslation('checkout')
     const [selectedAddressId, setSelectedAddressId] = useState(null)
     const { addresses, addressesLoading, addressesError } = useSelector(state => state.address)
 
@@ -103,15 +105,15 @@ function CheckoutModal({ onClose }) {
                     <div className='w-16 h-16 rounded-full bg-emerald-500 bg-opacity-20 border-2 border-emerald-500 flex items-center justify-center'>
                         <CheckCircle size={32} className='text-emerald-400' />
                     </div>
-                    <h2 className='text-white text-xl font-bold'>Payment Successful!</h2>
-                    <p className='text-zinc-400 text-sm'>Your order has been placed and is being processed.</p>
+                    <h2 className='text-white text-xl font-bold'>{t('payment_successful')}</h2>
+                    <p className='text-zinc-400 text-sm'>{t('order_placed_processing')}</p>
                     <div className='w-full h-px bg-zinc-800 my-2' />
-                    <p className='text-zinc-500 text-xs'>You'll receive a confirmation shortly. Track your orders in Order History.</p>
+                    <p className='text-zinc-500 text-xs'>{t('order_confirmation')}</p>
                     <button
                         onClick={handleClose}
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer mt-2'
                     >
-                        Done
+                        {t('done')}
                     </button>
                 </div>
             </div>
@@ -124,7 +126,7 @@ function CheckoutModal({ onClose }) {
             <div className='bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md flex flex-col'>
 
                 <div className='flex items-center justify-between p-6 border-b border-zinc-800'>
-                    <h2 className='text-white text-lg font-bold tracking-tight'>Checkout</h2>
+                    <h2 className='text-white text-lg font-bold tracking-tight'>{t('checkout')}</h2>
                     <button onClick={handleClose} className='text-zinc-500 hover:text-white transition-colors duration-200 cursor-pointer'>
                         <X size={18} />
                     </button>
@@ -133,7 +135,7 @@ function CheckoutModal({ onClose }) {
                 <div className='p-6 flex flex-col gap-5'>
 
                     <div className='flex flex-col gap-2'>
-                        <p className='text-zinc-400 text-xs font-medium uppercase tracking-widest'>Order Summary</p>
+                        <p className='text-zinc-400 text-xs font-medium uppercase tracking-widest'>{t('order_summary')}</p>
                         <div className='bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col gap-2 max-h-40 overflow-y-auto'>
                             {cartItems.map(item => (
                                 <div key={item.product._id} className='flex items-center justify-between gap-3'>
@@ -144,13 +146,13 @@ function CheckoutModal({ onClose }) {
                             ))}
                         </div>
                         <div className='flex justify-between items-center pt-1'>
-                            <span className='text-zinc-400 text-sm'>Total</span>
+                            <span className='text-zinc-400 text-sm'>{t('total')}</span>
                             <span className='text-emerald-400 text-lg font-bold'>₹{calculateCartTotal(cartItems)}</span>
                         </div>
                     </div>
 
                     <div className='flex flex-col gap-1.5'>
-                        <label className='text-zinc-300 text-sm font-medium'>Delivery Address</label>
+                        <label className='text-zinc-300 text-sm font-medium'>{t('delivery_address')}</label>
                         <div className='relative'>
                             <MapPin size={16} className='absolute left-3.5 top-3.5 text-zinc-500' />
                             <select
@@ -161,7 +163,7 @@ function CheckoutModal({ onClose }) {
                             >
                                 {addresses.length === 0 ? (
                                     <option value=''>
-                                        {addressesLoading ? 'Loading addresses...' : 'No saved address found'}
+                                        {addressesLoading ? t('loading_addresses') : t('no_saved_address')}
                                     </option>
                                 ) : (
                                     addresses.map((address) => (
@@ -190,13 +192,13 @@ function CheckoutModal({ onClose }) {
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
                     >
                         {orderLoading ? (
-                            <><Loader size={16} className='animate-spin' />Processing...</>
+                            <><Loader size={16} className='animate-spin' />{t('processing')}</>
                         ) : (
-                            <>Pay ₹{calculateCartTotal(cartItems)}<ArrowRight size={16} /></>
+                            <>{t('pay')} ₹{calculateCartTotal(cartItems)}<ArrowRight size={16} /></>
                         )}
                     </button>
 
-                    <p className='text-zinc-600 text-xs text-center'>Secured by Razorpay · 100% safe & encrypted</p>
+                    <p className='text-zinc-600 text-xs text-center'>{t('razorpay_secure')}</p>
                 </div>
             </div>
         </div>

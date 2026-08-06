@@ -1,5 +1,6 @@
-import  { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation, Trans } from 'react-i18next'
 import { fetchUserData, signupUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
 
@@ -26,6 +27,7 @@ import navigationStrings from '../../constants/navigationStrings/navigationStrin
 
 function SignUp() {
     const navigate = useNavigate()
+    const { t } = useTranslation(['auth', 'errors'])
 
     // ── Toast ──
     const { toast, toastVisible, showToast, dismissToast } = useToast()
@@ -53,11 +55,11 @@ function SignUp() {
     // Each validator shows its own error and returns false
     // We just check the return value and return early
     const _checkValidations = () => {
-        if (!checkNameValidation(name, showToast)) return false
-        if (checkIsEmpty(email)) { showToast("Please enter your email."); return false }
-        if (!isValidEmail(email)) { showToast("Please enter a valid email address."); return false }
-        if (!checkPasswordValidations(password, showToast)) return false
-        if (!checkPasswordMatch(password, confirmPassword, showToast)) return false
+        if (!checkNameValidation(name, showToast,t)) return false
+        if (checkIsEmpty(email)) { showToast(t('email_required')); return false }
+        if (!isValidEmail(email)) { showToast(t('email_invalid')); return false }
+        if (!checkPasswordValidations(password, showToast,t)) return false
+        if (!checkPasswordMatch(password, confirmPassword, showToast, t)) return false
         return true
     }
 
@@ -86,7 +88,7 @@ function SignUp() {
                 if (error.response) {
                     showToast(error.response.data.message)
                 } else {
-                    showToast('Server not reachable.')
+                    showToast(t('server_not_reachable'))
                 }
             }
             finally {
@@ -100,7 +102,7 @@ function SignUp() {
             if (error.response) {
                 showToast(error.response.data.message)
             } else {
-                showToast('Server not reachable.')
+                showToast(t('server_not_reachable'))
             }
         }
     }
@@ -117,17 +119,17 @@ function SignUp() {
             <SignUpLeftPanel />
 
             <div className='w-full lg:w-[55%] bg-[var(--color-bg)] lg:bg-[var(--color-card)] flex flex-col justify-center px-8 md:px-16 py-10 overflow-y-auto'>
-                
+
                 <BrandLogo />
 
                 <div className='flex justify-end mb-6'>
                     <p className='text-zinc-400 text-sm'>
-                        Already have an account?{' '}
+                        {t('already_have_account')}{' '}
                         <span
                             onClick={() => navigate(navigationStrings.LOGIN)}
                             className='text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 font-medium'
                         >
-                            Login
+                            {t('login_link')}
                         </span>
                     </p>
                 </div>
@@ -138,11 +140,11 @@ function SignUp() {
                         onImageChange={handleImageChange}
                     />
                     <div>
-                        <h1 className='text-white text-2xl font-bold tracking-tight'>Sign Up</h1>
+                        <h1 className='text-white text-2xl font-bold tracking-tight'>{t('sign_up')}</h1>
                         <p className='text-zinc-400 text-sm'>
                             {frontendImage
-                                ? 'Looking good! Fill in your details'
-                                : 'Create your account to get started'
+                                ? t('signup_subheading_filled')
+                                : t('signup_subheading_empty')
                             }
                         </p>
                     </div>
@@ -162,14 +164,9 @@ function SignUp() {
                 <SocialButtons />
 
                 <p className='text-zinc-500 text-xs text-center mt-5'>
-                    By signing up, you agree to our{' '}
-                    <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>
-                        Terms of Service
-                    </span>
-                    {' '}and{' '}
-                    <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>
-                        Privacy Policy
-                    </span>
+                    <Trans i18nKey='signup_terms_agreement' ns='auth'>
+                        By signing up, you agree to our <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Terms of Service</span> and <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Privacy Policy</span>
+                    </Trans>
                 </p>
 
             </div>

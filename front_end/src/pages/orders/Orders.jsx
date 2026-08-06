@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { fetchUserOrders, cancelOrder } from '../../redux/reduxActions'
-
+import { useTranslation } from 'react-i18next'
 import AccountSidebar from '../../components/common_components/AccountSidebar'
 import OrdersLoading from './OrdersLoading.jsx'
 import OrdersEmpty from './OrdersEmpty.jsx'
@@ -13,6 +13,7 @@ import OrderCard from './OrderCard.jsx'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Orders() {
+    const { t } = useTranslation('orders')
     const navigate = useNavigate()
     const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const { orders, ordersLoading, ordersError } = useSelector(state => state.order)
@@ -58,7 +59,7 @@ function Orders() {
                         onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='flex items-center gap-2 text-zinc-400 hover:text-emerald-400 text-sm transition-colors duration-200 cursor-pointer'
                     >
-                        Continue Shopping
+                        {t('continue_shopping')}
                         <ChevronRight size={15} />
                     </button>
                 </div>

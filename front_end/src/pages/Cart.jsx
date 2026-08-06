@@ -7,8 +7,10 @@ import { calculateCartTotal } from '../utils/CommonFunctions.js'
 import { Loader } from 'lucide-react'
 import PrimaryButton from '../components/common_components/PrimaryButton.jsx'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
+import { useTranslation } from 'react-i18next'
 
 function Cart() {
+    const { t } = useTranslation('cart')
     const navigate = useNavigate()
     const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const [showCheckout, setShowCheckout] = useState(false)
@@ -56,7 +58,7 @@ function Cart() {
     if (cartLoading) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
-                <p className='text-zinc-400 text-sm'>Loading cart...</p>
+                <p className='text-zinc-400 text-sm'>{t("loading_cart")}</p>
             </div>
         )
     }
@@ -64,13 +66,13 @@ function Cart() {
     if (cartItems.length === 0) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
-                <p className='text-white text-lg font-medium'>Your cart is empty</p>
-                <p className='text-zinc-400 text-sm'>Looks like you haven't added anything yet.</p>
+                <p className='text-white text-lg font-medium'>{t("cart_empty")}</p>
+                <p className='text-zinc-400 text-sm'>{t("cart_empty_description")}</p>
                 <button
                     onClick={() => navigate(navigationStrings.PRODUCTS)}
                     className='mt-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer'
                 >
-                    Browse Products
+                    {t("browse_products")}
                 </button>
             </div>
         )
@@ -83,16 +85,16 @@ function Cart() {
 
             <div className='max-w-3xl mx-auto flex items-center justify-between mb-8'>
                 <h1 className='text-white text-2xl font-semibold tracking-tight'>
-                    Your Cart
+                    {t("your_cart")}
                     <span className='text-zinc-500 text-base font-normal ml-2'>
-                        ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
+                        ({cartItems.length} {cartItems.length === 1 ? t("item_singular") : t("item_plural")})
                     </span>
                 </h1>
                 <button
                     onClick={handleClearCart}
                     className='text-sm text-zinc-500 hover:text-red-400 transition-colors duration-200 cursor-pointer'
                 >
-                    Clear cart
+                    {t("clear_cart")}
                 </button>
             </div>
 
@@ -117,7 +119,7 @@ function Cart() {
                                 {item.product.image ? (
                                     <img src={item.product.image} alt={item.product.title} className='w-full h-full object-cover' />
                                 ) : (
-                                    <div className='w-full h-full flex items-center justify-center text-zinc-600 text-xs'>No img</div>
+                                    <div className='w-full h-full flex items-center justify-center text-zinc-600 text-xs'>{t("no_image")}</div>
                                 )}
                             </div>
 
@@ -166,20 +168,20 @@ function Cart() {
 
                 <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mt-4 flex flex-col gap-4'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-zinc-400 text-sm'>Subtotal</span>
+                        <span className='text-zinc-400 text-sm'>{t("subtotal")}</span>
                         <span className='text-white text-sm'>₹{calculateCartTotal(cartItems)}</span>
                     </div>
                     <div className='flex justify-between items-center'>
-                        <span className='text-zinc-400 text-sm'>Shipping</span>
-                        <span className='text-emerald-400 text-sm'>Free</span>
+                        <span className='text-zinc-400 text-sm'>{t("shipping")}</span>
+                        <span className='text-emerald-400 text-sm'>{t("free")}</span>
                     </div>
                     <div className='h-px bg-zinc-800' />
                     <div className='flex justify-between items-center'>
-                        <span className='text-white font-semibold'>Total</span>
+                        <span className='text-white font-semibold'>{t("total")}</span>
                         <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems).toLocaleString('en-IN')}</span>
                     </div>
                     <PrimaryButton
-                        text='Proceed to Checkout'
+                        text={t("proceed_to_checkout")}
                         onClick={() => setShowCheckout(true)}
                         className='w-full mt-2'
                     />
@@ -187,7 +189,7 @@ function Cart() {
                         onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='w-full text-center text-zinc-400 hover:text-white text-sm transition-colors duration-200 cursor-pointer'
                     >
-                        ← Continue Shopping
+                        {t("continue_shopping")}
                     </button>
                 </div>
             </div>

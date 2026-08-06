@@ -1,4 +1,5 @@
 import { Trash2, Loader } from 'lucide-react'
+import { useTranslation, Trans } from 'react-i18next'
 
 // Generic delete-confirmation modal — used by Admin (deleting products)
 // and now AddressesSection (deleting addresses).
@@ -15,8 +16,12 @@ import { Trash2, Loader } from 'lucide-react'
 //   onConfirm    — runs the actual delete
 //   onCancel     — sets deleteTarget back to null, closes the modal
 
-function DeleteModal({ deleteTarget, title = 'Delete Item', itemName, loading, onConfirm, onCancel }) {
+function DeleteModal({ deleteTarget, title, itemName, loading, onConfirm, onCancel }) {
+    const { t } = useTranslation('common')
     if (!deleteTarget) return null
+
+    // If the caller didn't pass a specific title, fall back to a translated default
+    const modalTitle = title || t('delete_item_default_title')
 
     return (
         <div className='fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4'>
@@ -28,15 +33,16 @@ function DeleteModal({ deleteTarget, title = 'Delete Item', itemName, loading, o
                         <Trash2 size={16} className='text-red-400' />
                     </div>
                     <div>
-                        <h3 className='text-white font-semibold'>{title}</h3>
-                        <p className='text-zinc-400 text-sm'>This action cannot be undone.</p>
+                        <h3 className='text-white font-semibold'>{modalTitle}</h3>
+                        <p className='text-zinc-400 text-sm'>{t('delete_warning')}</p>
                     </div>
                 </div>
 
-                {/* Confirmation message — now reads itemName instead of deleteTarget.title */}
+                {/* Confirmation message — Trans matches the <span> below to <1> in the JSON string */}
                 <p className='text-zinc-300 text-sm'>
-                    Are you sure you want to delete{' '}
-                    <span className='text-white font-medium'>"{itemName}"</span>?
+                    <Trans i18nKey='delete_confirm_message' ns='common' values={{ itemName }}>
+                        Are you sure you want to delete <span className='text-white font-medium'>"{{ itemName }}"</span>?
+                    </Trans>
                 </p>
 
                 {/* Actions */}
@@ -45,7 +51,7 @@ function DeleteModal({ deleteTarget, title = 'Delete Item', itemName, loading, o
                         onClick={onCancel}
                         className='flex-1 h-11 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-sm font-medium transition-colors duration-200 cursor-pointer'
                     >
-                        Cancel
+                        {t('cancel')}
                     </button>
                     <button
                         onClick={onConfirm}
@@ -54,7 +60,7 @@ function DeleteModal({ deleteTarget, title = 'Delete Item', itemName, loading, o
                     >
                         {loading
                             ? <Loader size={14} className='animate-spin' />
-                            : 'Delete'
+                            : t('delete')
                         }
                     </button>
                 </div>

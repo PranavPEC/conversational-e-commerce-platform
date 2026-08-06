@@ -2,21 +2,23 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchProducts } from '../redux/reduxActions'
+import { useTranslation } from 'react-i18next'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 const CATEGORY_LABELS = {
-  electronics: 'Electronics',
-  fashion: 'Fashion',
-  home: 'Home',
-  beauty: 'Beauty',
-  accessories: 'Accessories',
-  audio: 'Audio',
-  laptops: 'Laptops',
-  premium: 'Premium',
-  uncategorized: 'Uncategorized',
+  electronics: 'electronics',
+  fashion: 'fashion',
+  home: 'home',
+  beauty: 'beauty',
+  accessories: 'accessories',
+  audio: 'audio',
+  laptops: 'laptops',
+  premium: 'premium',
+  uncategorized: 'uncategorized',
 }
 
 function ProductListing() {
+  const { t } = useTranslation('product')
   const navigate = useNavigate()
   const location = useLocation()
   const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
@@ -35,15 +37,15 @@ function ProductListing() {
   }, [normalizedCategory, normalizedSearch])
 
   const heading = normalizedSearch
-    ? `Search results for "${normalizedSearch}"`
+    ? t('search_results_for', { query: normalizedSearch })
     : normalizedCategory
-      ? (CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
-      : 'All Products'
+      ? t(CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
+      : t('all_products')
 
   if (productsLoading) {
     return (
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
-        <p className='text-zinc-400 text-sm'>Loading products...</p>
+        <p className='text-zinc-400 text-sm'>{t('loading_products')}</p>
       </div>
     )
   }
@@ -53,10 +55,10 @@ function ProductListing() {
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>
           {normalizedSearch
-            ? 'No products match your search.'
+            ? t('no_products_match_search')
             : normalizedCategory
-              ? 'No products found in this category.'
-              : 'No products found.'}
+              ? t('no_products_in_category')
+              : t('no_products_found')}
         </p>
       </div>
     )
@@ -81,7 +83,7 @@ function ProductListing() {
                 <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
               ) : (
                 <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>
-                  No Image
+                  {t('no_image')}
                 </div>
               )}
             </div>
@@ -95,9 +97,9 @@ function ProductListing() {
                   ₹{product.price.toLocaleString('en-IN')}
                 </span>
                 {product.stock === 0 ? (
-                  <span className='text-xs text-red-400 font-medium'>Out of stock</span>
+                  <span className='text-xs text-red-400 font-medium'>{t('out_of_stock')}</span>
                 ) : (
-                  <span className='text-xs text-zinc-500'>{product.stock} left</span>
+                  <span className='text-xs text-zinc-500'>{product.stock} {t('left')}</span>
                 )}
               </div>
             </div>

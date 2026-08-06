@@ -1,7 +1,7 @@
 ﻿import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-
+import { useTranslation } from 'react-i18next'
 // ── New architecture: plain async function, call directly ──
 import { fetchProducts } from '../../redux/reduxActions'
 
@@ -17,6 +17,7 @@ import navigationStrings from '../../constants/navigationStrings/navigationStrin
 
 function Home() {
     const navigate = useNavigate()
+    const { t } = useTranslation('home')
     const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
     const { userData } = useSelector(state => state.auth)
@@ -81,8 +82,8 @@ function Home() {
                 }`}
             >
                 <ProductRail
-                    title='Featured Products'
-                    subtitle='Handpicked for you'
+                    title={t('featured_products')}
+                    subtitle={t('handpicked_for_you')}
                     products={featuredProducts}
                     loading={productsLoading}
                     onProductClick={(id) => navigate(getProductDetailRoute(id))}
@@ -99,8 +100,8 @@ function Home() {
                 }`}
             >
                 <ProductRail
-                    title='New Arrivals'
-                    subtitle='Freshly added'
+                    title={t('new_arrivals')}
+                    subtitle={t('freshly_added')}
                     products={newArrivals}
                     loading={productsLoading}
                     onProductClick={(id) => navigate(getProductDetailRoute(id))}
@@ -115,8 +116,8 @@ function Home() {
                 }`}
             >
                 <ProductRail
-                    title='Top Deals'
-                    subtitle='Best prices right now'
+                    title={t('top_deals')}
+                    subtitle={t('best_prices_right_now')}
                     products={topDeals}
                     loading={productsLoading}
                     onProductClick={(id) => navigate(getProductDetailRoute(id))}

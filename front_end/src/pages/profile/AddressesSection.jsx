@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { MapPin, Plus, Pencil, Trash2, Loader } from 'lucide-react'
 import { fetchUserAddresses, deleteAddress, setDefaultAddress } from '../../redux/reduxActions'
-
+import { useTranslation } from 'react-i18next'
 import DeleteModal from '../../components/common_components/DeleteModal.jsx'
 import AddressForm from './AddressForm.jsx'
 
@@ -13,6 +13,7 @@ import AddressForm from './AddressForm.jsx'
 // this component only orchestrates when to call them.
 
 function AddressesSection() {
+    const { t } = useTranslation('profile')
     const { addresses, addressesLoading, addressesError } = useSelector(state => state.address)
 
     // ── Add/Edit form state ──
@@ -77,13 +78,13 @@ function AddressesSection() {
 
             {/* ── Header ── */}
             <div className='flex items-center justify-between mb-5'>
-                <h3 className='text-white text-lg font-semibold'>Addresses</h3>
+                <h3 className='text-white text-lg font-semibold'>{t('addresses')}</h3>
                 <button
                     onClick={handleAddClick}
                     className='flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors duration-200 cursor-pointer'
                 >
                     <Plus size={15} />
-                    Add Address
+                    {t('add_address')}
                 </button>
             </div>
 
@@ -104,7 +105,7 @@ function AddressesSection() {
                         onClick={() => fetchUserAddresses()}
                         className='text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors duration-200 cursor-pointer'
                     >
-                        Try again
+                        {t('try_again')}    
                     </button>
                 </div>
             )}
@@ -115,13 +116,13 @@ function AddressesSection() {
                     <div className='w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center'>
                         <MapPin size={20} className='text-zinc-500' />
                     </div>
-                    <p className='text-zinc-400 text-sm'>No saved addresses yet.</p>
+                    <p className='text-zinc-400 text-sm'>{t('no_saved_addresses')}</p>
                     <button
                         onClick={handleAddClick}
                         className='flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors duration-200 cursor-pointer'
                     >
                         <Plus size={15} />
-                        Add Address
+                        {t('add_address')}
                     </button>
                 </div>
             )}
@@ -141,7 +142,7 @@ function AddressesSection() {
                                 </span>
                                 {address.isDefault && (
                                     <span className='text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'>
-                                        Default
+                                        {t('default')}  
                                     </span>
                                 )}
                             </div>
@@ -161,14 +162,14 @@ function AddressesSection() {
                                     onClick={() => handleEditClick(address)}
                                     className='flex items-center gap-1.5 text-zinc-400 hover:text-white text-xs transition-colors duration-200 cursor-pointer'
                                 >
-                                    <Pencil size={13} /> Edit
+                                    <Pencil size={13} /> {t('edit')}
                                 </button>
 
                                 <button
                                     onClick={() => setDeleteTarget(address)}
                                     className='flex items-center gap-1.5 text-zinc-400 hover:text-red-400 text-xs transition-colors duration-200 cursor-pointer'
                                 >
-                                    <Trash2 size={13} /> Delete
+                                    <Trash2 size={13} /> {t('delete')}
                                 </button>
 
                                 {!address.isDefault && (
@@ -181,7 +182,7 @@ function AddressesSection() {
                                             ? <Loader size={13} className='animate-spin' />
                                             : null
                                         }
-                                        Set as Default
+                                        {t('set_as_default')}
                                     </button>
                                 )}
                             </div>
@@ -200,7 +201,7 @@ function AddressesSection() {
             {/* ── Delete confirmation ── */}
             <DeleteModal
                 deleteTarget={deleteTarget}
-                title='Delete Address'
+                title={t('delete_address')}
                 itemName={deleteTarget ? `${deleteTarget.label} — ${deleteTarget.line1}` : ''}
                 loading={deleting}
                 onConfirm={handleDeleteConfirm}

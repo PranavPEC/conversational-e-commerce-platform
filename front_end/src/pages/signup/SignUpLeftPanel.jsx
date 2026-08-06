@@ -1,20 +1,21 @@
-﻿
-import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
+﻿import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 // Signup-specific left panel
 // Same structure as LoginLeftPanel but different headline and description copy
-// Static â€” no props, no logic
+// Static — no props, no logic
 
 const features = [
-    { icon: Tag,    title: 'Exclusive offers',  desc: 'Access special deals' },
-    { icon: Truck,  title: 'Fast delivery',      desc: 'Quick & reliable shipping' },
-    { icon: Shield, title: 'Secure payments',    desc: '100% safe & secure' },
+    { icon: Tag,    title: 'feature_offers_title',   desc: 'feature_offers_desc' },
+    { icon: Truck,  title: 'feature_delivery_title', desc: 'feature_delivery_desc' },
+    { icon: Shield, title: 'feature_payments_title',  desc: 'feature_payments_desc' },
 ]
 
 function SignUpLeftPanel() {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
+    const { t } = useTranslation('auth')
     return (
         <div
             className='theme-lock-dark hidden lg:flex lg:w-[45%] bg-zinc-950 relative overflow-hidden flex-col justify-between p-10'
@@ -32,14 +33,14 @@ function SignUpLeftPanel() {
                 <div className='flex flex-col gap-4'>
                     {/* Signup-specific headline */}
                     <h1 className='text-white text-5xl font-bold leading-tight tracking-tight'>
-                        Create your<br />account
+                        {t('signup_panel_headline_line1')}<br />{t('signup_panel_headline_line2')}
                     </h1>
                     <h2 className='text-emerald-400 text-4xl font-bold leading-tight'>
-                        shop your style
+                        {t('signup_panel_subheadline')}
                     </h2>
                     <div className='w-16 h-1 bg-emerald-500 rounded-full' />
                     <p className='text-zinc-400 text-sm leading-relaxed max-w-xs'>
-                        Join ShopAI and explore thousands of products with the best deals just for you.
+                        {t('signup_panel_description')}
                     </p>
                 </div>
 
@@ -51,8 +52,8 @@ function SignUpLeftPanel() {
                                 <Icon size={16} className='text-emerald-400' />
                             </div>
                             <div>
-                                <p className='text-white text-sm font-medium'>{title}</p>
-                                <p className='text-zinc-500 text-xs'>{desc}</p>
+                                <p className='text-white text-sm font-medium'>{t(title)}</p>
+                                <p className='text-zinc-500 text-xs'>{t(desc)}</p>
                             </div>
                         </div>
                     ))}
@@ -72,7 +73,7 @@ function SignUpLeftPanel() {
                     </div>
                 </div>
                 <div>
-                    <p className='text-white text-sm font-medium'>Join 2K+ happy customers</p>
+                    <p className='text-white text-sm font-medium'>{t('signup_social_proof')}</p>
                     <div className='flex items-center gap-0.5 mt-0.5'>
                         {[1, 2, 3, 4, 5].map(i => (
                             <Star key={i} size={11} className='text-emerald-400 fill-emerald-400' />

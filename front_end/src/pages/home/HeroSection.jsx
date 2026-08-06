@@ -2,6 +2,7 @@
 import { ArrowRight, ShoppingBag, ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import './HeroSection.css'
+import { useTranslation } from 'react-i18next'
 
 const AUTO_ADVANCE_MS = 4500
 const MANUAL_PAUSE_MS = 3500
@@ -28,7 +29,9 @@ function HeroSection({
     onProductClick = () => {},
 }) {
     const products = heroShowcaseProducts
-
+    const {i18n} = useTranslation()
+    const {t}= useTranslation('home')
+    const isRTL = i18n.dir() === 'rtl'
     // ── Carousel state (mirrors ProductRail exactly) ──
     const [visibleCount, setVisibleCount] = useState(getVisibleCount)
     const [currentIndex, setCurrentIndex] = useState(visibleCount)
@@ -111,7 +114,7 @@ function HeroSection({
     }
 
     const slideWidth = 100 / visibleCount
-    const trackTranslate = `translateX(-${currentIndex * slideWidth}%)`
+    const trackTranslate = isRTL ? `translateX(${currentIndex * slideWidth}%)` : `translateX(-${currentIndex * slideWidth}%)`
 
     const productCount = products.length
     const logicalIndex = canCarousel
@@ -134,17 +137,16 @@ function HeroSection({
                     </div>
 
                     <h1 className='hero-headline text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-3'>
-                        Find Everything You Need
+                        {t('hero_headline')}
                     </h1>
 
                     <p className='hero-subtext text-base leading-relaxed max-w-xl mb-8'>
-                        Electronics, Fashion, Home, Beauty &amp; more — all in one place.
-                        Secure checkout and real-time order tracking.
+                        {t('hero_subtext')}
                     </p>
 
                     <div className='flex flex-col sm:flex-row gap-3'>
                         <PrimaryButton
-                            text='Shop Now'
+                            text={t('shop_now')}
                             icon={<ArrowRight size={16} />}
                             onClick={onBrowse}
                         />
@@ -153,7 +155,7 @@ function HeroSection({
                             className='flex items-center justify-center gap-2 px-7 py-3.5 border border-[var(--color-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm bg-transparent transition-all duration-300 cursor-pointer'
                         >
                             <ShoppingBag size={15} />
-                            View Cart
+                            {t('view_cart')}
                         </button>
                     </div>
                 </div>
@@ -165,17 +167,17 @@ function HeroSection({
                         <div className='flex items-center justify-between mb-4'>
                             <div>
                                 <p className='text-emerald-500 text-xs font-semibold tracking-widest uppercase mb-0.5'>
-                                    New in
+                                    {t('new_in')}
                                 </p>
                                 <h2 className='hero-headline text-xl font-bold tracking-tight'>
-                                    Trending Now
+                                    {t('trending_now')}
                                 </h2>
                             </div>
                             <button
                                 onClick={onBrowse}
                                 className='flex items-center gap-1 text-[var(--color-text-muted)] hover:text-emerald-500 text-sm transition-colors duration-200 cursor-pointer'
                             >
-                                See all <ChevronRight size={15} />
+                                {t('see_all')} <ChevronRight size={15} />
                             </button>
                         </div>
 
@@ -189,14 +191,14 @@ function HeroSection({
                                 <>
                                     <button
                                         onClick={movePrev}
-                                        aria-label='Previous'
+                                        aria-label={t('previous')}
                                         className='absolute left-2 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-emerald-500 hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center cursor-pointer'
                                     >
                                         <ChevronLeft size={18} />
                                     </button>
                                     <button
                                         onClick={() => moveNext(true)}
-                                        aria-label='Next'
+                                        aria-label={t('next')}
                                         className='absolute right-2 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-emerald-500 hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center cursor-pointer'
                                     >
                                         <ChevronRight size={18} />
@@ -233,12 +235,12 @@ function HeroSection({
                                                         />
                                                     ) : (
                                                         <div className='w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-xs'>
-                                                            No Image
+                                                            {t('no_image')}
                                                         </div>
                                                     )}
                                                     <div className='absolute inset-0 bg-black/10 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center'>
                                                         <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300'>
-                                                            <Eye size={16} /> View Details
+                                                            <Eye size={16} /> {t('view_details')}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -252,13 +254,13 @@ function HeroSection({
                                                         <span className='text-emerald-500 font-semibold text-sm'>
                                                             {product.price != null
                                                                 ? '\u20B9' + product.price.toLocaleString('en-IN')
-                                                                : 'N/A'}
+                                                                : t('not_available')}
                                                         </span>
                                                         {product.stock === 0 ? (
-                                                            <span className='text-xs text-red-400'>Out of stock</span>
+                                                            <span className='text-xs text-red-400'>{t('out_of_stock')}</span>
                                                         ) : (
                                                             <span className='text-xs text-[var(--color-text-muted)]'>
-                                                                {product.stock} left
+                                                                {t('items_left', { count: product.stock })}
                                                             </span>
                                                         )}
                                                     </div>
@@ -279,7 +281,7 @@ function HeroSection({
                                                 pauseAfterManualInteraction()
                                                 setCurrentIndex(visibleCount + i * visibleCount)
                                             }}
-                                            aria-label={`Go to slide ${i + 1}`}
+                                            aria-label={`${t('go_to_slide')} ${i + 1}`}
                                             className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                                                 activePage === i
                                                     ? 'w-6 bg-emerald-500'

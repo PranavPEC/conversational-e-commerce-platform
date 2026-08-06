@@ -1,0 +1,18 @@
+{
+  "language": "اللغة",
+  "preferred_language": "اختر لغتك المفضلة",
+  "english": "English",
+  "arabic": "العربية",
+  "switch_to_arabic": "التبديل إلى العربية",
+  "switch_to_english": "التبديل إلى الإنجليزية",
+  "toggle_language": "تبديل اللغة",
+  "appearance": "المظهر",
+  "appearance_description": "اختر كيف يبدو ShopAI بالنسبة لك",
+  "dark_mode": "الوضع الداكن",
+  "light_mode": "الوضع الفاتح",
+  "dark_mode_description": "مريح للعين في البيئات منخفضة الإضاءة",
+  "light_mode_description": "واضح ومشرق للاستخدام النهاري",
+  "toggle_theme": "تبديل المظهر",
+  "settings": "الإعدادات",
+  "settings_description": "إدارة تفضيلاتك وإعدادات حسابك"
+}

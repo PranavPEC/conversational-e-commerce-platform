@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { User, Package, Heart, Settings, LogOut } from 'lucide-react'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
@@ -15,17 +16,24 @@ import { clearCart } from '../../redux/reduxActions'   // still an RTK action �
 // `path: null` marks tabs that don't have a route yet (Wishlist, Settings).
 // Clicking them does nothing for now — same placeholder treatment as the
 // Wishlist heart icon in Navbar.jsx.
+//
+// `label` here is a translation KEY (looked up in common.json), not
+// literal display text — see t(label) in the render below. It has to be
+// a key and not the text itself because this array is defined outside
+// the component, and the t() function only exists once useTranslation()
+// runs inside the component during render.
 const NAV_ITEMS = [
-    { key: 'profile',  label: 'Profile',    icon: User,     path: navigationStrings.PROFILE },
-    { key: 'orders',   label: 'My Orders',  icon: Package,  path: navigationStrings.ORDERS },
-    { key: 'wishlist', label: 'Wishlist',   icon: Heart,    path: null },
-    { key: 'settings', label: 'Settings',   icon: Settings, path: navigationStrings.SETTINGS },
+    { key: 'profile', label: 'profile', icon: User, path: navigationStrings.PROFILE },
+    { key: 'orders', label: 'my_orders', icon: Package, path: navigationStrings.ORDERS },
+    { key: 'wishlist', label: 'wishlist', icon: Heart, path: null },
+    { key: 'settings', label: 'settings', icon: Settings, path: navigationStrings.SETTINGS },
 ]
 
 function AccountSidebar() {
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
+    const { t } = useTranslation('common')
 
     // ── Same logout logic as Navbar.jsx ──
     // Duplicated here rather than imported from Navbar, because Navbar's
@@ -50,14 +58,13 @@ function AccountSidebar() {
                         <button
                             key={key}
                             onClick={() => path && navigate(path)}
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm whitespace-nowrap transition-colors duration-200 cursor-pointer ${
-                                isActive
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm whitespace-nowrap transition-colors duration-200 cursor-pointer ${isActive
                                     ? 'bg-emerald-500/10 text-emerald-400 font-medium'
                                     : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)]'
-                            }`}
+                                }`}
                         >
                             <Icon size={17} />
-                            {label}
+                            {t(label)}
                         </button>
                     )
                 })}
@@ -69,7 +76,7 @@ function AccountSidebar() {
                     className='flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-400 hover:bg-[var(--color-input-bg)] hover:text-red-300 transition-colors duration-200 cursor-pointer whitespace-nowrap'
                 >
                     <LogOut size={17} />
-                    Logout
+                    {t('logout')}
                 </button>
 
             </nav>

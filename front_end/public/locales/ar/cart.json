@@ -1,0 +1,17 @@
+{
+  "loading_cart": "جارٍ تحميل السلة...",
+  "cart_empty": "سلة التسوق فارغة",
+  "cart_empty_description": "يبدو أنك لم تضف أي منتجات بعد.",
+  "browse_products": "تصفح المنتجات",
+  "your_cart": "سلة التسوق",
+  "item_singular": "عنصر",
+  "item_plural": "عناصر",
+  "clear_cart": "تفريغ السلة",
+  "no_image": "لا توجد صورة",
+  "subtotal": "المجموع الفرعي",
+  "shipping": "الشحن",
+  "free": "مجاني",
+  "total": "الإجمالي",
+  "proceed_to_checkout": "المتابعة إلى الدفع",
+  "continue_shopping": "← متابعة التسوق"
+}

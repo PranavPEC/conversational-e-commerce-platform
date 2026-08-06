@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { createAddress, updateAddress } from '../../redux/reduxActions'
 import useToast from '../../utils/useToast'
+import { useTranslation } from 'react-i18next'
 import Toast from '../../components/common_components/Toast'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import {
-    checkIsEmpty,
+    checkAddressValidation,
+    checkCityValidation,
+    checkStateValidation,
     checkNameValidation,
     checkPhoneValidation,
     checkPincodeValidation,
@@ -30,6 +33,8 @@ const EMPTY_FORM = {
 
 function AddressForm({ isOpen, editingAddress, onClose }) {
     const { toast, toastVisible, showToast, dismissToast } = useToast()
+    const { t } = useTranslation('profile')
+    const { t: authT } = useTranslation('auth')
 
     const [form, setForm] = useState(EMPTY_FORM)
     const [saving, setSaving] = useState(false)
@@ -79,17 +84,15 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
     // Profile's phone/DOB, which were optional) — so checkIsEmpty runs first
     // on each, then the shared format validators run on top where they exist.
     const _checkValidations = () => {
-        if (!checkNameValidation(form.fullName, showToast)) return false
+        if (!checkNameValidation(form.fullName, showToast, authT)) return false
 
-        if (checkIsEmpty(form.phone)) { showToast("Please enter a phone number."); return false }
-        if (!checkPhoneValidation(form.phone, showToast)) return false
+        if (!checkPhoneValidation(form.phone, showToast, authT)) return false
 
-        if (checkIsEmpty(form.line1)) { showToast("Please enter your address."); return false }
-        if (checkIsEmpty(form.city)) { showToast("Please enter your city."); return false }
-        if (checkIsEmpty(form.state)) { showToast("Please enter your state."); return false }
+        if (!checkAddressValidation(form.line1, showToast, authT)) return false
+        if (!checkCityValidation(form.city, showToast, authT)) return false
+        if (!checkStateValidation(form.state, showToast, authT)) return false
 
-        if (checkIsEmpty(form.pincode)) { showToast("Please enter your pincode."); return false }
-        if (!checkPincodeValidation(form.pincode, showToast)) return false
+        if (!checkPincodeValidation(form.pincode, showToast, authT)) return false
 
         return true
     }
@@ -102,14 +105,14 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
         try {
             if (editingAddress) {
                 await updateAddress(editingAddress._id, form)
-                showToast('Address updated successfully', 'success')
+                showToast(t('address_updated_successfully'), 'success')
             } else {
                 await createAddress(form)
-                showToast('Address added successfully', 'success')
+                showToast(t('address_added_successfully'), 'success')
             }
             onClose()
         } catch (error) {
-            showToast(error?.response?.data?.message || 'Failed to save address', 'error')
+            showToast(error?.response?.data?.message || t('address_save_failed'), 'error')
         } finally {
             setSaving(false)
         }
@@ -131,7 +134,7 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                 {/* ── Header ── */}
                 <div className='flex items-center justify-between'>
                     <h3 className='text-white text-lg font-semibold'>
-                        {editingAddress ? 'Edit Address' : 'Add Address'}
+                        {editingAddress ? t('edit_address') : t('add_address')}
                     </h3>
                     <button
                         onClick={onClose}
@@ -144,21 +147,21 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
 
                 {/* ── Label ── */}
                 <div>
-                    <label className='block text-zinc-400 text-xs mb-1.5'>Label</label>
+                    <label className='block text-zinc-400 text-xs mb-1.5'>{t('label')}</label>
                     <select
                         value={form.label}
                         onChange={handleChange('label')}
                         className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     >
-                        <option value='Home'>Home</option>
-                        <option value='Work'>Work</option>
-                        <option value='Other'>Other</option>
+                        <option value='Home'>{t('home')}</option>
+                        <option value='Work'>{t('work')}</option>
+                        <option value='Other'>{t('other')}</option>
                     </select>
                 </div>
 
                 {/* ── Full Name ── */}
                 <div>
-                    <label className='block text-zinc-400 text-xs mb-1.5'>Full Name</label>
+                    <label className='block text-zinc-400 text-xs mb-1.5'>{t('full_name')}</label>
                     <input
                         type='text'
                         value={form.fullName}
@@ -169,38 +172,38 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
 
                 {/* ── Phone ── */}
                 <div>
-                    <label className='block text-zinc-400 text-xs mb-1.5'>Phone Number</label>
+                    <label className='block text-zinc-400 text-xs mb-1.5'>{t('phone_number')}</label>
                     <input
                         type='tel'
                         inputMode='numeric'
                         maxLength={10}
                         value={form.phone}
                         onChange={handlePhoneChange}
-                        placeholder='10-digit mobile number'
+                        placeholder={t('phone_placeholder')}
                         className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     />
                 </div>
 
                 {/* ── Address Line 1 ── */}
                 <div>
-                    <label className='block text-zinc-400 text-xs mb-1.5'>Address Line 1</label>
+                    <label className='block text-zinc-400 text-xs mb-1.5'>{t('address_line_1')}</label>
                     <input
                         type='text'
                         value={form.line1}
                         onChange={handleChange('line1')}
-                        placeholder='House no., street, area'
+                        placeholder={t('address_line_1_placeholder')}
                         className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     />
                 </div>
 
                 {/* ── Address Line 2 (optional) ── */}
                 <div>
-                    <label className='block text-zinc-400 text-xs mb-1.5'>Address Line 2 (optional)</label>
+                    <label className='block text-zinc-400 text-xs mb-1.5'>{t('address_line_2')}</label>
                     <input
                         type='text'
                         value={form.line2}
                         onChange={handleChange('line2')}
-                        placeholder='Landmark, apartment, etc.'
+                        placeholder={t('address_line_2_placeholder')}
                         className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     />
                 </div>
@@ -208,21 +211,21 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                 {/* ── City / State ── */}
                 <div className='grid grid-cols-2 gap-4'>
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>City</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('city')}</label>
                         <input
                             type='text'
                             value={form.city}
-                            placeholder='city'
+                            placeholder={t('city_placeholder')}
                             onChange={handleChange('city')}
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
                     </div>
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>State</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('state')}</label>
                         <input
                             type='text'
                             value={form.state}
-                            placeholder='state'
+                            placeholder={t('state_placeholder')}
                             onChange={handleChange('state')}
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
@@ -231,14 +234,14 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
 
                 {/* ── Pincode ── */}
                 <div>
-                    <label className='block text-zinc-400 text-xs mb-1.5'>Pincode</label>
+                    <label className='block text-zinc-400 text-xs mb-1.5'>{t('pincode')}</label>
                     <input
                         type='text'
                         inputMode='numeric'
                         maxLength={6}
                         value={form.pincode}
                         onChange={handlePincodeChange}
-                        placeholder='6-digit pincode'
+                        placeholder={t('pincode_placeholder')}
                         className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                     />
                 </div>
@@ -252,7 +255,7 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                             onChange={(e) => setForm(prev => ({ ...prev, isDefault: e.target.checked }))}
                             className='w-4 h-4 rounded border-zinc-700 accent-emerald-500 cursor-pointer'
                         />
-                        <span className='text-zinc-300 text-sm'>Set as default address</span>
+                        <span className='text-zinc-300 text-sm'>{t('set_default_address')}</span>
                     </label>
                 )}
 
@@ -263,13 +266,13 @@ function AddressForm({ isOpen, editingAddress, onClose }) {
                         disabled={saving}
                         className='px-5 py-2.5 rounded-xl border border-zinc-700 text-zinc-300 text-sm font-medium hover:bg-zinc-800 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
                     >
-                        Cancel
+                        {t('cancel')}
                     </button>
                     <PrimaryButton
-                        text={editingAddress ? 'Save Changes' : 'Add Address'}
+                        text={editingAddress ? t('save_changes') : t('add_address')}
                         onClick={handleSubmit}
                         loading={saving}
-                        LoadingText='Saving...'
+                        LoadingText={t('saving')}
                     />
                 </div>
 

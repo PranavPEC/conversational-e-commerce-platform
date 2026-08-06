@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import {useTranslation} from 'react-i18next'
 import { fetchProductById, addCartItem } from '../redux/reduxActions'
 import PrimaryButton from '../components/common_components/PrimaryButton'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 function ProductDetail() {
+    const { t } = useTranslation('product')
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -31,9 +33,9 @@ function ProductDetail() {
 
         try {
             await addCartItem({ productId: product._id, quantity })
-            setFeedback({ success: true, msg: 'Added to cart successfully!' })
+            setFeedback({ success: true, msg: t('added_to_cart_successfully') })
         } catch (err) {
-            setFeedback({ success: false, msg: err.response?.data?.message || 'Something went wrong.' })
+            setFeedback({ success: false, msg: err.response?.data?.message || t('something_went_wrong') })
         }
         finally {
             setAdding(false)
@@ -44,7 +46,7 @@ function ProductDetail() {
     if (productLoading) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
-                <p className='text-zinc-400 text-sm'>Loading product...</p>
+                <p className='text-zinc-400 text-sm'>{t('loading_product')}</p>
             </div>
         )
     }
@@ -52,9 +54,9 @@ function ProductDetail() {
     if (!product) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
-                <p className='text-zinc-400 text-sm'>Product not found.</p>
+                <p className='text-zinc-400 text-sm'>{t('product_not_found')}</p>
                 <button onClick={() => navigate(navigationStrings.PRODUCTS)} className='text-emerald-400 text-sm hover:text-emerald-300 transition-colors duration-200'>
-                    Back to products
+                    {t('back_to_products')}
                 </button>
             </div>
         )
@@ -67,7 +69,7 @@ function ProductDetail() {
                 onClick={() => navigate(navigationStrings.PRODUCTS)}
                 className='text-zinc-400 text-sm hover:text-white transition-colors duration-200 mb-8 flex items-center gap-2 cursor-pointer'
             >
-                ← Back to products
+                ← {t('back_to_products')}
             </button>
 
             <div className='max-w-4xl mx-auto flex flex-col md:flex-row gap-10'>
@@ -76,7 +78,7 @@ function ProductDetail() {
                     {product.image ? (
                         <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
                     ) : (
-                        <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>No Image</div>
+                        <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>{t('no_image')}</div>
                     )}
                 </div>
 
@@ -90,16 +92,16 @@ function ProductDetail() {
                     <span className='text-emerald-400 text-3xl font-bold'>₹{product.price.toLocaleString('en-IN')}</span>
 
                     {product.stock === 0 ? (
-                        <span className='text-red-400 text-sm font-medium'>Out of stock</span>
+                        <span className='text-red-400 text-sm font-medium'>{t('out_of_stock')}</span>
                     ) : (
-                        <span className='text-zinc-500 text-sm'>{product.stock} items in stock</span>
+                        <span className='text-zinc-500 text-sm'>{product.stock} {t('items_in_stock')}</span>
                     )}
 
                     <div className='h-px bg-zinc-800 w-full' />
 
                     {product.stock > 0 && (
                         <div className='flex items-center gap-4'>
-                            <span className='text-zinc-400 text-sm'>Quantity</span>
+                            <span className='text-zinc-400 text-sm'>{t('quantity')}</span>
                             <div className='flex items-center gap-3'>
                                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className='w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-white hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center text-lg'>−</button>
                                 <span className='text-white font-medium w-6 text-center'>{quantity}</span>
@@ -116,8 +118,8 @@ function ProductDetail() {
 
                     <PrimaryButton
                     onClick={handleAddToCart}
-                    text="Add to Cart"
-                    LoadingText='Adding...'
+                    text={t('add_to_cart')}
+                    LoadingText={t('adding')}
                     className='w-full'
                     disabled={product.stock === 0 || adding}
                     loading={adding}

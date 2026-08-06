@@ -2,28 +2,28 @@
 import { Star, ArrowRight } from 'lucide-react'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import useScrollReveal from '../../hooks/useScrollReveal'
-
+import { useTranslation } from 'react-i18next'
 // Placeholder testimonials — fictional names, not real customer data yet.
 // Replace with real reviews once a testimonial/review backend feature is built.
 const TESTIMONIALS = [
     {
         name: 'Alex M.',
-        quote: '"ShopAI helped me find exactly what I was looking for in seconds. The recommendations were spot on!"',
+        quote: 'testimonial_alex',
         rating: 5,
     },
     {
         name: 'Priya S.',
-        quote: '"Fast delivery, great quality. I love how easy it is to browse and checkout. Will definitely be back."',
+        quote: 'testimonial_priya',
         rating: 5,
     },
     {
         name: 'Jordan K.',
-        quote: '"The deals on this platform are genuinely unbeatable. Found my headphones at half the usual price."',
+        quote: 'testimonial_jordan',
         rating: 4,
     },
     {
         name: 'Sneha R.',
-        quote: '"Super clean interface and a smooth shopping experience. Customer support was helpful too!"',
+        quote: 'testimonial_sneha',
         rating: 5,
     },
 ]
@@ -34,6 +34,7 @@ function SocialProofBanner({ onShopNow }) {
     const [ref, isVisible] = useScrollReveal()
     const [activeIndex, setActiveIndex] = useState(0)
     const [visible, setVisible] = useState(true)
+    const { t } = useTranslation('home')
 
     // Auto-advance carousel every 4.5 seconds with fade transition
     useEffect(() => {
@@ -90,7 +91,7 @@ function SocialProofBanner({ onShopNow }) {
                         className={`transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}
                     >
                         <p className='text-zinc-300 text-sm md:text-base leading-relaxed max-w-xl'>
-                            {current.quote}
+                            {t(current.quote)}
                         </p>
                         <p className='text-emerald-400 text-xs font-semibold mt-3'>
                             — {current.name}
@@ -129,18 +130,18 @@ function SocialProofBanner({ onShopNow }) {
                             </div>
                         </div>
                         <div>
-                            <p className='text-white text-sm font-medium'>2,000+ happy customers</p>
+                            <p className='text-white text-sm font-medium'>{t('happy_customers')}</p>
                             <div className='flex items-center gap-0.5 mt-1'>
                                 {[1, 2, 3, 4, 5].map(i => (
                                     <Star key={i} size={12} className='text-emerald-400 fill-emerald-400' />
                                 ))}
-                                <span className='text-zinc-500 text-xs ml-1.5'>5.0 average rating</span>
+                                <span className='text-zinc-500 text-xs ml-1.5'>{t('average_rating')}</span>
                             </div>
                         </div>
                     </div>
 
                     <PrimaryButton
-                        text="Shop Now"
+                        text={t('shop_now')}
                         icon={<ArrowRight size={15} />}
                         onClick={onShopNow}
                     />

@@ -8,7 +8,7 @@ import {
     setAdminProducts,
     clearAdminStatus,
 } from '../../redux/reduxActions'
-
+import { useTranslation } from 'react-i18next'
 import AdminHeader from './AdminHeader.jsx'
 import AdminToast from './AdminToast.jsx'
 import ProductForm from './ProductForm.jsx'
@@ -20,6 +20,7 @@ import { buildFormData } from '../../utils/CommonFunctions.js'
 const EMPTY_FORM = { title: '', description: '', price: '', stock: '', category: [] }
 
 function Admin() {
+    const { t } = useTranslation('admin')
     // New state keys from adminReducers — adminLoading/adminError/adminSuccess
     const { products, adminLoading, adminError, adminSuccess } = useSelector(state => state.admin)
     const { products: publicProducts } = useSelector(state => state.products)
@@ -145,7 +146,7 @@ function Admin() {
             <DeleteModal
                 deleteTarget={deleteTarget}
                 loading={adminLoading}
-                title='Delete Product'
+                title={t('delete_product')}
                 itemName={deleteTarget?.title}
                 onConfirm={handleDeleteConfirm}
                 onCancel={() => setDeleteTarget(null)}

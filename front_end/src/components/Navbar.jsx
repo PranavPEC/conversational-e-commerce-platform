@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import PrimaryButton from './common_components/PrimaryButton.jsx'
+import { useTranslation } from 'react-i18next'
 import { Heart, ShoppingCart, User, Package, Settings, LogOut, ChevronDown, Search, Menu } from 'lucide-react'
 
 // ── New architecture: logoutUser is a plain async function, call directly ──
@@ -18,20 +19,23 @@ import navigationStrings from '../constants/navigationStrings/navigationStrings.
 import { getInitial } from '../utils/CommonFunctions.js'
 
 const NAV_CATEGORIES = [
-  { key: 'electronics', label: 'Electronics' },
-  { key: 'fashion', label: 'Fashion' },
-  { key: 'home', label: 'Home' },
-  { key: 'beauty', label: 'Beauty' },
-  { key: 'accessories', label: 'Accessories' },
-  { key: 'audio', label: 'Audio' },
-  { key: 'laptops', label: 'Laptops' },
-  { key: 'premium', label: 'Premium' },
+  { key: 'electronics', label: 'category_electronics' },
+  { key: 'fashion', label: 'category_fashion' },
+  { key: 'home', label: 'category_home' },
+  { key: 'beauty', label: 'category_beauty' },
+  { key: 'accessories', label: 'category_accessories' },
+  { key: 'audio', label: 'category_audio' },
+  { key: 'laptops', label: 'category_laptops' },
+  { key: 'premium', label: 'category_premium' },
 ]
+
+const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
 function Navbar() {
   const dispatch = useDispatch()    // still needed for clearCart (RTK action)
   const navigate = useNavigate()
   const location = useLocation()
+  const {t} = useTranslation('common')
 
   const { cartCount } = useSelector(state => state.cart)
   const { userData } = useSelector(state => state.auth)
@@ -161,12 +165,12 @@ function Navbar() {
               handleSearchSubmit()
             }
           }}
-          placeholder='Search products...'
+          placeholder={mobile ? t('search_products') : t('search_products')}
           className='w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none'
         />
         <button
           onClick={handleSearchSubmit}
-          aria-label='Search products'
+          aria-label={t('search_products_label')}
           className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
         >
           <Search size={16} />
@@ -176,11 +180,11 @@ function Navbar() {
       {suggestionsOpen && (
         <div className='absolute left-0 right-0 mt-2 bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-2xl shadow-black/20 py-2 z-50 max-h-80 overflow-y-auto'>
           {suggestionsLoading && (
-            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>Searching...</p>
+            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>{t('searching')}</p>
           )}
 
           {!suggestionsLoading && searchSuggestions.length === 0 && (
-            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>No products found.</p>
+            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>{t('no_products_found')}</p>
           )}
 
           {!suggestionsLoading && searchSuggestions.map((product) => (
@@ -193,7 +197,7 @@ function Navbar() {
                 {product.image ? (
                   <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
                 ) : (
-                  <div className='w-full h-full flex items-center justify-center text-[10px] text-zinc-500'>No Img</div>
+                  <div className='w-full h-full flex items-center justify-center text-[10px] text-zinc-500'>{t('no_image_short')}</div>
                 )}
               </div>
               <div className='min-w-0'>
@@ -216,31 +220,29 @@ function Navbar() {
         <div className='w-max min-w-full flex items-center justify-center gap-2 md:gap-3'>
           <div className='hidden md:flex items-center gap-2 px-2 py-1.5 rounded-xl text-xs font-semibold text-[var(--color-text-primary)] bg-[var(--color-input-bg)] border border-[var(--color-input-border)]'>
             <Menu size={14} />
-            Shop by Categories
+            {t('shop_by_categories')}
           </div>
 
           <button
             onClick={() => handleCategoryNav(null)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${
-              !activeCategory
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${!activeCategory
                 ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
                 : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
-            }`}
+              }`}
           >
-            All
+            {t('all')}
           </button>
 
           {NAV_CATEGORIES.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => handleCategoryNav(key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${
-                activeCategory === key
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${activeCategory === key
                   ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
                   : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
-              }`}
+                }`}
             >
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -267,7 +269,7 @@ function Navbar() {
           <div className='flex items-center gap-2 md:gap-3'>
             <button
               onClick={() => setMobileSearchOpen(prev => !prev)}
-              aria-label='Open search'
+              aria-label={t('open_search')}
               className='md:hidden text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer p-1'
             >
               <Search size={19} />
@@ -278,12 +280,12 @@ function Navbar() {
               onClick={() => navigate(navigationStrings.LOGIN)}
               className='flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 bg-transparent border border-[var(--color-input-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm transition-all duration-300 cursor-pointer'
             >
-              Login
+              {t('login')}
             </button>
 
             {/* ── Sign Up — reuses PrimaryButton, opted into the compact "sm" size for Navbar ── */}
             <PrimaryButton
-              text='Sign Up'
+              text={t('sign_up')}
               onClick={() => navigate(navigationStrings.SIGNUP)}
               size='sm'
             />
@@ -321,7 +323,7 @@ function Navbar() {
         <div className='flex items-center gap-3 md:gap-5'>
           <button
             onClick={() => setMobileSearchOpen(prev => !prev)}
-            aria-label='Open search'
+            aria-label={t('open_search')}
             className='md:hidden text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer p-1'
           >
             <Search size={19} />
@@ -331,13 +333,13 @@ function Navbar() {
             onClick={() => navigate(navigationStrings.PRODUCTS)}
             className={`text-sm transition-colors duration-200 ${isActive(navigationStrings.PRODUCTS) ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
           >
-            Products
+            {t('products')}
           </button>
 
           {/* ── Wishlist — icon only, not functional yet ── */}
           <button
             onClick={() => { }}
-            aria-label='Wishlist'
+            aria-label={t('wishlist')}
             className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
           >
             <Heart size={20} />
@@ -346,7 +348,7 @@ function Navbar() {
           {/* ── Cart — icon only, stays outside the dropdown ── */}
           <button
             onClick={() => navigate(navigationStrings.CART)}
-            aria-label='Cart'
+            aria-label={t('cart')}
             className={`relative transition-colors duration-200 cursor-pointer ${isActive(navigationStrings.CART) ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
           >
             <ShoppingCart size={20} />
@@ -387,14 +389,14 @@ function Navbar() {
                   onClick={() => { setDropdownOpen(false); navigate(navigationStrings.PROFILE) }}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
-                  <User size={16} /> Profile
+                  <User size={16} /> {t('profile')}
                 </button>
 
                 <button
                   onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ORDERS) }}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
-                  <Package size={16} /> My Orders
+                  <Package size={16} /> {t('my_orders')}
                 </button>
 
                 {userData?.role === 'admin' && (
@@ -402,7 +404,7 @@ function Navbar() {
                     onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ADMIN) }}
                     className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                   >
-                    <Package size={16} /> Admin
+                    <Package size={16} /> {t('admin')}
                   </button>
                 )}
 
@@ -410,7 +412,7 @@ function Navbar() {
                   onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SETTINGS) }}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
-                  <Settings size={16} /> Settings
+                  <Settings size={16} /> {t('settings')}
                 </button>
 
                 <div className='my-1.5 border-t border-[var(--color-border)]' />
@@ -419,7 +421,7 @@ function Navbar() {
                   onClick={handleLogout}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-[var(--color-input-bg)] hover:text-red-300 transition-colors duration-200 cursor-pointer'
                 >
-                  <LogOut size={16} /> Logout
+                  <LogOut size={16} /> {t('logout')}
                 </button>
 
               </div>
@@ -441,4 +443,4 @@ function Navbar() {
 }
 
 export default Navbar
-  const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
+

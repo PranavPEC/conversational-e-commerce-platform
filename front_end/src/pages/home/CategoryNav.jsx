@@ -1,23 +1,24 @@
 ﻿import { useNavigate } from 'react-router-dom'
 import { Smartphone, Shirt, Home, Sparkles, Watch, Headphones, Laptop, Gem } from 'lucide-react'
+import {useTranslation} from 'react-i18next'
 import useScrollReveal from '../../hooks/useScrollReveal'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 const CATEGORIES = [
-    { key: 'electronics', label: 'Electronics', icon: Smartphone },
-    { key: 'fashion', label: 'Fashion', icon: Shirt },
-    { key: 'home', label: 'Home', icon: Home },
-    { key: 'beauty', label: 'Beauty', icon: Sparkles },
-    { key: 'accessories', label: 'Accessories', icon: Watch },
-    { key: 'audio', label: 'Audio', icon: Headphones },
-    { key: 'laptops', label: 'Laptops', icon: Laptop },
-    { key: 'premium', label: 'Premium', icon: Gem },
+    { key: 'electronics', label: 'category_electronics', icon: Smartphone },
+    { key: 'fashion', label: 'category_fashion', icon: Shirt },
+    { key: 'home', label: 'category_home', icon: Home },
+    { key: 'beauty', label: 'category_beauty', icon: Sparkles },
+    { key: 'accessories', label: 'category_accessories', icon: Watch },
+    { key: 'audio', label: 'category_audio', icon: Headphones },
+    { key: 'laptops', label: 'category_laptops', icon: Laptop },
+    { key: 'premium', label: 'category_premium', icon: Gem },
 ]
 
 function CategoryNav() {
     const navigate = useNavigate()
     const [ref, isVisible] = useScrollReveal()
-
+    const { t } = useTranslation('home')
     return (
         <section
             ref={ref}
@@ -28,10 +29,10 @@ function CategoryNav() {
             <div className='max-w-5xl mx-auto flex flex-col items-center gap-5'>
                 <div className='text-center'>
                     <p className='text-emerald-400 text-xs font-medium tracking-widest uppercase mb-1'>
-                        Explore
+                        {t('explore')}
                     </p>
                     <h2 className='text-white text-xl md:text-2xl font-bold tracking-tight'>
-                        Shop by Category
+                        {t('shop_by_category')}
                     </h2>
                 </div>
 
@@ -49,7 +50,7 @@ function CategoryNav() {
                                 <div className='w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center transition-colors duration-200 group-hover:border-emerald-500'>
                                     <Icon size={22} className='text-zinc-400 transition-colors duration-200 group-hover:text-emerald-400' />
                                 </div>
-                                <span className='text-xs text-zinc-400 whitespace-nowrap'>{label}</span>
+                                <span className='text-xs text-zinc-400 whitespace-nowrap'>{t(label)}</span>
                             </button>
                         ))}
                     </div>

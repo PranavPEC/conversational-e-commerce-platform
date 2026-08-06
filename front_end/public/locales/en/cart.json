@@ -1,0 +1,17 @@
+{
+  "loading_cart": "Loading cart...",
+  "cart_empty": "Your cart is empty",
+  "cart_empty_description": "Looks like you haven't added anything yet.",
+  "browse_products": "Browse Products",
+  "your_cart": "Your Cart",
+  "item_singular": "item",
+  "item_plural": "items",
+  "clear_cart": "Clear cart",
+  "no_image": "No image",
+  "subtotal": "Subtotal",
+  "shipping": "Shipping",
+  "free": "Free",
+  "total": "Total",
+  "proceed_to_checkout": "Proceed to Checkout",
+  "continue_shopping": "← Continue Shopping"
+}

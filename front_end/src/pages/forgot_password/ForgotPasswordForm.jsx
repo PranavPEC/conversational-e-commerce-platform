@@ -1,4 +1,4 @@
-
+import { useTranslation } from 'react-i18next'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 function ForgotPasswordForm({
     email,
@@ -6,6 +6,7 @@ function ForgotPasswordForm({
     handleSendOTP,
     loading,
 }) {
+    const { t } = useTranslation('auth');
     return (
         <form
             onSubmit={handleSendOTP}
@@ -14,25 +15,25 @@ function ForgotPasswordForm({
             {/* Email */}
             <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-2">
-                    Email Address
+                    {t("email_address")}
                 </label>
 
                 <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your registered email"
+                    placeholder={t("registered_email_placeholder")}
                     className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                 />
             </div>
 
             {/* Send OTP Button */}
             <PrimaryButton
-                text="Send OTP"
+                text={t("send_otp")}
                 type="submit"
                 loading={loading}
                 disabled={loading}
-                loadingText="Sending OTP..."
+                LoadingText={t("sending_otp")}
                 className="w-full"
                 textColor='text-white'
             />

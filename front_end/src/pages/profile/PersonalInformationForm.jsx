@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect } from 'react'
 import { updateUserProfile } from '../../redux/reduxActions'
 import useToast from '../../utils/useToast'
+import { useTranslation } from 'react-i18next'
 import Toast from '../../components/common_components/Toast'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import { checkNameValidation, checkPhoneValidation, checkDateOfBirthValidation } from '../../utils/validations'
@@ -17,6 +18,8 @@ const formatDOB = (value) => (value ? value.slice(0, 10) : '')
 
 function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, onSaved }) {
     const { toast, toastVisible, showToast, dismissToast } = useToast()
+    const { t } = useTranslation('profile')
+    const { t: authT } = useTranslation('auth')
 
     // ── Gender lock: true once any non-empty value has been saved ──
     // Derived from the persisted userData (server source of truth), not from
@@ -70,9 +73,9 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
         // returns false on failure, caller returns early on the first one
         // that fails. Phone and DOB are optional, so their validators pass
         // straight through when the field is empty.
-        if (!checkNameValidation(form.name, showToast)) return
-        if (!checkPhoneValidation(form.phone, showToast)) return
-        if (!checkDateOfBirthValidation(form.dateOfBirth, showToast)) return
+        if (!checkNameValidation(form.name, showToast, authT)) return
+        if (!checkPhoneValidation(form.phone, showToast, authT)) return
+        if (!checkDateOfBirthValidation(form.dateOfBirth, showToast, authT)) return
 
         setSaving(true)
         try {
@@ -85,10 +88,10 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                 gender: form.gender,
                 profileImageFile: avatarFile,
             })
-            showToast('Profile updated successfully', 'success')
+            showToast(t('profile_updated_successfully'), 'success')
             onSaved()
         } catch (error) {
-            showToast(error?.response?.data?.message || 'Failed to update profile', 'error')
+            showToast(error?.response?.data?.message || t('profile_update_failed'), 'error')
         } finally {
             setSaving(false)
         }
@@ -100,13 +103,13 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
 
             <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6'>
 
-                <h3 className='text-white text-lg font-semibold mb-5'>Personal Information</h3>
+                <h3 className='text-white text-lg font-semibold mb-5'>{t('profile:personal_information')}</h3>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
 
                     {/* ── Full Name ── */}
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>Full Name</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('full_name')}</label>
                         <input
                             type='text'
                             value={form.name}
@@ -118,7 +121,7 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
 
                     {/* ── Email — always read-only; changing it needs a separate verified flow ── */}
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>Email Address</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('email_address')}</label>
                         <input
                             type='email'
                             value={userData?.email || ''}
@@ -129,7 +132,7 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
 
                     {/* ── Phone Number ── */}
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>Phone Number</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('phone_number')}</label>
                         <input
                             type='tel'
                             inputMode='numeric'
@@ -137,14 +140,14 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                             value={form.phone}
                             onChange={handlePhoneChange}
                             disabled={!isEditing}
-                            placeholder='10-digit mobile number'
+                            placeholder={t('phone_placeholder')}
                             className='w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] disabled:text-[var(--color-text-muted)] disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         />
                     </div>
 
                     {/* ── Date of Birth ── */}
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>Date of Birth</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('date_of_birth')}</label>
                         <input
                             type='date'
                             value={form.dateOfBirth}
@@ -159,21 +162,21 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                         field becomes permanently read-only regardless of edit mode, so
                         users never fill it in expecting it to save and get a confusing 400. */}
                     <div>
-                        <label className='block text-zinc-400 text-xs mb-1.5'>Gender</label>
+                        <label className='block text-zinc-400 text-xs mb-1.5'>{t('gender')}</label>
                         <select
                             value={form.gender}
                             onChange={handleChange('gender')}
                             disabled={genderLocked || !isEditing}
                             className='w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white disabled:text-zinc-500 disabled:cursor-not-allowed focus:outline-none focus:border-emerald-500 transition-colors duration-200'
                         >
-                            <option value=''>Select</option>
-                            <option value='male'>Male</option>
-                            <option value='female'>Female</option>
-                            <option value='other'>Other</option>
+                            <option value=''>{t('select')}</option>
+                            <option value='male'>{t('male')}</option>
+                            <option value='female'>{t('female')}</option>
+                            <option value='other'>{t('other')}</option>
                         </select>
                         {genderLocked && (
                             <p className='mt-1.5 text-xs text-zinc-500'>
-                                Gender cannot be changed once set.
+                                {t('gender_locked')}
                             </p>
                         )}
                     </div>
@@ -188,13 +191,13 @@ function PersonalInformationForm({ userData, isEditing, avatarFile, onCancel, on
                             disabled={saving}
                             className='px-5 py-2.5 rounded-xl border border-zinc-700 text-zinc-300 text-sm font-medium hover:bg-zinc-800 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
                         >
-                            Cancel
+                            {t('cancel')}
                         </button>
                         <PrimaryButton
-                            text='Save Changes'
+                            text={t('save_changes')}
                             onClick={handleSave}
                             loading={saving}
-                            LoadingText='Saving...'
+                            LoadingText={t('saving')}
                         />
                     </div>
                 )}

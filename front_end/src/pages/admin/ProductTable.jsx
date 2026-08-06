@@ -1,18 +1,19 @@
 ﻿import { Pencil, Trash2, Package } from 'lucide-react'
-
+import { useTranslation } from 'react-i18next'
 // Props:
 //   products      — array of product objects from adminSlice
 //   onEdit        — called with product object when Edit is clicked (Admin.jsx pre-fills form)
 //   onDeleteClick — called with product object when Delete is clicked (Admin.jsx sets deleteTarget)
 
 function ProductTable({ products, onEdit, onDeleteClick }) {
+    const { t } = useTranslation('admin')
     return (
         <div className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden'>
 
             {/* Table header */}
             <div className='px-5 py-4 border-b border-zinc-800'>
                 <h2 className='text-white font-semibold'>
-                    All Products
+                    {t('all_products')}
                     <span className='text-zinc-500 text-sm font-normal ml-2'>
                         ({products.length})
                     </span>
@@ -23,7 +24,7 @@ function ProductTable({ products, onEdit, onDeleteClick }) {
             {products.length === 0 && (
                 <div className='flex flex-col items-center justify-center py-16 gap-3'>
                     <Package size={32} className='text-zinc-700' />
-                    <p className='text-zinc-400 text-sm'>No products yet. Add your first one.</p>
+                    <p className='text-zinc-400 text-sm'>{t('no_products_yet')}</p>
                 </div>
             )}
 
@@ -68,7 +69,7 @@ function ProductTable({ products, onEdit, onDeleteClick }) {
                                             key={cat}
                                             className='inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] uppercase tracking-wide'
                                         >
-                                            {cat}
+                                            {t(cat)}
                                         </span>
                                     ))}
                                 </div>
@@ -78,7 +79,7 @@ function ProductTable({ products, onEdit, onDeleteClick }) {
                         {/* Price + stock */}
                         <div className='text-right flex-shrink-0 hidden sm:block'>
                             <p className='text-emerald-400 text-sm font-semibold'>&#8377;{product.price}</p>
-                            <p className='text-zinc-500 text-xs'>{product.stock} in stock</p>
+                            <p className='text-zinc-500 text-xs'>{product.stock} {t('in_stock')}</p>
                         </div>
 
                         {/* Action buttons */}

@@ -1,20 +1,24 @@
-﻿
-import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
+﻿import { ShoppingBag, Tag, Truck, Shield, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
-// Static panel â€” no props, no logic
+// Static panel — no props, no logic
 // Same markup for Login and SignUp left panels
 // SignUp has different headline text so it gets its own SignUpLeftPanel
 
+// `title`/`desc` here are translation KEYS, not literal text — same
+// reason as AccountSidebar's NAV_ITEMS: this array is module-level,
+// outside the component, so t() isn't available here yet.
 const features = [
-    { icon: Tag,    title: 'Exclusive offers',  desc: 'Access special deals' },
-    { icon: Truck,  title: 'Fast delivery',      desc: 'Quick & reliable shipping' },
-    { icon: Shield, title: 'Secure payments',    desc: '100% safe & secure' },
+    { icon: Tag,    title: 'feature_offers_title',   desc: 'feature_offers_desc' },
+    { icon: Truck,  title: 'feature_delivery_title', desc: 'feature_delivery_desc' },
+    { icon: Shield, title: 'feature_payments_title',  desc: 'feature_payments_desc' },
 ]
 
 function LoginLeftPanel() {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
+    const { t } = useTranslation('auth')
     return (
         <div
             className='theme-lock-dark hidden lg:flex lg:w-[45%] bg-zinc-950 relative overflow-hidden flex-col justify-between p-10'
@@ -31,14 +35,14 @@ function LoginLeftPanel() {
             <div className='z-10 flex flex-col gap-8'>
                 <div className='flex flex-col gap-4'>
                     <h1 className='text-white text-5xl font-bold leading-tight tracking-tight'>
-                        Welcome<br />back
+                        {t('login_panel_headline_line1')}<br />{t('login_panel_headline_line2')}
                     </h1>
                     <h2 className='text-emerald-400 text-4xl font-bold leading-tight'>
-                        good to see you
+                        {t('login_panel_subheadline')}
                     </h2>
                     <div className='w-16 h-1 bg-emerald-500 rounded-full' />
                     <p className='text-zinc-400 text-sm leading-relaxed max-w-xs'>
-                        Log back in to ShopAI and pick up right where you left off. Your cart is waiting.
+                        {t('login_panel_description')}
                     </p>
                 </div>
 
@@ -50,8 +54,8 @@ function LoginLeftPanel() {
                                 <Icon size={16} className='text-emerald-400' />
                             </div>
                             <div>
-                                <p className='text-white text-sm font-medium'>{title}</p>
-                                <p className='text-zinc-500 text-xs'>{desc}</p>
+                                <p className='text-white text-sm font-medium'>{t(title)}</p>
+                                <p className='text-zinc-500 text-xs'>{t(desc)}</p>
                             </div>
                         </div>
                     ))}
@@ -71,7 +75,7 @@ function LoginLeftPanel() {
                     </div>
                 </div>
                 <div>
-                    <p className='text-white text-sm font-medium'>Join 2K+ happy customers</p>
+                    <p className='text-white text-sm font-medium'>{t('signup_social_proof')}</p>
                     <div className='flex items-center gap-0.5 mt-0.5'>
                         {[1, 2, 3, 4, 5].map(i => (
                             <Star key={i} size={11} className='text-emerald-400 fill-emerald-400' />

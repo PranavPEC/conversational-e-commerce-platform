@@ -38,6 +38,7 @@ function ProfileSummaryCard({ userData, isEditing, onEditClick, avatarPreview, o
                         <img
                             src={userData.profileImage}
                             alt={userData.name}
+                            referrerPolicy='no-referrer'
                             className='w-20 h-20 rounded-full object-cover border border-zinc-700 flex-shrink-0'
                         />
                     ) : (

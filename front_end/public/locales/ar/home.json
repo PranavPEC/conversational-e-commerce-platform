@@ -56,5 +56,7 @@
     "go_to_slide": "الانتقال إلى الشريحة {{number}}",
     "previous_products": "المنتجات السابقة",
     "next_products": "المنتجات التالية",
-    "no_products_available": "لا توجد منتجات متاحة حاليًا."
+    "no_products_available": "لا توجد منتجات متاحة حاليًا.",
+    "add_to_wishlist": "أضف إلى قائمة الرغبات",
+    "remove_from_wishlist": "إزالة من قائمة الرغبات"
 }

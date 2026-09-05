@@ -8,9 +8,11 @@ import { Loader } from 'lucide-react'
 import PrimaryButton from '../components/common_components/PrimaryButton.jsx'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 import { useTranslation } from 'react-i18next'
+import {formatCurrency} from '../utils/CommonFunctions.js'
 
 function Cart() {
-    const { t } = useTranslation('cart')
+    const { t, i18n } = useTranslation('cart')
+    const isRTL = i18n.dir() === 'rtl'
     const navigate = useNavigate()
     const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const [showCheckout, setShowCheckout] = useState(false)
@@ -130,7 +132,7 @@ function Cart() {
                                 >
                                     {item.product.title}
                                 </h2>
-                                <p className='text-emerald-400 text-sm font-semibold'>₹{item.product.price}</p>
+                                <p className='text-emerald-400 text-sm font-semibold'>{formatCurrency(item.product.price, isRTL)}</p>
                             </div>
 
                             <div className='flex items-center gap-3'>
@@ -152,7 +154,7 @@ function Cart() {
                             </div>
 
                             <div className='w-24 text-right'>
-                                <p className='text-white text-sm font-semibold'>₹{item.product.price * item.quantity}</p>
+                                <p className='text-white text-sm font-semibold'>{formatCurrency(item.product.price * item.quantity, isRTL)}</p>
                             </div>
 
                             <button
@@ -169,7 +171,7 @@ function Cart() {
                 <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mt-4 flex flex-col gap-4'>
                     <div className='flex justify-between items-center'>
                         <span className='text-zinc-400 text-sm'>{t("subtotal")}</span>
-                        <span className='text-white text-sm'>₹{calculateCartTotal(cartItems)}</span>
+                        <span className='text-white text-sm'>{formatCurrency(calculateCartTotal(cartItems), isRTL)}</span>
                     </div>
                     <div className='flex justify-between items-center'>
                         <span className='text-zinc-400 text-sm'>{t("shipping")}</span>
@@ -178,7 +180,7 @@ function Cart() {
                     <div className='h-px bg-zinc-800' />
                     <div className='flex justify-between items-center'>
                         <span className='text-white font-semibold'>{t("total")}</span>
-                        <span className='text-emerald-400 text-xl font-bold'>₹{calculateCartTotal(cartItems).toLocaleString('en-IN')}</span>
+                        <span className='text-emerald-400 text-xl font-bold'>{formatCurrency(calculateCartTotal(cartItems), isRTL)}</span>
                     </div>
                     <PrimaryButton
                         text={t("proceed_to_checkout")}

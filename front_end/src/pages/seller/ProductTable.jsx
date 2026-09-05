@@ -1,12 +1,12 @@
 ﻿import { Pencil, Trash2, Package } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 // Props:
-//   products      — array of product objects from adminSlice
-//   onEdit        — called with product object when Edit is clicked (Admin.jsx pre-fills form)
-//   onDeleteClick — called with product object when Delete is clicked (Admin.jsx sets deleteTarget)
+//   products      — array of product objects from sellerSlice
+//   onEdit        — called with product object when Edit is clicked (Seller.jsx pre-fills form)
+//   onDeleteClick — called with product object when Delete is clicked (Seller.jsx sets deleteTarget)
 
 function ProductTable({ products, onEdit, onDeleteClick }) {
-    const { t } = useTranslation('admin')
+    const { t } = useTranslation('seller')
     return (
         <div className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden'>
 

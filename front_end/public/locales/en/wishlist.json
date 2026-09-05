@@ -1,0 +1,14 @@
+{
+    "my_wishlist": "My Wishlist",
+    "items_count": "{{count}} items in your wishlist",
+    "empty_wishlist": "Your wishlist is empty",
+    "empty_wishlist_description": "Save items you love here so you can find them easily later.",
+    "browse_products": "Browse Products",
+    "retry": "Retry",
+    "remove": "Remove",
+    "continue_shopping": "Continue Shopping",
+    "no_image": "No Image",
+    "not_available": "N/A",
+    "out_of_stock": "Out of Stock",
+    "product_unavailable": "This product is no longer available"
+}

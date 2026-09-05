@@ -16,12 +16,12 @@ const CATEGORY_OPTIONS = [
 
 // Used for both Create and Edit modes
 // editingProduct === null  → Create mode
-// editingProduct !== null  → Edit mode (form pre-filled by Admin.jsx)
+// editingProduct !== null  → Edit mode (form pre-filled by Seller.jsx)
 //
 // Props:
 //   form, setForm          — controlled form state (title, description, price, stock, category[])
 //   imagePreview           — blob URL or existing Cloudinary URL for preview
-//   handleImageChange      — file input onChange handler (defined in Admin.jsx)
+//   handleImageChange      — file input onChange handler (defined in Seller.jsx)
 //   handleSubmit           — dispatches createProduct or updateProduct
 //   handleResetForm        — closes form and resets all state
 //   editingProduct         — null in create mode, product object in edit mode
@@ -39,7 +39,7 @@ function ProductForm({
 }) {
     // category is now an array — valid if at least one item is checked
     const isFormValid = form.title && form.description && form.price && form.stock && form.category.length > 0
-    const { t } = useTranslation('admin')
+    const { t } = useTranslation('seller')
     const toggleCategory = (value) => {
         setForm(f => {
             const already = f.category.includes(value)

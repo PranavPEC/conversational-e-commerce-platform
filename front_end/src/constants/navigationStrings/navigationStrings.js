@@ -12,5 +12,12 @@ export default {
     ORDERS: "/orders",
     PROFILE: "/profile",
     SETTINGS: "/settings",
+    TERMS: "/terms",
+    PRIVACY_POLICY: "/privacy-policy",
     ADMIN: "/admin",
+    SELLER_APPLICATIONS: "/admin/seller-applications",
+    SELLER: "/seller",
+    SELLER_ORDERS: "/seller/orders",
+    SELLER_ANALYTICS: "/seller/analytics",
+    WISHLIST: "/wishlist",
     }

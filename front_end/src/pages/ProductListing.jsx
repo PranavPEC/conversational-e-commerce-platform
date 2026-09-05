@@ -1,8 +1,10 @@
-﻿import { useEffect } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { fetchProducts } from '../redux/reduxActions'
+import { Heart } from 'lucide-react'
+import { fetchProducts, fetchUserWishlist, addToWishlist, removeFromWishlist } from '../redux/reduxActions'
 import { useTranslation } from 'react-i18next'
+import { formatCurrency } from '../utils/CommonFunctions.js'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 const CATEGORY_LABELS = {
@@ -18,12 +20,21 @@ const CATEGORY_LABELS = {
 }
 
 function ProductListing() {
-  const { t } = useTranslation('product')
+  const { t, i18n } = useTranslation('product')
+  const isRTL = i18n.dir() === 'rtl'
   const navigate = useNavigate()
   const location = useLocation()
   const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
   const { products, productsLoading } = useSelector(state => state.products)
+  const { userData } = useSelector(state => state.auth)
+  const { wishlist } = useSelector(state => state.wishlist)
+  const [togglingWishlistId, setTogglingWishlistId] = useState(null)
+
+  const wishlistedIds = useMemo(
+    () => new Set(wishlist.map(item => item.product?._id).filter(Boolean)),
+    [wishlist]
+  )
 
   const searchParams = new URLSearchParams(location.search)
   const categoryParam = searchParams.get('category')
@@ -35,6 +46,30 @@ function ProductListing() {
   useEffect(() => {
     fetchProducts(normalizedCategory, normalizedSearch)   // plain call — no dispatch()
   }, [normalizedCategory, normalizedSearch])
+
+  useEffect(() => {
+    if (userData) fetchUserWishlist().catch(() => {})
+  }, [userData])
+
+  const handleToggleWishlist = async (e, productId) => {
+    e.stopPropagation()   // don't trigger the card's navigate onClick
+    if (!userData) {
+      navigate(navigationStrings.LOGIN)
+      return
+    }
+    setTogglingWishlistId(productId)
+    try {
+      if (wishlistedIds.has(productId)) {
+        await removeFromWishlist(productId)
+      } else {
+        await addToWishlist(productId)
+      }
+    } catch {
+      // wishlistError is already in Redux if this fails
+    } finally {
+      setTogglingWishlistId(null)
+    }
+  }
 
   const heading = normalizedSearch
     ? t('search_results_for', { query: normalizedSearch })
@@ -76,8 +111,21 @@ function ProductListing() {
           <div
             key={product._id}
             onClick={() => navigate(getProductDetailRoute(product._id))}
-            className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
+            className='relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
           >
+            <button
+              onClick={(e) => handleToggleWishlist(e, product._id)}
+              disabled={togglingWishlistId === product._id}
+              aria-label={wishlistedIds.has(product._id) ? t('remove_from_wishlist') : t('add_to_wishlist')}
+              className='absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/60'
+            >
+              <Heart
+                size={16}
+                className={wishlistedIds.has(product._id) ? 'text-red-500' : 'text-white'}
+                fill={wishlistedIds.has(product._id) ? 'currentColor' : 'none'}
+              />
+            </button>
+
             <div className='w-full h-48 overflow-hidden bg-zinc-800'>
               {product.image ? (
                 <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
@@ -94,7 +142,7 @@ function ProductListing() {
 
               <div className='mt-auto pt-3 flex items-center justify-between'>
                 <span className='text-emerald-400 font-semibold text-sm'>
-                  ₹{product.price.toLocaleString('en-IN')}
+                  {formatCurrency(product.price, isRTL)}
                 </span>
                 {product.stock === 0 ? (
                   <span className='text-xs text-red-400 font-medium'>{t('out_of_stock')}</span>

@@ -1,6 +1,8 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
-import { ShoppingBag, ChevronRight, Eye, ChevronLeft } from 'lucide-react'
+﻿import React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ShoppingBag, ChevronRight, Eye, ChevronLeft, Heart } from 'lucide-react'
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from '../../utils/CommonFunctions.js'
 const AUTO_ADVANCE_MS = 4500
 const MANUAL_PAUSE_MS = 3500
 
@@ -13,14 +15,13 @@ const getVisibleCount = () => {
 // Generic rail component shared across Home sections (Featured, New Arrivals,
 // etc). Keeps the existing loading / populated / empty-state behavior exactly
 // the same as the old FeaturedProducts component.
-function ProductRail({ title, subtitle, products, loading, onProductClick, onSeeAll }) {
+function ProductRail({ title, subtitle, products, loading, onProductClick, onSeeAll, wishlistedIds = new Set(), onToggleWishlist, togglingWishlistId }) {
     const [visibleCount, setVisibleCount] = useState(getVisibleCount)
     const [currentIndex, setCurrentIndex] = useState(visibleCount)
     const [isTransitionEnabled, setIsTransitionEnabled] = useState(true)
     const [isHovered, setIsHovered] = useState(false)
     const [isManualPaused, setIsManualPaused] = useState(false)
-    const { i18n } = useTranslation();
-    const { t } = useTranslation('home');
+    const { t, i18n } = useTranslation('home');
     const isRTL = i18n.dir() === 'rtl'
     const manualPauseTimeoutRef = useRef(null)
 
@@ -47,7 +48,7 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
         })
 
         return () => cancelAnimationFrame(outerRaf)
-    }, [visibleCount, canCarousel, products.length])
+    }, [visibleCount, canCarousel, products.length, isRTL])
 
     // ── Build display list: real items sandwiched between head/tail clones ──
     // Clone the last `visibleCount` items at the front and the first
@@ -218,8 +219,25 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                                     >
                                         <div
                                             onClick={() => onProductClick(product._id)}
-                                            className='group bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer flex flex-col transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-500/20 h-full'
+                                            className='relative group bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer flex flex-col transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-500/20 h-full'
                                         >
+                                            {onToggleWishlist && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()   // don't let the click also trigger onProductClick
+                                                        onToggleWishlist(product._id)
+                                                    }}
+                                                    disabled={togglingWishlistId === product._id}
+                                                    aria-label={wishlistedIds.has(product._id) ? t('remove_from_wishlist') : t('add_to_wishlist')}
+                                                    className='absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/60'
+                                                >
+                                                    <Heart
+                                                        size={16}
+                                                        className={wishlistedIds.has(product._id) ? 'text-red-500' : 'text-white'}
+                                                        fill={wishlistedIds.has(product._id) ? 'currentColor' : 'none'}
+                                                    />
+                                                </button>
+                                            )}
                                             {/* Image */}
                                             <div className='relative w-full h-44 overflow-hidden bg-zinc-800'>
                                                 {product.image ? (
@@ -249,7 +267,7 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
                                                 </h3>
                                                 <div className='mt-auto pt-2 flex items-center justify-between'>
                                                     <span className='text-emerald-400 font-semibold text-sm transition-all duration-300 group-hover:tracking-wide'>
-                                                        {product.price != null ? '\u20B9' + product.price.toLocaleString('en-IN') : t('not_available')}
+                                                        {product.price != null ? formatCurrency(product.price, isRTL) : t('not_available')}
                                                     </span>
                                                     {product.stock === 0 ? (
                                                         <span className='text-xs text-red-400'>{t('out_of_stock')}</span>
@@ -300,4 +318,4 @@ function ProductRail({ title, subtitle, products, loading, onProductClick, onSee
     )
 }
 
-export default ProductRail
+export default React.memo(ProductRail)

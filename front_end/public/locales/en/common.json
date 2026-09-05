@@ -48,5 +48,7 @@
   "profile": "Profile",
   "my_orders": "My Orders",
   "admin": "Admin",
+  "admin_dashboard": "Admin Dashboard",
+  "seller_dashboard": "Seller Dashboard",
   "settings": "Settings"
 }

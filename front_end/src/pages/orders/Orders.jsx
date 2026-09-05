@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
-import { fetchUserOrders, cancelOrder } from '../../redux/reduxActions'
+import { fetchUserOrders, cancelOrder, requestReturn } from '../../redux/reduxActions'
 import { useTranslation } from 'react-i18next'
 import AccountSidebar from '../../components/common_components/AccountSidebar'
 import OrdersLoading from './OrdersLoading.jsx'
@@ -50,6 +50,7 @@ function Orders() {
                             order={order}
                             onProductClick={(id) => navigate(getProductDetailRoute(id))}
                             onCancel={handleCancelOrder}
+                            onRequestReturn={(id, reason) => requestReturn(id, reason).catch(() => {})}
                         />
                     ))}
                 </div>

@@ -8,11 +8,19 @@ import SignUp from '../pages/signup/SignUp.jsx'
 import Login from '../pages/login/Login.jsx'
 import ProductListing from '../pages/ProductListing.jsx'
 import ProductDetail from '../pages/ProductDetail.jsx'
+import Terms from '../pages/legal/Terms.jsx'
+import PrivacyPolicy from '../pages/legal/PrivacyPolicy.jsx'
 import Cart from '../pages/Cart.jsx'
+import Wishlist from '../pages/wishlist/Wishlist.jsx'
 import Orders from '../pages/orders/Orders.jsx'
 import Profile from '../pages/profile/Profile.jsx'
 import Settings from '../pages/settings/Settings.jsx'
 import Admin from '../pages/admin/Admin.jsx'
+import SellerApplications from '../pages/admin/SellerApplications.jsx'
+import Seller from '../pages/seller/Seller.jsx'
+import SellerOrders from '../pages/seller/SellerOrders.jsx'
+import SellerDashboard from '../pages/seller/SellerDashboard.jsx'
+import SellerPendingApproval from '../pages/seller/SellerPendingApproval.jsx'
 import ForgotPassword from '../pages/forgot_password/ForgotPassword.jsx'
 import VerifyOTP from '../pages/forgot_password/VerifyOTP.jsx'
 import ResetPassword from '../pages/forgot_password/ResetPassword.jsx'
@@ -27,11 +35,18 @@ const APP_ROUTES = [
     { path: navigationStrings.RESET_PASSWORD, element: <ResetPassword /> },
     { path: navigationStrings.PRODUCTS, element: <ProductListing /> },
     { path: navigationStrings.PRODUCT_DETAIL, element: <ProductDetail /> },
+    { path: navigationStrings.TERMS, element: <Terms /> },
+    { path: navigationStrings.PRIVACY_POLICY, element: <PrivacyPolicy /> },
     { path: navigationStrings.CART, element: <Cart />, protected: true },
     { path: navigationStrings.ORDERS, element: <Orders />, protected: true },
     { path: navigationStrings.PROFILE, element: <Profile />, protected: true },
     { path: navigationStrings.SETTINGS, element: <Settings />, protected: true },
     { path: navigationStrings.ADMIN, element: <Admin />, protected: true, adminOnly: true },
+    { path: navigationStrings.SELLER_APPLICATIONS, element: <SellerApplications />, protected: true, adminOnly: true },
+    { path: navigationStrings.SELLER, element: <Seller />, protected: true, sellerOnly: true },
+    { path: navigationStrings.SELLER_ORDERS, element: <SellerOrders />, protected: true, sellerOnly: true },
+    { path: navigationStrings.SELLER_ANALYTICS, element: <SellerDashboard />, protected: true, sellerOnly: true },
+    { path: navigationStrings.WISHLIST, element: <Wishlist />, protected: true },
 ]
 
 const HIDE_NAVBAR_PATHS = [
@@ -46,6 +61,15 @@ const resolveElement = (route, userData) => {
     if (route.adminOnly) {
         if (!userData) return <Navigate to={navigationStrings.LOGIN} />
         return userData.role === 'admin' ? route.element : <Navigate to={navigationStrings.HOME} />
+    }
+    if (route.sellerOnly) {
+        if (!userData) return <Navigate to={navigationStrings.LOGIN} />
+        const role = userData.role
+        if (role === 'admin') return route.element
+        if (role === 'seller') {
+            return userData.sellerStatus === 'approved' ? route.element : <SellerPendingApproval />
+        }
+        return <Navigate to={navigationStrings.HOME} />
     }
     if (route.protected) {
         return userData ? route.element : <Navigate to={navigationStrings.LOGIN} />

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation, Trans } from 'react-i18next'
-import { fetchUserData, signupUser } from '../../redux/reduxActions/authActions.js'
+import {  signupUser, googleLogin, facebookLogin } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
 
 // ── Validations ──
@@ -40,6 +40,7 @@ function SignUp() {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
     const [loading, setLoading] = useState(false);
+    const [role, setRole] = useState('user')
 
     // ── Avatar state ──
     const [frontendImage, setFrontendImage] = useState(null)
@@ -55,10 +56,10 @@ function SignUp() {
     // Each validator shows its own error and returns false
     // We just check the return value and return early
     const _checkValidations = () => {
-        if (!checkNameValidation(name, showToast,t)) return false
+        if (!checkNameValidation(name, showToast, t)) return false
         if (checkIsEmpty(email)) { showToast(t('email_required')); return false }
         if (!isValidEmail(email)) { showToast(t('email_invalid')); return false }
-        if (!checkPasswordValidations(password, showToast,t)) return false
+        if (!checkPasswordValidations(password, showToast, t)) return false
         if (!checkPasswordMatch(password, confirmPassword, showToast, t)) return false
         return true
     }
@@ -75,13 +76,13 @@ function SignUp() {
             formData.append('name', name)
             formData.append('email', email)
             formData.append('password', password)
+            formData.append('role', role)
             if (backendImage) {
                 formData.append('profileImage', backendImage)
             }
             setLoading(true);
             try {
                 await signupUser(formData);
-                await fetchUserData()
                 navigate(navigationStrings.HOME)
             }
             catch (error) {
@@ -106,6 +107,39 @@ function SignUp() {
             }
         }
     }
+
+    const handleGoogleAuth = async () => {
+        setLoading(true)
+        try {
+            await googleLogin()
+            navigate(navigationStrings.HOME)
+        } catch (error) {
+            if (error.response) {
+                showToast(error.response.data.message)
+            } else {
+                showToast(t('server_not_reachable'))
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleFacebookAuth = async () => {
+        setLoading(true)
+        try {
+            await facebookLogin()
+            navigate(navigationStrings.HOME)
+        } catch (error) {
+            if (error.response) {
+                showToast(error.response.data.message)
+            } else {
+                showToast(t('server_not_reachable'))
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     return (
         <div className='w-full min-h-screen bg-[var(--color-bg)] flex'>
@@ -159,13 +193,14 @@ function SignUp() {
                     showConfirm={showConfirm} setShowConfirm={setShowConfirm}
                     handleSignUp={handleSignUp}
                     loading={loading}
+                    role={role} setRole={setRole}
                 />
 
-                <SocialButtons />
+                <SocialButtons onGoogleAuth={handleGoogleAuth} onFacebookAuth={handleFacebookAuth} />
 
                 <p className='text-zinc-500 text-xs text-center mt-5'>
                     <Trans i18nKey='signup_terms_agreement' ns='auth'>
-                        By signing up, you agree to our <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Terms of Service</span> and <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Privacy Policy</span>
+                        By signing up, you agree to our <span onClick={() => navigate(navigationStrings.TERMS)} className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Terms of Service</span> and <span onClick={() => navigate(navigationStrings.PRIVACY_POLICY)} className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Privacy Policy</span>
                     </Trans>
                 </p>
 

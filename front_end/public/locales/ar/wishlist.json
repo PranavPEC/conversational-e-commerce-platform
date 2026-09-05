@@ -1,0 +1,14 @@
+{
+    "my_wishlist": "قائمة الرغبات",
+    "items_count": "{{count}} عناصر في قائمة رغباتك",
+    "empty_wishlist": "قائمة رغباتك فارغة",
+    "empty_wishlist_description": "احفظ العناصر التي تحبها هنا لتجدها بسهولة لاحقًا.",
+    "browse_products": "تصفح المنتجات",
+    "retry": "إعادة المحاولة",
+    "remove": "إزالة",
+    "continue_shopping": "متابعة التسوق",
+    "no_image": "لا توجد صورة",
+    "not_available": "غير متاح",
+    "out_of_stock": "غير متوفر",
+    "product_unavailable": "هذا المنتج لم يعد متوفرًا"
+}

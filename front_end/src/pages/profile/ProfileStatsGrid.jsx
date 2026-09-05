@@ -2,14 +2,16 @@ import { ShoppingBag, Heart, MapPin, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 // ── 4-card stat strip, same "data-driven map" pattern as PerksBar.jsx ──
 // Props:
-//   ordersCount — real number, passed down from Profile.jsx (state.order.orders.length)
+//   ordersCount    — real number, passed down from Profile.jsx (state.order.orders.length)
+//   addressesCount — real number, passed down from Profile.jsx (state.address.addresses.length)
 
-function ProfileStatsGrid({ ordersCount }) {
+function ProfileStatsGrid({ ordersCount, addressesCount }) {
     const { t } = useTranslation('profile')
 
-    // Wishlist and Addresses aren't built yet — show '—' instead of '0' so it
-    // reads as "not available yet" rather than "you have zero of these,"
-    // which would be a misleading claim about a feature that doesn't exist.
+    // Wishlist isn't built yet — show '—' instead of '0' so it reads as
+    // "not available yet" rather than "you have zero of these," which would
+    // be a misleading claim about a feature that doesn't exist. Addresses
+    // IS built now, so it gets a real count like Orders does.
     const STATS = [
         {
             icon: ShoppingBag,
@@ -32,8 +34,8 @@ function ProfileStatsGrid({ ordersCount }) {
             iconColor: 'text-amber-400',
             iconBg: 'bg-amber-500/10',
             label: 'addresses',
-            value: '—',
-            desc: 'coming_soon',
+            value: addressesCount,
+            desc: 'saved_addresses',
         },
         {
             icon: ShieldCheck,
@@ -44,7 +46,6 @@ function ProfileStatsGrid({ ordersCount }) {
             desc: 'account_status',
         },
     ]
-
 
     return (
         <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>

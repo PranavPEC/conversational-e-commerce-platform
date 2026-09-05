@@ -1,8 +1,9 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowRight, ShoppingBag, ChevronLeft, ChevronRight, Eye } from 'lucide-react'
+import { ArrowRight, ShoppingBag, ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react'
 import PrimaryButton from '../../components/common_components/PrimaryButton'
 import './HeroSection.css'
 import { useTranslation } from 'react-i18next'
+import { formatCurrency } from '../../utils/CommonFunctions.js'
 
 const AUTO_ADVANCE_MS = 4500
 const MANUAL_PAUSE_MS = 3500
@@ -26,11 +27,14 @@ function HeroSection({
     onBrowse,
     onCart,
     heroShowcaseProducts = [],
-    onProductClick = () => {},
+    onProductClick = () => { },
+    wishlistedIds = new Set(),
+    onToggleWishlist,
+    togglingWishlistId,
 }) {
     const products = heroShowcaseProducts
-    const {i18n} = useTranslation()
-    const {t}= useTranslation('home')
+    const { i18n } = useTranslation()
+    const { t } = useTranslation('home')
     const isRTL = i18n.dir() === 'rtl'
     // ── Carousel state (mirrors ProductRail exactly) ──
     const [visibleCount, setVisibleCount] = useState(getVisibleCount)
@@ -243,6 +247,24 @@ function HeroSection({
                                                             <Eye size={16} /> {t('view_details')}
                                                         </div>
                                                     </div>
+
+                                                    {onToggleWishlist && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                onToggleWishlist(product._id)
+                                                            }}
+                                                            disabled={togglingWishlistId === product._id}
+                                                            aria-label={wishlistedIds.has(product._id) ? t('remove_from_wishlist') : t('add_to_wishlist')}
+                                                            className='absolute top-2 right-2 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/60'
+                                                        >
+                                                            <Heart
+                                                                size={16}
+                                                                className={wishlistedIds.has(product._id) ? 'text-red-500' : 'text-white'}
+                                                                fill={wishlistedIds.has(product._id) ? 'currentColor' : 'none'}
+                                                            />
+                                                        </button>
+                                                    )}
                                                 </div>
 
                                                 {/* Product info */}
@@ -253,7 +275,7 @@ function HeroSection({
                                                     <div className='mt-auto pt-2 flex items-center justify-between'>
                                                         <span className='text-emerald-500 font-semibold text-sm'>
                                                             {product.price != null
-                                                                ? '\u20B9' + product.price.toLocaleString('en-IN')
+                                                                ? formatCurrency(product.price, isRTL)
                                                                 : t('not_available')}
                                                         </span>
                                                         {product.stock === 0 ? (
@@ -282,11 +304,10 @@ function HeroSection({
                                                 setCurrentIndex(visibleCount + i * visibleCount)
                                             }}
                                             aria-label={`${t('go_to_slide')} ${i + 1}`}
-                                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                                                activePage === i
-                                                    ? 'w-6 bg-emerald-500'
-                                                    : 'w-2 bg-[var(--color-border)] hover:bg-[var(--color-text-muted)]'
-                                            }`}
+                                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${activePage === i
+                                                ? 'w-6 bg-emerald-500'
+                                                : 'w-2 bg-[var(--color-border)] hover:bg-[var(--color-text-muted)]'
+                                                }`}
                                         />
                                     ))}
                                 </div>

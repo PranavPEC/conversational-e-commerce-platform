@@ -17,7 +17,7 @@ const parseCategories = (raw) => {
     return arr.map(c => String(c).trim().toLowerCase()).filter(Boolean)
 }
 
-// Create Product  (Admin Only)
+// Create Product  (Seller Only)
 export const createProduct = async (req, res) => {
     try {
         const { title, description, price, stock, category } = req.body;
@@ -52,7 +52,8 @@ export const createProduct = async (req, res) => {
             price: Number(price),   // req.body values from FormData come as strings — convert
             stock: Number(stock),
             category: categories,
-            image
+            image,
+            seller: req.userId,     // req.userId was attached by checkAuth middleware
         });
 
         return sendSuccess(res, 201, "Product Created Successfully.", { product: newProduct });
@@ -109,7 +110,7 @@ export const getAllProducts = async (req, res) => {
 // Get Single Product By ID  (Public)
 export const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate("seller", "name");
         if (!product) {
             return sendError(res, 404, "Product Not Found.");
         }
@@ -121,15 +122,39 @@ export const getProductById = async (req, res) => {
 };
 
 
+// Get My Products  (Seller Only) — only returns products owned by req.userId
+export const getMyProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ seller: req.userId });
+        return sendSuccess(res, 200, "My Products Fetched Successfully.", { products });
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
+    }
+};
+
+
 // Update Product  (Admin Only)
 export const updateProduct = async (req, res) => {
     try {
-        const { title, description, price, stock, category } = req.body;
-
         const product = await Product.findById(req.params.id);
         if (!product) {
             return sendError(res, 404, "Product Not Found.");
         }
+        // Ownership check: only the owning seller can update; admins bypass this
+        // Legacy products (seller === null) are admin-only — no seller can claim them
+        if (req.userRole !== 'admin') {
+            if (!product.seller || product.seller.toString() !== req.userId) {
+                return sendError(res, 403, "Access denied. You can only update your own products.");
+            }
+        }
+
+        const { title, description, price, stock, category } = req.body;
+
+        // const product = await Product.findById(req.params.id);
+        // if (!product) {
+        //     return sendError(res, 404, "Product Not Found.");
+        // }
 
         if (price !== undefined && Number(price) < 0) {
             return sendError(res, 400, "Price cannot be negative.");
@@ -172,13 +197,22 @@ export const updateProduct = async (req, res) => {
 };
 
 
-// Delete Product  (Admin Only)
+// Delete Product  (Seller Only)
 export const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const product = await Product.findById(req.params.id);
         if (!product) {
             return sendError(res, 404, "Product Not Found.");
         }
+
+        // Ownership check: only the owning seller can delete; admins bypass this
+        if (req.userRole !== 'admin') {
+            if (!product.seller || product.seller.toString() !== req.userId) {
+                return sendError(res, 403, "Access denied. You can only delete your own products.");
+            }
+        }
+
+        await Product.findByIdAndDelete(req.params.id);
 
         return sendSuccess(res, 200, "Product Deleted Successfully.");
 

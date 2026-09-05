@@ -11,7 +11,7 @@ i18n
     debug: true,
     fallbackLng: 'en',
     supportedLngs: ['en', 'ar'],
-    ns: ['common', 'auth', 'home', 'profile', 'orders', 'admin', 'checkout', 'settings', 'cart', 'errors'],
+    ns: ['common', 'auth', 'home', 'profile', 'orders', 'seller', 'admin', 'legal', 'checkout', 'settings', 'cart', 'errors','product','wishlist'],
     defaultNS: 'common',
     backend: { loadPath: '/locales/{{lng}}/{{ns}}.json' },
     detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'] },

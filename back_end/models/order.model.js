@@ -8,6 +8,13 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
 
+    // Checkout is split one Order per seller — this is that seller
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
     products: [
         {
             product: {
@@ -49,8 +56,16 @@ const orderSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: ["placed", "shipped", "delivered", "cancelled"],
-        default: "placed"
+        enum: ["pending_approval", "placed", "shipped", "delivered", "cancelled", "rejected", "return_requested", "return_approved", "return_rejected", "refunded"],
+        default: "pending_approval"
+    },
+
+    returnReason: {
+        type: String
+    },
+
+    deliveredAt: {
+        type: Date
     },
 
     paymentStatus: {

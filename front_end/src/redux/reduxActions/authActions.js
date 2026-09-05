@@ -1,8 +1,10 @@
 // src/redux/reduxActions/authActions.js
 
 import axios from "axios";
-import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL, FORGOT_PASSWORD_URL, VERIFY_OTP_URL, RESET_PASSWORD_URL, UPDATE_USER_URL } from "../../config/urls";
+import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL, FORGOT_PASSWORD_URL, VERIFY_OTP_URL, RESET_PASSWORD_URL, UPDATE_USER_URL, SOCIAL_AUTH_URL } from "../../config/urls";
 import { buildFormData } from "../../utils/CommonFunctions.js";
+import { signInWithGoogle, signInWithFacebook } from "../../config/firebase.js";
+// add SOCIAL_AUTH_URL to your existing import from "../../config/urls"
 import store from "../reduxStore";
 
 import {
@@ -77,6 +79,7 @@ export const signupUser = async (formData) => {
       headers: { 'Content-Type': 'multipart/form-data' }
     }
   );
+  await fetchUserData()
   return true;
 };
 // ── Forgot Password ──
@@ -156,4 +159,30 @@ export const resetPassword = async ({
 
   return data;
 
+};
+
+export const googleLogin = async () => {
+  const idToken = await signInWithGoogle();
+
+  await axios.post(
+    SOCIAL_AUTH_URL,
+    { idToken },
+    { withCredentials: true }
+  );
+
+  await fetchUserData();
+  return true;
+};
+
+export const facebookLogin = async () => {
+  const idToken = await signInWithFacebook();
+
+  await axios.post(
+    SOCIAL_AUTH_URL,
+    { idToken },
+    { withCredentials: true }
+  );
+
+  await fetchUserData();
+  return true;
 };

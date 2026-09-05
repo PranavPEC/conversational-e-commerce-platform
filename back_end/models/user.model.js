@@ -11,11 +11,24 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: function () {
+      return this.provider === 'local';
+    }
+  },
+  provider: {
+    type: String,
+    enum: ['local', 'google', 'facebook'],
+    default: 'local'
   },
   role: {
     type: String,
-    default: "user",
+    enum: ['user', 'seller', 'admin'],
+    default: 'user'
+  },
+  sellerStatus: {
+    type: String,
+    enum: ['not_applicable', 'pending', 'approved', 'rejected'],
+    default: 'not_applicable'
   },
   profileImage: {
     type: String,
@@ -57,7 +70,15 @@ const userSchema = new mongoose.Schema({
   gender: {
     type: String,
     required: false
-  }
+  },
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: {
+    type: Date,
+    required: false
+  },
 }, {
   timestamps: true
 })

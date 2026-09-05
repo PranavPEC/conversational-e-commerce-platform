@@ -1,99 +1,80 @@
 // src/redux/reduxActions/adminActions.js
 
 import axios from "axios"
-import { CREATE_PRODUCT_URL,UPDATE_PRODUCT_URL,DELETE_PRODUCT_URL } from "../../config/urls"
+import { GET_ADMIN_DASHBOARD_URL, GET_SELLER_APPLICATIONS_URL, UPDATE_SELLER_STATUS_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
-    setAdminProducts as _setAdminProducts,
-    addAdminProduct,
-    updateAdminProduct,
-    removeAdminProduct,
-    setAdminLoading,
-    setAdminError,
-    setAdminSuccess,
-    clearAdminStatus as _clearAdminStatus,
+    setDashboardStats,
+    setDashboardLoading,
+    setDashboardError,
+    setSellerApplications,
+    setSellerApplicationsLoading,
+    setSellerApplicationsError,
+    updateSellerApplicationInList,
 } from "../reduxReducers/adminReducers"
 
 const { dispatch } = store
 
-// ── Create product ──
-export const createProduct = async (formData) => {
-    dispatch(setAdminLoading(true))
-    dispatch(setAdminError(null))
-    dispatch(setAdminSuccess(null))
+// ── Fetch platform-wide dashboard stats for admins ──
+export const fetchDashboardStats = async () => {
+    dispatch(setDashboardLoading(true))
+    dispatch(setDashboardError(null))
 
     try {
-        const { data } = await axios.post(
-            CREATE_PRODUCT_URL,
-            formData,
+        const { data } = await axios.get(
+            GET_ADMIN_DASHBOARD_URL,
             { withCredentials: true }
         )
-        dispatch(addAdminProduct(data.data.product))
-        dispatch(setAdminSuccess("Product created successfully."))
-        return data.data.product
+        dispatch(setDashboardStats(data.data))
+        return data.data
     } catch (error) {
-        dispatch(setAdminError(
-            error.response?.data?.message || "Failed to create product."
+        dispatch(setDashboardError(
+            error.response?.data?.message || "Failed to fetch dashboard stats."
         ))
         throw error
     } finally {
-        dispatch(setAdminLoading(false))
+        dispatch(setDashboardLoading(false))
     }
 }
 
-// ── Update product ──
-export const updateProduct = async ({ id, formData }) => {
-    dispatch(setAdminLoading(true))
-    dispatch(setAdminError(null))
-    dispatch(setAdminSuccess(null))
+// ── Fetch seller applications for admins ──
+export const fetchSellerApplications = async () => {
+    dispatch(setSellerApplicationsLoading(true))
+    dispatch(setSellerApplicationsError(null))
+
+    try {
+        const { data } = await axios.get(
+            GET_SELLER_APPLICATIONS_URL,
+            { withCredentials: true }
+        )
+        dispatch(setSellerApplications(data.data.sellers))
+        return data.data.sellers
+    } catch (error) {
+        dispatch(setSellerApplicationsError(
+            error.response?.data?.message || "Failed to fetch seller applications."
+        ))
+        throw error
+    } finally {
+        dispatch(setSellerApplicationsLoading(false))
+    }
+}
+
+// ── Update seller application status ──
+export const updateSellerApplicationStatus = async (sellerId, status) => {
+    dispatch(setSellerApplicationsError(null))
 
     try {
         const { data } = await axios.put(
-            UPDATE_PRODUCT_URL(id),
-            formData,
+            UPDATE_SELLER_STATUS_URL(sellerId),
+            { status },
             { withCredentials: true }
         )
-        dispatch(updateAdminProduct(data.data.product))
-        dispatch(setAdminSuccess("Product updated successfully."))
-        return data.data.product
+        dispatch(updateSellerApplicationInList(data.data.seller))
+        return data.data.seller
     } catch (error) {
-        dispatch(setAdminError(
-            error.response?.data?.message || "Failed to update product."
+        dispatch(setSellerApplicationsError(
+            error.response?.data?.message || "Failed to update seller status."
         ))
         throw error
-    } finally {
-        dispatch(setAdminLoading(false))
     }
-}
-
-// ── Delete product ──
-export const deleteProduct = async (id) => {
-    dispatch(setAdminLoading(true))
-    dispatch(setAdminError(null))
-    dispatch(setAdminSuccess(null))
-
-    try {
-        await axios.delete(
-            DELETE_PRODUCT_URL(id),
-            { withCredentials: true }
-        )
-        dispatch(removeAdminProduct(id))
-        dispatch(setAdminSuccess("Product deleted successfully."))
-        return id
-    } catch (error) {
-        dispatch(setAdminError(
-            error.response?.data?.message || "Failed to delete product."
-        ))
-        throw error
-    } finally {
-        dispatch(setAdminLoading(false))
-    }
-}
-
-export const setAdminProducts = (products) => {
-    dispatch(_setAdminProducts(products))
-}
-
-export const clearAdminStatus = () => {
-    dispatch(_clearAdminStatus())
 }

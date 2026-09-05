@@ -22,7 +22,7 @@ const { dispatch } = store
 
 // ── Fetch products ──
 // Used by:
-//   Home.jsx / Admin.jsx        → fetchProducts() for all products
+//   Home.jsx / Seller.jsx        → fetchProducts() for all products
 //   ProductListing.jsx          → fetchProducts(category, search) for filtered pages
 export const fetchProducts = async (category = null, search = null) => {
     dispatch(setProductsLoading(true))

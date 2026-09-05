@@ -25,5 +25,8 @@
     "audio": "Audio",
     "laptops": "Laptops",
     "premium": "Premium",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "add_to_wishlist": "Add to wishlist",
+    "remove_from_wishlist": "Remove from wishlist",
+    "sold_by": "Sold by {{name}}"
 }

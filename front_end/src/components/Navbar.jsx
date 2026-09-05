@@ -5,7 +5,7 @@ import axios from 'axios'
 import PrimaryButton from './common_components/PrimaryButton.jsx'
 import { useTranslation } from 'react-i18next'
 import { Heart, ShoppingCart, User, Package, Settings, LogOut, ChevronDown, Search, Menu } from 'lucide-react'
-
+import { formatCurrency, getInitial } from '../utils/CommonFunctions.js'
 // ── New architecture: logoutUser is a plain async function, call directly ──
 import { logoutUser } from '../redux/reduxActions'
 
@@ -15,8 +15,6 @@ import { clearCart } from '../redux/reduxActions'
 import { GET_ALL_PRODUCTS_URL } from '../config/urls'
 import useDebounce from '../hooks/useDebounce'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
-
-import { getInitial } from '../utils/CommonFunctions.js'
 
 const NAV_CATEGORIES = [
   { key: 'electronics', label: 'category_electronics' },
@@ -35,7 +33,8 @@ function Navbar() {
   const dispatch = useDispatch()    // still needed for clearCart (RTK action)
   const navigate = useNavigate()
   const location = useLocation()
-  const {t} = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
+  const isRTL = i18n.dir() === 'rtl'
 
   const { cartCount } = useSelector(state => state.cart)
   const { userData } = useSelector(state => state.auth)
@@ -202,7 +201,7 @@ function Navbar() {
               </div>
               <div className='min-w-0'>
                 <p className='text-sm text-[var(--color-text-primary)] font-medium line-clamp-1'>{product.title}</p>
-                <p className='text-xs text-emerald-400 font-semibold'>₹{(product.price ?? 0).toLocaleString('en-IN')}</p>
+                <p className='text-xs text-emerald-400 font-semibold'>{formatCurrency(product.price ?? 0, isRTL)}</p>
               </div>
             </button>
           ))}
@@ -226,8 +225,8 @@ function Navbar() {
           <button
             onClick={() => handleCategoryNav(null)}
             className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${!activeCategory
-                ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
-                : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
+              ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+              : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
               }`}
           >
             {t('all')}
@@ -238,8 +237,8 @@ function Navbar() {
               key={key}
               onClick={() => handleCategoryNav(key)}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${activeCategory === key
-                  ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
-                  : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
+                ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+                : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
                 }`}
             >
               {t(label)}
@@ -337,8 +336,9 @@ function Navbar() {
           </button>
 
           {/* ── Wishlist — icon only, not functional yet ── */}
+          {/* ── Wishlist ── */}
           <button
-            onClick={() => { }}
+            onClick={() => navigate(navigationStrings.WISHLIST)}
             aria-label={t('wishlist')}
             className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
           >
@@ -369,6 +369,7 @@ function Navbar() {
                 <img
                   src={userData.profileImage}
                   alt={userData.name}
+                  referrerPolicy='no-referrer'
                   className='w-9 h-9 rounded-full object-cover border border-[var(--color-input-border)]'
                 />
               ) : (
@@ -399,12 +400,21 @@ function Navbar() {
                   <Package size={16} /> {t('my_orders')}
                 </button>
 
+                {(userData?.role === 'seller' || userData?.role === 'admin') && (
+                  <button
+                    onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SELLER) }}
+                    className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
+                  >
+                    <Package size={16} /> {t('seller_dashboard')}
+                  </button>
+                )}
+
                 {userData?.role === 'admin' && (
                   <button
                     onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ADMIN) }}
                     className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                   >
-                    <Package size={16} /> {t('admin')}
+                    <Package size={16} /> {t('admin_dashboard')}
                   </button>
                 )}
 

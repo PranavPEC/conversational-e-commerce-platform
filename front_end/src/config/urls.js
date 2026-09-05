@@ -19,6 +19,7 @@ export const FORGOT_PASSWORD_URL = SERVER_URL + "/forgot-password";
 export const VERIFY_OTP_URL = SERVER_URL + "/verify-otp";
 export const RESET_PASSWORD_URL = SERVER_URL + "/reset-password";
 export const UPDATE_USER_URL = (id) => SERVER_URL + "/update/" + id
+export const SOCIAL_AUTH_URL = SERVER_URL + "/social-auth"
 
 // ── Products ──
 export const GET_ALL_PRODUCTS_URL = (category = null, search = null) => {
@@ -42,15 +43,26 @@ export const CLEAR_CART_URL = SERVER_URL + "/cart/clear"
 // ── Orders ──
 export const GET_MY_ORDERS_URL = SERVER_URL + "/order/myorders"
 export const CANCEL_ORDER_URL = (id) => SERVER_URL + "/order/cancel/" + id
+export const REQUEST_RETURN_URL = (id) => SERVER_URL + "/order/return/" + id
+export const GET_SELLER_ORDERS_URL = SERVER_URL + "/order/seller/my-orders"
+export const UPDATE_ORDER_STATUS_URL = (id) => SERVER_URL + "/order/status/" + id
 
 // ── Payment ──
 export const CREATE_RAZORPAY_ORDER_URL = SERVER_URL + "/payment/create-order"
 export const VERIFY_PAYMENT_URL = SERVER_URL + "/payment/verify"
 
-// ── Admin / Products CRUD ──
+// ── Seller / Products CRUD ──
 export const CREATE_PRODUCT_URL = SERVER_URL + "/product/create"
 export const UPDATE_PRODUCT_URL = (id) => SERVER_URL + "/product/update/" + id
 export const DELETE_PRODUCT_URL = (id) => SERVER_URL + "/product/delete/" + id
+export const GET_MY_PRODUCTS_URL = SERVER_URL + "/product/my-products"
+export const GET_SELLER_DASHBOARD_URL = SERVER_URL + "/seller/dashboard"
+
+// ── Admin ──
+export const GET_ADMIN_DASHBOARD_URL = SERVER_URL + "/admin/dashboard"
+export const GET_SELLER_APPLICATIONS_URL = SERVER_URL + "/admin/sellers"
+export const UPDATE_SELLER_STATUS_URL = (id) => SERVER_URL + "/admin/sellers/" + id + "/status"
+
 
 // ── Addresses ──
 export const ADD_ADDRESS_URL = SERVER_URL + "/address/add"
@@ -58,3 +70,8 @@ export const GET_MY_ADDRESSES_URL = SERVER_URL + "/address/myaddresses"
 export const UPDATE_ADDRESS_URL = (id) => SERVER_URL + "/address/update/" + id
 export const DELETE_ADDRESS_URL = (id) => SERVER_URL + "/address/delete/" + id
 export const SET_DEFAULT_ADDRESS_URL = (id) => SERVER_URL + "/address/set-default/" + id
+
+// ── Wishlist ──
+export const ADD_TO_WISHLIST_URL = SERVER_URL + "/wishlist/add"
+export const GET_MY_WISHLIST_URL = SERVER_URL + "/wishlist/mywishlist"
+export const REMOVE_FROM_WISHLIST_URL = (productId) => SERVER_URL + "/wishlist/remove/" + productId

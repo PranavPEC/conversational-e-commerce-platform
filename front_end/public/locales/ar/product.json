@@ -25,5 +25,8 @@
     "audio": "صوتيات",
     "laptops": "أجهزة محمولة",
     "premium": "مميزة",
-    "uncategorized": "غير مصنف"
+    "uncategorized": "غير مصنف",
+    "add_to_wishlist": "أضف إلى قائمة الرغبات",
+    "remove_from_wishlist": "إزالة من قائمة الرغبات",
+    "sold_by": "يُباع بواسطة {{name}}"
 }

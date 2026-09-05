@@ -1,26 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import {useTranslation} from 'react-i18next'
-import { fetchProductById, addCartItem } from '../redux/reduxActions'
+import { useTranslation } from 'react-i18next'
+import { Heart } from 'lucide-react'
+import { formatCurrency } from '../utils/CommonFunctions.js'
+import { fetchProductById, addCartItem, fetchUserWishlist, addToWishlist, removeFromWishlist } from '../redux/reduxActions'
 import PrimaryButton from '../components/common_components/PrimaryButton'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 function ProductDetail() {
-    const { t } = useTranslation('product')
+    const { t, i18n } = useTranslation('product')
+    const isRTL = i18n.dir() === 'rtl'
     const { id } = useParams()
     const navigate = useNavigate()
 
     const { selectedProduct: product, productLoading } = useSelector(state => state.products)
     const { userData } = useSelector(state => state.auth)
+    const { wishlist } = useSelector(state => state.wishlist)
 
     const [quantity, setQuantity] = useState(1)
     const [adding, setAdding] = useState(false)
     const [feedback, setFeedback] = useState(null)
+    const [togglingWishlist, setTogglingWishlist] = useState(false)
 
     useEffect(() => {
         fetchProductById(id)   // plain call
     }, [id])
+
+    useEffect(() => {
+        if (userData) fetchUserWishlist().catch(() => { })
+    }, [userData])
+
+    const isWishlisted = useMemo(
+        () => wishlist.some(item => item.product?._id === product?._id),
+        [wishlist, product]
+    )
 
     const handleAddToCart = async () => {
         if (!userData) {
@@ -40,6 +54,25 @@ function ProductDetail() {
         finally {
             setAdding(false)
             setTimeout(() => setFeedback(null), 3000)
+        }
+    }
+
+    const handleToggleWishlist = async () => {
+        if (!userData) {
+            navigate(navigationStrings.LOGIN)
+            return
+        }
+        setTogglingWishlist(true)
+        try {
+            if (isWishlisted) {
+                await removeFromWishlist(product._id)
+            } else {
+                await addToWishlist(product._id)
+            }
+        } catch {
+            // wishlistError is already in Redux if this fails
+        } finally {
+            setTogglingWishlist(false)
         }
     }
 
@@ -74,22 +107,40 @@ function ProductDetail() {
 
             <div className='max-w-4xl mx-auto flex flex-col md:flex-row gap-10'>
 
-                <div className='w-full md:w-[45%] bg-zinc-800 rounded-2xl overflow-hidden h-80 md:h-auto flex-shrink-0'>
+                <div className='relative w-full md:w-[45%] bg-zinc-800 rounded-2xl overflow-hidden h-80 md:h-auto flex-shrink-0'>
                     {product.image ? (
                         <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
                     ) : (
                         <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>{t('no_image')}</div>
                     )}
+
+                    <button
+                        onClick={handleToggleWishlist}
+                        disabled={togglingWishlist}
+                        aria-label={isWishlisted ? t('remove_from_wishlist') : t('add_to_wishlist')}
+                        className='absolute top-3 right-3 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/60'
+                    >
+                        <Heart
+                            size={20}
+                            className={isWishlisted ? 'text-red-500' : 'text-white'}
+                            fill={isWishlisted ? 'currentColor' : 'none'}
+                        />
+                    </button>
                 </div>
 
                 <div className='flex flex-col gap-5 flex-1'>
 
                     <div className='flex flex-col gap-2'>
                         <h1 className='text-white text-2xl font-semibold tracking-tight'>{product.title}</h1>
+                        {product.seller?.name && (
+                            <p className='text-zinc-500 text-xs'>
+                                {t('sold_by', { name: product.seller.name })}
+                            </p>
+                        )}
                         <p className='text-zinc-400 text-sm leading-relaxed'>{product.description}</p>
                     </div>
 
-                    <span className='text-emerald-400 text-3xl font-bold'>₹{product.price.toLocaleString('en-IN')}</span>
+                    <span className='text-emerald-400 text-3xl font-bold'>{formatCurrency(product.price, isRTL)}</span>
 
                     {product.stock === 0 ? (
                         <span className='text-red-400 text-sm font-medium'>{t('out_of_stock')}</span>
@@ -117,12 +168,12 @@ function ProductDetail() {
                     )}
 
                     <PrimaryButton
-                    onClick={handleAddToCart}
-                    text={t('add_to_cart')}
-                    LoadingText={t('adding')}
-                    className='w-full'
-                    disabled={product.stock === 0 || adding}
-                    loading={adding}
+                        onClick={handleAddToCart}
+                        text={t('add_to_cart')}
+                        LoadingText={t('adding')}
+                        className='w-full'
+                        disabled={product.stock === 0 || adding}
+                        loading={adding}
                     />
 
                 </div>

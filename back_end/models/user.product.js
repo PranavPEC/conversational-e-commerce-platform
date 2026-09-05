@@ -18,6 +18,11 @@ const productSchema = new mongoose.Schema({
   price: Number,
   stock: Number,
   image: String,
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
   category: {
     type: [String],
     enum: PRODUCT_CATEGORIES,

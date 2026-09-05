@@ -23,7 +23,7 @@ function AddressesSection() {
     const [isFormOpen, setIsFormOpen] = useState(false)
     const [editingAddress, setEditingAddress] = useState(null)
 
-    // ── Delete confirmation state — same pattern as Admin's product delete ──
+    // ── Delete confirmation state — same pattern as Seller's product delete ──
     const [deleteTarget, setDeleteTarget] = useState(null)
     const [deleting, setDeleting] = useState(false)
 

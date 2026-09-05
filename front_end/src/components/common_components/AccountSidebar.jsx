@@ -25,8 +25,9 @@ import { clearCart } from '../../redux/reduxActions'   // still an RTK action â€
 const NAV_ITEMS = [
     { key: 'profile', label: 'profile', icon: User, path: navigationStrings.PROFILE },
     { key: 'orders', label: 'my_orders', icon: Package, path: navigationStrings.ORDERS },
-    { key: 'wishlist', label: 'wishlist', icon: Heart, path: null },
+    // { key: 'wishlist', label: 'wishlist', icon: Heart, path: null },
     { key: 'settings', label: 'settings', icon: Settings, path: navigationStrings.SETTINGS },
+    {key: 'wishlist', label: 'wishlist', icon: Heart, path: navigationStrings.WISHLIST },
 ]
 
 function AccountSidebar() {

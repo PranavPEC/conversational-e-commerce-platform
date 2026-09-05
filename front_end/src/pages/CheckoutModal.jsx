@@ -9,10 +9,11 @@ import {
     fetchUserAddresses,
     fetchCart,
 } from '../redux/reduxActions'
-import { calculateCartTotal } from '../utils/CommonFunctions.js'
+import { calculateCartTotal,formatCurrency } from '../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
-    const { t } = useTranslation('checkout')
+    const { t, i18n } = useTranslation('checkout')
+    const isRTL = i18n.dir() === 'rtl'
     const [selectedAddressId, setSelectedAddressId] = useState(null)
     const { addresses, addressesLoading, addressesError } = useSelector(state => state.address)
 
@@ -141,13 +142,13 @@ function CheckoutModal({ onClose }) {
                                 <div key={item.product._id} className='flex items-center justify-between gap-3'>
                                     <span className='text-zinc-300 text-sm truncate flex-1'>{item.product.title}</span>
                                     <span className='text-zinc-500 text-xs flex-shrink-0'>×{item.quantity}</span>
-                                    <span className='text-white text-sm font-medium flex-shrink-0'>₹{item.product.price * item.quantity}</span>
+                                    <span className='text-white text-sm font-medium flex-shrink-0'>{formatCurrency(item.product.price * item.quantity, isRTL)}</span>
                                 </div>
                             ))}
                         </div>
                         <div className='flex justify-between items-center pt-1'>
                             <span className='text-zinc-400 text-sm'>{t('total')}</span>
-                            <span className='text-emerald-400 text-lg font-bold'>₹{calculateCartTotal(cartItems)}</span>
+                            <span className='text-emerald-400 text-lg font-bold'>{formatCurrency(calculateCartTotal(cartItems), isRTL)}</span>
                         </div>
                     </div>
 
@@ -194,7 +195,7 @@ function CheckoutModal({ onClose }) {
                         {orderLoading ? (
                             <><Loader size={16} className='animate-spin' />{t('processing')}</>
                         ) : (
-                            <>{t('pay')} ₹{calculateCartTotal(cartItems)}<ArrowRight size={16} /></>
+                            <>{t('pay')} {formatCurrency(calculateCartTotal(cartItems), isRTL)} <ArrowRight size={16} /></>
                         )}
                     </button>
 

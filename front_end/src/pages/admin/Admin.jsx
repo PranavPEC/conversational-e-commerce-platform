@@ -1,156 +1,158 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import {
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    fetchProducts,
-    setAdminProducts,
-    clearAdminStatus,
-} from '../../redux/reduxActions'
 import { useTranslation } from 'react-i18next'
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    PieChart,
+    Pie,
+    Cell,
+    CartesianGrid,
+} from 'recharts'
+import { Users, Store, Package, ClipboardList, IndianRupee, Hourglass } from 'lucide-react'
+import { fetchDashboardStats } from '../../redux/reduxActions'
+import { formatCurrency } from '../../utils/CommonFunctions.js'
 import AdminHeader from './AdminHeader.jsx'
-import AdminToast from './AdminToast.jsx'
-import ProductForm from './ProductForm.jsx'
-import ProductTable from './ProductTable.jsx'
-import DeleteModal from '../../components/common_components/DeleteModal.jsx'
-import { buildFormData } from '../../utils/CommonFunctions.js'
+import { StatCard, ChartCard, RankedList } from '../../components/dashboard/DashboardWidgets.jsx'
 
-// category is now an array of strings — default to empty array, not empty string
-const EMPTY_FORM = { title: '', description: '', price: '', stock: '', category: [] }
+const CATEGORY_COLORS = ['#10b981', '#38bdf8', '#f59e0b', '#f43f5e', '#a3e635', '#f97316', '#8b5cf6']
+
+const DashboardLoading = () => (
+    <div className='flex flex-col gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+            {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className='bg-zinc-900 border border-zinc-800 rounded-2xl p-5 h-24 animate-pulse' />
+            ))}
+        </div>
+        <div className='grid grid-cols-1 xl:grid-cols-2 gap-6'>
+            {[1, 2, 3, 4].map(i => (
+                <div key={i} className='bg-zinc-900 border border-zinc-800 rounded-2xl h-80 animate-pulse' />
+            ))}
+        </div>
+    </div>
+)
 
 function Admin() {
-    const { t } = useTranslation('admin')
-    // New state keys from adminReducers — adminLoading/adminError/adminSuccess
-    const { products, adminLoading, adminError, adminSuccess } = useSelector(state => state.admin)
-    const { products: publicProducts } = useSelector(state => state.products)
-
-    const [form, setForm] = useState(EMPTY_FORM)
-    const [imageFile, setImageFile] = useState(null)
-    const [imagePreview, setImagePreview] = useState(null)
-    const [editingProduct, setEditingProduct] = useState(null)
-    const [deleteTarget, setDeleteTarget] = useState(null)
-    const [showForm, setShowForm] = useState(false)
+    const { t, i18n } = useTranslation('admin')
+    const isRTL = i18n.dir() === 'rtl'
+    const { dashboardStats, dashboardLoading, dashboardError } = useSelector(state => state.admin)
 
     useEffect(() => {
-        fetchProducts()   // plain call
+        fetchDashboardStats().catch(() => {
+            // Intentionally ignored here — dashboardError is already surfaced below.
+        })
     }, [])
 
-    useEffect(() => {
-        if (publicProducts.length > 0) {
-            setAdminProducts(publicProducts)   // plain call — dispatches internally
+    const renderContent = () => {
+        if (dashboardLoading) return <DashboardLoading />
+
+        if (dashboardError) {
+            return (
+                <div className='flex flex-col items-center justify-center gap-3 py-16'>
+                    <p className='text-red-400 text-sm'>{dashboardError}</p>
+                    <button
+                        onClick={() => fetchDashboardStats()}
+                        className='px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-sm transition-colors duration-200 cursor-pointer'
+                    >
+                        {t('retry')}
+                    </button>
+                </div>
+            )
         }
-    }, [publicProducts])
 
-    useEffect(() => {
-        if (adminSuccess || adminError) {
-            const t = setTimeout(() => clearAdminStatus(), 3000)
-            return () => clearTimeout(t)
-        }
-    }, [adminSuccess, adminError])
+        if (!dashboardStats) return null
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0]
-        if (!file) return
-        setImageFile(file)
-        setImagePreview(URL.createObjectURL(file))
-    }
+        const {
+            summary,
+            ordersByStatus = [],
+            revenueOverTime = [],
+            topSellers = [],
+            topProducts = [],
+            productsByCategory = [],
+        } = dashboardStats
 
-    const handleEdit = (product) => {
-        setEditingProduct(product)
-        setForm({
-            title: product.title || '',
-            description: product.description || '',
-            price: product.price || '',
-            stock: product.stock || '',
-            // product.category is an array after migration; fall back gracefully
-            // if somehow it's still a string (pre-migration legacy document)
-            category: Array.isArray(product.category)
-                ? product.category
-                : [product.category || 'uncategorized'],
-        })
-        setImageFile(null)
-        setImagePreview(product.image || null)
-        setShowForm(true)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+        return (
+            <div className='flex flex-col gap-6'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+                    <StatCard icon={Users} label={t('total_users')} value={summary.totalUsers} />
+                    <StatCard icon={Store} label={t('total_sellers')} value={summary.totalSellers} />
+                    <StatCard icon={Package} label={t('total_products')} value={summary.totalProducts} />
+                    <StatCard icon={ClipboardList} label={t('total_orders')} value={summary.totalOrders} />
+                    <StatCard icon={IndianRupee} label={t('total_revenue')} value={formatCurrency(summary.totalRevenue, isRTL)} />
+                    <StatCard icon={Hourglass} label={t('pending_approvals')} value={summary.pendingApprovals} />
+                </div>
 
-    const handleResetForm = () => {
-        setEditingProduct(null)
-        setForm(EMPTY_FORM)
-        setImageFile(null)
-        setImagePreview(null)
-        setShowForm(false)
-    }
+                <div className='grid grid-cols-1 xl:grid-cols-2 gap-6'>
+                    <ChartCard title={t('orders_by_status')}>
+                        <ResponsiveContainer width='100%' height='100%'>
+                            <BarChart data={ordersByStatus}>
+                                <CartesianGrid strokeDasharray='3 3' stroke='#27272a' />
+                                <XAxis dataKey='status' stroke='#a1a1aa' fontSize={12} />
+                                <YAxis stroke='#a1a1aa' fontSize={12} allowDecimals={false} />
+                                <Tooltip cursor={{ fill: '#18181b' }} contentStyle={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 12, color: '#fff' }} />
+                                <Bar dataKey='count' fill='#10b981' radius={[8, 8, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
 
-    const handleSubmit = async () => {
-        if (!form.title || !form.description || !form.price || !form.stock || form.category.length === 0) return
+                    <ChartCard title={t('revenue_over_time')}>
+                        <ResponsiveContainer width='100%' height='100%'>
+                            <LineChart data={revenueOverTime}>
+                                <CartesianGrid strokeDasharray='3 3' stroke='#27272a' />
+                                <XAxis dataKey='month' stroke='#a1a1aa' fontSize={12} />
+                                <YAxis stroke='#a1a1aa' fontSize={12} width={70} />
+                                <Tooltip contentStyle={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 12, color: '#fff' }} />
+                                <Line type='monotone' dataKey='revenue' stroke='#10b981' strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
 
-        // buildFormData does formData.append(key, value) for each field.
-        // Appending a JS array directly would coerce it to "val1,val2" string.
-        // JSON.stringify here so the controller can JSON.parse it back to an array.
-        const serializedForm = { ...form, category: JSON.stringify(form.category) }
-        const formData = buildFormData(serializedForm, imageFile)
+                    <ChartCard title={t('products_by_category')}>
+                        <ResponsiveContainer width='100%' height='100%'>
+                            <PieChart>
+                                <Pie data={productsByCategory} dataKey='count' nameKey='category' outerRadius={90} label>
+                                    {productsByCategory.map((entry, index) => (
+                                        <Cell key={entry.category} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip contentStyle={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 12, color: '#fff' }} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
 
-        try {
-            if (editingProduct) {
-                await updateProduct({ id: editingProduct._id, formData })   // plain call
-            } else {
-                await createProduct(formData)   // plain call
-            }
-            handleResetForm()
-        } catch {
-            // Intentionally ignored here — adminError is already surfaced via AdminToast.
-        }
-    }
-
-    const handleDeleteConfirm = async () => {
-        if (!deleteTarget) return
-        try {
-            await deleteProduct(deleteTarget._id)   // plain call
-            setDeleteTarget(null)
-        } catch {
-            // Intentionally ignored here — adminError is already surfaced via AdminToast.
-        }
+                    <div className='grid grid-cols-1 gap-6'>
+                        <RankedList
+                            title={t('top_sellers')}
+                            items={topSellers}
+                            renderName={(seller) => seller.name}
+                            renderMeta={(seller) => formatCurrency(seller.revenue, isRTL)}
+                            emptyLabel={t('no_sellers_data')}
+                        />
+                        <RankedList
+                            title={t('top_products')}
+                            items={topProducts}
+                            renderName={(product) => product.title}
+                            renderMeta={(product) => `${product.unitsSold} ${t('units_sold')}`}
+                            emptyLabel={t('no_products_data')}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
-            <div className='max-w-5xl mx-auto flex flex-col gap-8'>
-
-                <AdminHeader onAddClick={() => { handleResetForm(); setShowForm(true) }} />
-
-                <AdminToast success={adminSuccess} error={adminError} />
-
-                {showForm && (
-                    <ProductForm
-                        form={form}
-                        setForm={setForm}
-                        imagePreview={imagePreview}
-                        handleImageChange={handleImageChange}
-                        handleSubmit={handleSubmit}
-                        handleResetForm={handleResetForm}
-                        editingProduct={editingProduct}
-                        loading={adminLoading}
-                    />
-                )}
-
-                <ProductTable
-                    products={products}
-                    onEdit={handleEdit}
-                    onDeleteClick={setDeleteTarget}
-                />
-
+            <div className='max-w-7xl mx-auto flex flex-col gap-8'>
+                <AdminHeader />
+                {renderContent()}
             </div>
-
-            <DeleteModal
-                deleteTarget={deleteTarget}
-                loading={adminLoading}
-                title={t('delete_product')}
-                itemName={deleteTarget?.title}
-                onConfirm={handleDeleteConfirm}
-                onCancel={() => setDeleteTarget(null)}
-            />
         </div>
     )
 }

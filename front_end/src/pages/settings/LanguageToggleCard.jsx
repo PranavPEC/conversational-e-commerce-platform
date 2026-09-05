@@ -10,7 +10,7 @@ import { Languages } from 'lucide-react'
 function LanguageToggleCard() {
     const { i18n } = useTranslation()
     const { t } = useTranslation('settings')  // for translation keys in settings.json
-    const isArabic = i18n.language === 'ar'
+    const isArabic = i18n.resolvedLanguage === "ar";
 
     const toggleLanguage = () => {
         const next = isArabic ? 'en' : 'ar'

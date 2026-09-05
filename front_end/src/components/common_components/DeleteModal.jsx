@@ -1,7 +1,7 @@
 import { Trash2, Loader } from 'lucide-react'
 import { useTranslation, Trans } from 'react-i18next'
 
-// Generic delete-confirmation modal — used by Admin (deleting products)
+// Generic delete-confirmation modal — used by Seller (deleting products)
 // and now AddressesSection (deleting addresses).
 //
 // Props:

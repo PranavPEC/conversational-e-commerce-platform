@@ -12,6 +12,10 @@ function Profile() {
     const { t } = useTranslation('profile')
     const { userData } = useSelector(state => state.auth)
     const { orders } = useSelector(state => state.order)
+    // Addresses are already fetched by AddressesSection's own useEffect below —
+    // this just reads the same Redux slice for the stats card count, so there's
+    // no need for a second fetch call here.
+    const { addresses } = useSelector(state => state.address)
 
     // ── Edit mode ──
     // Lifted up here because ProfileSummaryCard, ProfileStatsGrid and
@@ -85,7 +89,7 @@ function Profile() {
                     />
 
                     {/* ── Orders / Wishlist / Addresses / Account stat cards ── */}
-                    <ProfileStatsGrid ordersCount={orders.length} />
+                    <ProfileStatsGrid ordersCount={orders.length} addressesCount={addresses.length} />
 
                     {/* ── Editable form — reads/writes isEditing via props, now also
                         carries the pending avatar file so it saves together with
@@ -98,7 +102,8 @@ function Profile() {
                         onSaved={handleSaved}
                     />
 
-                    {/* ── Static placeholder — real address CRUD is a future feature ── */}
+                    {/* ── Real address CRUD — fetches and manages its own state
+                        via addressActions/addressReducers ── */}
                     <AddressesSection />
 
                 </div>

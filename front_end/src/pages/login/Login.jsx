@@ -4,6 +4,8 @@ import { useTranslation, Trans } from 'react-i18next'
 import { Lock } from 'lucide-react'
 import { loginUser } from '../../redux/reduxActions/authActions.js'
 import useToast from '../../utils/useToast.js'
+import { googleLogin, facebookLogin } from '../../redux/reduxActions/authActions.js'
+// (add googleLogin to your existing import from authActions)
 
 // ── Validations ──
 import { checkIsEmpty, isValidEmail } from '../../utils/validations.js'
@@ -57,6 +59,39 @@ function Login() {
         }
     }
 
+
+    const handleGoogleAuth = async () => {
+        setLoading(true)
+        try {
+            await googleLogin()
+            navigate(navigationStrings.HOME)
+        } catch (error) {
+            if (error.response) {
+                showToast(error.response.data.message)
+            } else {
+                showToast(t('server_not_reachable'))
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleFacebookAuth = async () => {
+        setLoading(true)
+        try {
+            await facebookLogin()
+            navigate(navigationStrings.HOME)
+        } catch (error) {
+            if (error.response) {
+                showToast(error.response.data.message)
+            } else {
+                showToast(t('server_not_reachable'))
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className='w-full min-h-screen bg-[var(--color-bg)] flex'>
 
@@ -105,11 +140,11 @@ function Login() {
                     loading={loading}
                 />
 
-                <SocialButtons />
+                <SocialButtons onGoogleAuth={handleGoogleAuth} onFacebookAuth={handleFacebookAuth} />
 
                 <p className='text-zinc-500 text-xs text-center mt-5'>
                     <Trans i18nKey='login_terms_agreement' ns='auth'>
-                        By logging in, you agree to our <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Terms of Service</span> and <span className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Privacy Policy</span>
+                        By logging in, you agree to our <span onClick={() => navigate(navigationStrings.TERMS)} className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Terms of Service</span> and <span onClick={() => navigate(navigationStrings.PRIVACY_POLICY)} className='text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors duration-200'>Privacy Policy</span>
                     </Trans>
                 </p>
 

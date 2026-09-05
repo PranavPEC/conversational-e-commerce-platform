@@ -52,5 +52,6 @@
     "active": "Active",
     "account_status": "Account status",
     "profile": "Profile",
-    "profile_page_description": "Manage your personal information and account details"
+    "profile_page_description": "Manage your personal information and account details",
+    "saved_addresses": "Saved Addresses"
 }

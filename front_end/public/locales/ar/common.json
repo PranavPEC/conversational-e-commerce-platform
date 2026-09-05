@@ -48,5 +48,7 @@
   "profile": "الملف الشخصي",
   "my_orders": "طلباتي",
   "admin": "المسؤول",
+  "admin_dashboard": "لوحة المسؤول",
+  "seller_dashboard": "لوحة البائع",
   "settings": "الإعدادات"
 }

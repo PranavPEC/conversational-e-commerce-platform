@@ -1,9 +1,10 @@
-﻿import { useEffect } from 'react'
+﻿import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 // ── New architecture: plain async function, call directly ──
-import { fetchProducts } from '../../redux/reduxActions'
+import { fetchProducts, fetchUserWishlist, addToWishlist, removeFromWishlist } from '../../redux/reduxActions'
 
 // ── Child Components ──
 import HeroSection from './HeroSection.jsx'
@@ -18,57 +19,127 @@ import navigationStrings from '../../constants/navigationStrings/navigationStrin
 function Home() {
     const navigate = useNavigate()
     const { t } = useTranslation('home')
-    const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
     const { userData } = useSelector(state => state.auth)
+    const { wishlist } = useSelector(state => state.wishlist)
+    const [togglingWishlistId, setTogglingWishlistId] = useState(null)
+
+    // Set lookup is O(1) per card, vs .some() re-scanning the whole array
+    // for every one of the ~12 cards rendered across the three rails.
+    const wishlistedIds = useMemo(
+        () => new Set(wishlist.map(item => item.product?._id).filter(Boolean)),
+        [wishlist]
+    )
     const { products, productsLoading } = useSelector(state => state.products)
 
     useEffect(() => {
-        fetchProducts()   // call directly — no dispatch() wrapper
+        fetchProducts()
     }, [])
+
+    useEffect(() => {
+        if (userData) fetchUserWishlist().catch(() => { })
+    }, [userData])
 
     const firstName = userData?.name?.split(' ')[0] || 'there'
 
-    // ── Rail datasets ──
-    const featuredProducts = products.slice(0, 8)
+    // ───────────────────────────────────────────────
+    // Navigation callbacks (memoized)
+    // ───────────────────────────────────────────────
 
-    // Use real creation time for New Arrivals when available (timestamps: true)
-    // and gracefully fall back to array order if createdAt is missing.
-    const newArrivals = [...products]
-        .sort((a, b) => {
-            const aTime = a?.createdAt ? new Date(a.createdAt).getTime() : 0
-            const bTime = b?.createdAt ? new Date(b.createdAt).getTime() : 0
-            return bTime - aTime
-        })
-        .slice(0, 8)
+    const handleBrowse = useCallback(() => {
+        navigate(navigationStrings.PRODUCTS)
+    }, [navigate])
 
-    const topDeals = [...products]
-        .sort((a, b) => (a?.price ?? 0) - (b?.price ?? 0))
-        .slice(0, 8)
+    const handleCart = useCallback(() => {
+        navigate(navigationStrings.CART)
+    }, [navigate])
 
-    // ── Hero showcase: top 8 newest products — passed to the hero carousel ──
-    const heroShowcaseProducts = [...products]
-        .sort((a, b) => {
-            const aTime = a?.createdAt ? new Date(a.createdAt).getTime() : 0
-            const bTime = b?.createdAt ? new Date(b.createdAt).getTime() : 0
-            return bTime - aTime
-        })
-        .slice(0, 8)
+    const handleSeeAll = useCallback(() => {
+        navigate(navigationStrings.PRODUCTS)
+    }, [navigate])
 
-    // ── Independent scroll reveals for each rail ──
+    const handleProductClick = useCallback(
+        (id) => {
+            navigate(
+                navigationStrings.PRODUCT_DETAIL.replace(':id', id)
+            )
+        },
+        [navigate]
+    )
+
+    const handleToggleWishlist = async (productId) => {
+        if (!userData) {
+            navigate(navigationStrings.LOGIN)
+            return
+        }
+        setTogglingWishlistId(productId)
+        try {
+            if (wishlistedIds.has(productId)) {
+                await removeFromWishlist(productId)
+            } else {
+                await addToWishlist(productId)
+            }
+        } catch {
+            // wishlistError is already in Redux if this fails — nothing extra needed here
+        } finally {
+            setTogglingWishlistId(null)
+        }
+    }
+
+    // ───────────────────────────────────────────────
+    // Memoized rail datasets
+    // ───────────────────────────────────────────────
+
+    const featuredProducts = useMemo(() => {
+        return products.slice(0, 8)
+    }, [products])
+
+    const newestProducts = useMemo(() => {
+        return [...products]
+            .sort((a, b) => {
+                const aTime = a?.createdAt
+                    ? new Date(a.createdAt).getTime()
+                    : 0
+
+                const bTime = b?.createdAt
+                    ? new Date(b.createdAt).getTime()
+                    : 0
+
+                return bTime - aTime
+            })
+            .slice(0, 8)
+    }, [products])
+
+    const newArrivals = newestProducts
+
+    const heroShowcaseProducts = newestProducts
+
+    const topDeals = useMemo(() => {
+        return [...products]
+            .sort((a, b) => (a?.price ?? 0) - (b?.price ?? 0))
+            .slice(0, 8)
+    }, [products])
+
+    // ───────────────────────────────────────────────
+    // Scroll reveal hooks
+    // ───────────────────────────────────────────────
+
     const [featuredRef, featuredVisible] = useScrollReveal()
     const [arrivalsRef, arrivalsVisible] = useScrollReveal()
     const [dealsRef, dealsVisible] = useScrollReveal()
 
     return (
-        <div className='w-full min-h-screen bg-[var(--color-bg)]'>
+        <div className="w-full min-h-screen bg-[var(--color-bg)]">
 
             <HeroSection
                 firstName={firstName}
-                onBrowse={() => navigate(navigationStrings.PRODUCTS)}
-                onCart={() => navigate(navigationStrings.CART)}
+                onBrowse={handleBrowse}
+                onCart={handleCart}
                 heroShowcaseProducts={heroShowcaseProducts}
-                onProductClick={(id) => navigate(getProductDetailRoute(id))}
+                onProductClick={handleProductClick}
+                wishlistedIds={wishlistedIds}
+                onToggleWishlist={handleToggleWishlist}
+                togglingWishlistId={togglingWishlistId}
             />
 
             <DealBanner />
@@ -77,17 +148,21 @@ function Home() {
 
             <div
                 ref={featuredRef}
-                className={`transition-all duration-700 ease-out ${
-                    featuredVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+                className={`transition-all duration-700 ease-out ${featuredVisible
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 translate-y-8'
+                    }`}
             >
                 <ProductRail
                     title={t('featured_products')}
                     subtitle={t('handpicked_for_you')}
                     products={featuredProducts}
                     loading={productsLoading}
-                    onProductClick={(id) => navigate(getProductDetailRoute(id))}
-                    onSeeAll={() => navigate(navigationStrings.PRODUCTS)}
+                    onProductClick={handleProductClick}
+                    onSeeAll={handleSeeAll}
+                    wishlistedIds={wishlistedIds}
+                    onToggleWishlist={handleToggleWishlist}
+                    togglingWishlistId={togglingWishlistId}
                 />
             </div>
 
@@ -95,38 +170,46 @@ function Home() {
 
             <div
                 ref={arrivalsRef}
-                className={`transition-all duration-700 ease-out ${
-                    arrivalsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+                className={`transition-all duration-700 ease-out ${arrivalsVisible
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 translate-y-8'
+                    }`}
             >
                 <ProductRail
                     title={t('new_arrivals')}
                     subtitle={t('freshly_added')}
                     products={newArrivals}
                     loading={productsLoading}
-                    onProductClick={(id) => navigate(getProductDetailRoute(id))}
-                    onSeeAll={() => navigate(navigationStrings.PRODUCTS)}
+                    onProductClick={handleProductClick}
+                    onSeeAll={handleSeeAll}
+                    wishlistedIds={wishlistedIds}
+                    onToggleWishlist={handleToggleWishlist}
+                    togglingWishlistId={togglingWishlistId}
                 />
             </div>
 
             <div
                 ref={dealsRef}
-                className={`transition-all duration-700 ease-out ${
-                    dealsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+                className={`transition-all duration-700 ease-out ${dealsVisible
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 translate-y-8'
+                    }`}
             >
                 <ProductRail
                     title={t('top_deals')}
                     subtitle={t('best_prices_right_now')}
                     products={topDeals}
                     loading={productsLoading}
-                    onProductClick={(id) => navigate(getProductDetailRoute(id))}
-                    onSeeAll={() => navigate(navigationStrings.PRODUCTS)}
+                    onProductClick={handleProductClick}
+                    onSeeAll={handleSeeAll}
+                    wishlistedIds={wishlistedIds}
+                    onToggleWishlist={handleToggleWishlist}
+                    togglingWishlistId={togglingWishlistId}
                 />
             </div>
 
             <SocialProofBanner
-                onShopNow={() => navigate(navigationStrings.PRODUCTS)}
+                onShopNow={handleBrowse}
             />
 
         </div>
@@ -134,4 +217,3 @@ function Home() {
 }
 
 export default Home
-//This is home page

@@ -7,7 +7,7 @@ import { CheckCircle, AlertCircle } from 'lucide-react'
 //   success — success message string or null
 //   error   — error message string or null
 
-function AdminToast({ success, error }) {
+function SellerToast({ success, error }) {
     if (!success && !error) return null
 
     return (
@@ -25,4 +25,4 @@ function AdminToast({ success, error }) {
     )
 }
 
-export default AdminToast
+export default SellerToast

@@ -1,8 +1,9 @@
 // src/redux/reduxActions/sellerActions.js
 
 import axios from "axios"
-import { CREATE_PRODUCT_URL, UPDATE_PRODUCT_URL, DELETE_PRODUCT_URL, GET_MY_PRODUCTS_URL, GET_SELLER_DASHBOARD_URL } from "../../config/urls"
+import { CREATE_PRODUCT_URL, UPDATE_PRODUCT_URL, DELETE_PRODUCT_URL, GET_MY_PRODUCTS_URL, GET_SELLER_DASHBOARD_URL, SUBMIT_SELLER_KYC_URL } from "../../config/urls"
 import store from "../reduxStore"
+import { fetchUserData } from "./authActions"
 import {
     setSellerProducts as _setSellerProducts,
     addSellerProduct,
@@ -139,4 +140,28 @@ export const fetchSellerDashboardStats = async () => {
     } finally {
         dispatch(setSellerDashboardLoading(false))
     }
+}
+
+export const submitSellerKycDocuments = async (formData) => {
+  dispatch(setSellerLoading(true))
+  dispatch(setSellerError(null))
+  dispatch(setSellerSuccess(null))
+
+  try {
+    const { data } = await axios.post(
+      SUBMIT_SELLER_KYC_URL,
+      formData,
+      { withCredentials: true, headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+    dispatch(setSellerSuccess("KYC documents submitted successfully."))
+    await fetchUserData() // refreshes userData.sellerDocuments in the auth slice
+    return data.data
+  } catch (error) {
+    dispatch(setSellerError(
+      error.response?.data?.message || "Failed to submit documents."
+    ))
+    throw error
+  } finally {
+    dispatch(setSellerLoading(false))
+  }
 }

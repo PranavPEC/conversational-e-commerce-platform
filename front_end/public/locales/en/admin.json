@@ -24,5 +24,14 @@
   "units_sold": "units sold",
   "no_sellers_data": "No seller revenue data yet.",
   "no_products_data": "No product sales data yet.",
-  "retry": "Retry"
+  "retry": "Retry",
+  "view_documents": "View Documents",
+  "hide_documents": "Hide Documents",
+  "aadhar_number": "Aadhar Number",
+  "pan_number": "PAN Number",
+  "gstin_number": "GSTIN",
+  "not_provided": "Not provided",
+  "no_documents_submitted": "Documents not submitted yet",
+  "view_file": "View File",
+  "submitted_on": "Submitted on"
 }

@@ -20,4 +20,5 @@ export default {
     SELLER_ORDERS: "/seller/orders",
     SELLER_ANALYTICS: "/seller/analytics",
     WISHLIST: "/wishlist",
-    }
+    SELLER_KYC_DOCUMENTS: "/seller/documents",
+};

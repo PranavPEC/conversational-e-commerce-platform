@@ -1,8 +1,14 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Hourglass } from 'lucide-react'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function SellerPendingApproval() {
     const { t } = useTranslation('seller')
+    const navigate = useNavigate()
+    const { userData } = useSelector(state => state.auth)
+    const hasSubmittedDocuments = !!userData?.sellerDocuments?.submittedAt
 
     return (
         <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10 flex items-center justify-center'>
@@ -18,6 +24,14 @@ function SellerPendingApproval() {
                         {t('pending_approval_message')}
                     </p>
                 </div>
+                {!hasSubmittedDocuments && (
+                    <button
+                        onClick={() => navigate(navigationStrings.SELLER_KYC_DOCUMENTS)}
+                        className='px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer'
+                    >
+                        {t('complete_verification_cta')}
+                    </button>
+                )}
             </div>
         </div>
     )

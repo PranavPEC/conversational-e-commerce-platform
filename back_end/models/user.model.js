@@ -30,6 +30,14 @@ const userSchema = new mongoose.Schema({
     enum: ['not_applicable', 'pending', 'approved', 'rejected'],
     default: 'not_applicable'
   },
+  sellerDocuments: {
+  aadharNumber: { type: String, required: false },
+  aadharImage: { type: String, required: false },
+  panNumber: { type: String, required: false },
+  panImage: { type: String, required: false },
+  gstin: { type: String, required: false },
+  submittedAt: { type: Date, required: false },
+},
   profileImage: {
     type: String,
     required: false

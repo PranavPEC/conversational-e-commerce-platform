@@ -94,6 +94,35 @@ export const checkNameValidation = (
     return true
 }
 
+// ── Seller KYC validations ──
+export const checkAadharValidation = (aadharNumber, showToast, t) => {
+    if (checkIsEmpty(aadharNumber)) {
+        showToast(t('aadhar_number_required'))
+        return false
+    }
+
+    if (!/^\d{12}$/.test(aadharNumber)) {
+        showToast(t('aadhar_number_invalid'))
+        return false
+    }
+
+    return true
+}
+
+export const checkPanValidation = (panNumber, showToast, t) => {
+    if (checkIsEmpty(panNumber)) {
+        showToast(t('pan_number_required'))
+        return false
+    }
+
+    if (!/^[A-Za-z]{5}\d{4}[A-Za-z]$/.test(panNumber)) {
+        showToast(t('pan_number_invalid'))
+        return false
+    }
+
+    return true
+}
+
 export const isValidPassword = (password) => {
     const passwordRegex =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/

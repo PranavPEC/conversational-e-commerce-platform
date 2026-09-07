@@ -83,7 +83,10 @@ function SignUp() {
             setLoading(true);
             try {
                 await signupUser(formData);
-                navigate(navigationStrings.HOME)
+                navigate(role === 'seller'
+                    ? navigationStrings.SELLER_KYC_DOCUMENTS
+                    : navigationStrings.HOME
+                )
             }
             catch (error) {
                 if (error.response) {

@@ -24,5 +24,14 @@
   "units_sold": "وحدة مباعة",
   "no_sellers_data": "لا توجد بيانات إيرادات للبائعين بعد.",
   "no_products_data": "لا توجد بيانات مبيعات للمنتجات بعد.",
-  "retry": "إعادة المحاولة"
+  "retry": "إعادة المحاولة",
+  "view_documents": "عرض المستندات",
+  "hide_documents": "إخفاء المستندات",
+  "aadhar_number": "رقم الهوية الوطنية",
+  "pan_number": "رقم PAN",
+  "gstin_number": "رقم GSTIN",
+  "not_provided": "غير متوفر",
+  "no_documents_submitted": "لم يتم إرسال المستندات بعد",
+  "view_file": "عرض الملف",
+  "submitted_on": "تاريخ الإرسال"
 }

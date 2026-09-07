@@ -6,6 +6,7 @@ import Footer from '../components/common_components/Footer.jsx'
 import Home from '../pages/home/Home.jsx'
 import SignUp from '../pages/signup/SignUp.jsx'
 import Login from '../pages/login/Login.jsx'
+import SellerKycDocuments from '../pages/seller/SellerKycDocuments.jsx'
 import ProductListing from '../pages/ProductListing.jsx'
 import ProductDetail from '../pages/ProductDetail.jsx'
 import Terms from '../pages/legal/Terms.jsx'
@@ -46,6 +47,7 @@ const APP_ROUTES = [
     { path: navigationStrings.SELLER, element: <Seller />, protected: true, sellerOnly: true },
     { path: navigationStrings.SELLER_ORDERS, element: <SellerOrders />, protected: true, sellerOnly: true },
     { path: navigationStrings.SELLER_ANALYTICS, element: <SellerDashboard />, protected: true, sellerOnly: true },
+    { path: navigationStrings.SELLER_KYC_DOCUMENTS, element: <SellerKycDocuments />, protected: true },
     { path: navigationStrings.WISHLIST, element: <Wishlist />, protected: true },
 ]
 

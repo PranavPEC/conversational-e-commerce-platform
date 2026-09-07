@@ -57,6 +57,7 @@ export const UPDATE_PRODUCT_URL = (id) => SERVER_URL + "/product/update/" + id
 export const DELETE_PRODUCT_URL = (id) => SERVER_URL + "/product/delete/" + id
 export const GET_MY_PRODUCTS_URL = SERVER_URL + "/product/my-products"
 export const GET_SELLER_DASHBOARD_URL = SERVER_URL + "/seller/dashboard"
+export const SUBMIT_SELLER_KYC_URL = SERVER_URL + "/seller/kyc-documents"
 
 // ── Admin ──
 export const GET_ADMIN_DASHBOARD_URL = SERVER_URL + "/admin/dashboard"

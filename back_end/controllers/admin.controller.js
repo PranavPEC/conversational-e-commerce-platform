@@ -150,8 +150,10 @@ export const getDashboardStats = async (req, res) => {
 
 export const getSellerApplications = async (req, res) => {
     try {
-        const sellers = await User.find({ role: "seller" }, "name email sellerStatus createdAt")
-            .sort({ createdAt: -1 });
+        const sellers = await User.find(
+            { role: "seller" },
+            "name email sellerStatus createdAt sellerDocuments"
+        ).sort({ createdAt: -1 });
 
         return sendSuccess(res, 200, "Seller Applications Fetched Successfully.", { sellers });
 

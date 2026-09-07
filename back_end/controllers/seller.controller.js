@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Product from "../models/user.product.js";
 import Order from "../models/order.model.js";
+import User from "../models/user.model.js"
+import uploadOnCloudinary from "../config/cloudinary.js"
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const getSellerDashboardStats = async (req, res) => {
@@ -93,4 +95,44 @@ export const getSellerDashboardStats = async (req, res) => {
         console.error(error);
         return sendError(res, 500, "Internal Server Error", error.message);
     }
+};
+
+export const submitSellerKycDocuments = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return sendError(res, 404, "User not found");
+    }
+    if (user.role !== "seller") {
+      return sendError(res, 403, "Only seller accounts can submit KYC documents.");
+    }
+
+    const { aadharNumber, panNumber, gstin } = req.body;
+    if (!aadharNumber || !panNumber) {
+      return sendError(res, 400, "Aadhar and PAN numbers are required.");
+    }
+    if (!req.files?.aadharImage || !req.files?.panImage) {
+      return sendError(res, 400, "Aadhar and PAN card images are required.");
+    }
+
+    const aadharImage = await uploadOnCloudinary(req.files.aadharImage[0].path);
+    const panImage = await uploadOnCloudinary(req.files.panImage[0].path);
+
+    user.sellerDocuments = {
+      aadharNumber,
+      aadharImage,
+      panNumber,
+      panImage,
+      gstin: gstin || undefined,
+      submittedAt: new Date(),
+    };
+    await user.save();
+
+    return sendSuccess(res, 200, "KYC documents submitted. Awaiting admin review.", {
+      sellerDocuments: user.sellerDocuments,
+    });
+  } catch (error) {
+    console.error(error);
+    return sendError(res, 500, "Internal Server Error", error.message);
+  }
 };

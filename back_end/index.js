@@ -12,6 +12,7 @@ import addressRouter from "./routes/address.route.js";
 import adminRouter from "./routes/admin.route.js";
 import sellerRouter from "./routes/seller.route.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
+import helmet from "helmet";
 import cors from "cors";
 
 dotenv.config();
@@ -19,6 +20,7 @@ dotenv.config();
 // console.log("KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET)
 const app=express();
 
+app.use(helmet());
 app.use(cookieParser());
 app.use(cors({
     origin:process.env.CLIENT_URL,

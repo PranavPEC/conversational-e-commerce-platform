@@ -1,9 +1,8 @@
 ﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { fetchCart, updateCart, removeCartItem, clearEntireCart } from '../redux/reduxActions'
+import { fetchCart, updateCart, removeCartItem, clearEntireCart, applyCoupon, removeCoupon } from '../redux/reduxActions'
 import CheckoutModal from './CheckoutModal.jsx'
-import { calculateCartTotal } from '../utils/CommonFunctions.js'
 import { Loader } from 'lucide-react'
 import PrimaryButton from '../components/common_components/PrimaryButton.jsx'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
@@ -16,11 +15,15 @@ function Cart() {
     const navigate = useNavigate()
     const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const [showCheckout, setShowCheckout] = useState(false)
+    const [couponCode, setCouponCode] = useState('')
+    const [couponRemovedNotice, setCouponRemovedNotice] = useState(null)
 
-    const { cartItems, cartLoading, itemLoading, error } = useSelector(state => state.cart)
+    const { cartItems, cartLoading, itemLoading, error, pricing, couponLoading, couponError } = useSelector(state => state.cart)
 
     useEffect(() => {
-        fetchCart().catch(() => {
+        fetchCart().then(data => {
+            if (data?.couponRemoved) setCouponRemovedNotice(data.couponRemoved)
+        }).catch(() => {
             // Intentionally ignored here — cart error state is already rendered inline below.
         })
     }, [])
@@ -56,6 +59,23 @@ function Cart() {
             // Intentionally ignored here — cart error state is already rendered inline below.
         }
     }
+    const handleApplyCoupon = async (event) => {
+        event.preventDefault()
+        try {
+            await applyCoupon(couponCode)
+            setCouponCode('')
+            setCouponRemovedNotice(null)
+        } catch {
+            // Intentionally ignored here — couponError is rendered in the summary.
+        }
+    }
+    const handleRemoveCoupon = async () => {
+        try {
+            await removeCoupon()
+        } catch {
+            // Intentionally ignored here — couponError is rendered in the summary.
+        }
+    }
 
     if (cartLoading) {
         return (
@@ -68,6 +88,9 @@ function Cart() {
     if (cartItems.length === 0) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
+                {couponRemovedNotice && (
+                    <p className='text-amber-400 text-sm text-center'>{t('coupon_removed_notice', { reason: couponRemovedNotice })}</p>
+                )}
                 <p className='text-white text-lg font-medium'>{t("cart_empty")}</p>
                 <p className='text-zinc-400 text-sm'>{t("cart_empty_description")}</p>
                 <button
@@ -103,6 +126,14 @@ function Cart() {
             {error && (
                 <div className='max-w-3xl mx-auto mb-4'>
                     <p className='text-red-400 text-sm'>{error}</p>
+                </div>
+            )}
+            {couponRemovedNotice && (
+                <div className='max-w-3xl mx-auto mb-4 flex items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3'>
+                    <p className='text-amber-300 text-sm'>{t('coupon_removed_notice', { reason: couponRemovedNotice })}</p>
+                    <button onClick={() => setCouponRemovedNotice(null)} className='text-amber-300 hover:text-white' aria-label='Dismiss'>
+                        ×
+                    </button>
                 </div>
             )}
 
@@ -169,18 +200,60 @@ function Cart() {
                 })}
 
                 <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mt-4 flex flex-col gap-4'>
+                    {pricing.couponCode ? (
+                        <div className='flex items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3'>
+                            <span className='text-emerald-300 text-sm font-medium'>{pricing.couponCode}</span>
+                            <button
+                                type='button'
+                                onClick={handleRemoveCoupon}
+                                disabled={couponLoading}
+                                className='text-sm text-zinc-300 hover:text-white disabled:opacity-50 cursor-pointer'
+                            >
+                                {t('remove_coupon')}
+                            </button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleApplyCoupon} className='flex flex-col gap-2'>
+                            <label htmlFor='coupon-code' className='text-zinc-300 text-sm font-medium'>{t('have_coupon')}</label>
+                            <div className='flex gap-2'>
+                                <input
+                                    id='coupon-code'
+                                    type='text'
+                                    value={couponCode}
+                                    onChange={event => setCouponCode(event.target.value)}
+                                    placeholder={t('coupon_code_placeholder')}
+                                    disabled={couponLoading}
+                                    className='min-w-0 flex-1 h-11 bg-zinc-800 text-white placeholder-zinc-500 outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl px-4 text-sm disabled:opacity-60'
+                                />
+                                <button
+                                    type='submit'
+                                    disabled={couponLoading || !couponCode.trim()}
+                                    className='px-4 h-11 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
+                                >
+                                    {couponLoading ? t('applying') : t('apply')}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                    {couponError && <p className='text-red-400 text-sm'>{couponError}</p>}
                     <div className='flex justify-between items-center'>
                         <span className='text-zinc-400 text-sm'>{t("subtotal")}</span>
-                        <span className='text-white text-sm'>{formatCurrency(calculateCartTotal(cartItems), isRTL)}</span>
+                        <span className='text-white text-sm'>{formatCurrency(pricing.subtotal, isRTL)}</span>
                     </div>
                     <div className='flex justify-between items-center'>
                         <span className='text-zinc-400 text-sm'>{t("shipping")}</span>
                         <span className='text-emerald-400 text-sm'>{t("free")}</span>
                     </div>
                     <div className='h-px bg-zinc-800' />
+                    {pricing.discountAmount > 0 && (
+                        <div className='flex justify-between items-center'>
+                            <span className='text-zinc-400 text-sm'>{t("discount")} {pricing.couponCode && `(${pricing.couponCode})`}</span>
+                            <span className='text-emerald-400 text-sm'>−{formatCurrency(pricing.discountAmount, isRTL)}</span>
+                        </div>
+                    )}
                     <div className='flex justify-between items-center'>
                         <span className='text-white font-semibold'>{t("total")}</span>
-                        <span className='text-emerald-400 text-xl font-bold'>{formatCurrency(calculateCartTotal(cartItems), isRTL)}</span>
+                        <span className='text-emerald-400 text-xl font-bold'>{formatCurrency(pricing.total, isRTL)}</span>
                     </div>
                     <PrimaryButton
                         text={t("proceed_to_checkout")}

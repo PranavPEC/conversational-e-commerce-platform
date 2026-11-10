@@ -9,17 +9,20 @@ import {
     fetchUserAddresses,
     fetchCart,
 } from '../redux/reduxActions'
-import { calculateCartTotal,formatCurrency } from '../utils/CommonFunctions.js'
+import { formatCurrency } from '../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
     const { t, i18n } = useTranslation('checkout')
+    const { t: tCart } = useTranslation('cart')
     const isRTL = i18n.dir() === 'rtl'
     const [selectedAddressId, setSelectedAddressId] = useState(null)
+    const [couponRemovedNotice, setCouponRemovedNotice] = useState(null)
+    const [checkoutReady, setCheckoutReady] = useState(false)
     const { addresses, addressesLoading, addressesError } = useSelector(state => state.address)
 
     // New state keys from orderReducers — orderLoading/orderError instead of loading/error
     const { pendingOrder, orderLoading, orderError, paymentSuccess } = useSelector(state => state.order)
-    const { cartItems } = useSelector(state => state.cart)
+    const { cartItems, pricing } = useSelector(state => state.cart)
 
     const handleClose = () => {
         resetOrder()   // plain call — no dispatch()
@@ -29,7 +32,13 @@ function CheckoutModal({ onClose }) {
     const handleProceedToPayment = async () => {
         if (!selectedAddressId) return
         try {
-            await createRazorpayOrder({ addressId: selectedAddressId })   // plain call
+            const result = await createRazorpayOrder({ addressId: selectedAddressId })
+            if (result?.couponRemoved) {
+                setCouponRemovedNotice(result.couponRemoved)
+                await fetchCart()
+            } else {
+                setCheckoutReady(true)
+            }
         } catch {
             // Intentionally ignored here — orderError is already rendered in this modal.
         }
@@ -54,7 +63,7 @@ function CheckoutModal({ onClose }) {
 
     // Open Razorpay SDK when pendingOrder is set
     useEffect(() => {
-        if (!pendingOrder) return
+        if (!pendingOrder || !checkoutReady) return
 
         const options = {
             key: pendingOrder.keyId,
@@ -84,7 +93,7 @@ function CheckoutModal({ onClose }) {
 
         const rzp = new window.Razorpay(options)
         rzp.open()
-    }, [pendingOrder])
+    }, [pendingOrder, checkoutReady])
 
     // Reset stale paymentSuccess on mount
     useEffect(() => {
@@ -147,8 +156,18 @@ function CheckoutModal({ onClose }) {
                             ))}
                         </div>
                         <div className='flex justify-between items-center pt-1'>
+                            <span className='text-zinc-400 text-sm'>{t('subtotal')}</span>
+                            <span className='text-white text-sm'>{formatCurrency(pricing.subtotal, isRTL)}</span>
+                        </div>
+                        {pricing.discountAmount > 0 && (
+                            <div className='flex justify-between items-center'>
+                                <span className='text-zinc-400 text-sm'>{t('discount')} {pricing.couponCode && `(${pricing.couponCode})`}</span>
+                                <span className='text-emerald-400 text-sm'>−{formatCurrency(pricing.discountAmount, isRTL)}</span>
+                            </div>
+                        )}
+                        <div className='flex justify-between items-center pt-1'>
                             <span className='text-zinc-400 text-sm'>{t('total')}</span>
-                            <span className='text-emerald-400 text-lg font-bold'>{formatCurrency(calculateCartTotal(cartItems), isRTL)}</span>
+                            <span className='text-emerald-400 text-lg font-bold'>{formatCurrency(pricing.total, isRTL)}</span>
                         </div>
                     </div>
 
@@ -186,16 +205,32 @@ function CheckoutModal({ onClose }) {
                             <p className='text-white text-sm'>{orderError}</p>
                         </div>
                     )}
+                    {couponRemovedNotice && (
+                        <div className='flex flex-col gap-3 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3'>
+                            <p className='text-amber-300 text-sm'>
+                                {tCart('coupon_removed_notice', { reason: couponRemovedNotice })}
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setCouponRemovedNotice(null)
+                                    setCheckoutReady(true)
+                                }}
+                                className='self-end text-amber-200 hover:text-white text-sm font-medium cursor-pointer'
+                            >
+                                {t('continue_to_payment')}
+                            </button>
+                        </div>
+                    )}
 
                     <button
                         onClick={handleProceedToPayment}
-                        disabled={orderLoading || !selectedAddressId}
+                        disabled={orderLoading || !selectedAddressId || !!couponRemovedNotice}
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
                     >
                         {orderLoading ? (
                             <><Loader size={16} className='animate-spin' />{t('processing')}</>
                         ) : (
-                            <>{t('pay')} {formatCurrency(calculateCartTotal(cartItems), isRTL)} <ArrowRight size={16} /></>
+                            <>{t('pay')} {formatCurrency(pricing.total, isRTL)} <ArrowRight size={16} /></>
                         )}
                     </button>
 

@@ -21,4 +21,6 @@ export default {
     SELLER_ANALYTICS: "/seller/analytics",
     WISHLIST: "/wishlist",
     SELLER_KYC_DOCUMENTS: "/seller/documents",
+    SELLER_VOUCHERS: "/seller/vouchers",
+    ADMIN_COUPONS: "/admin/coupons",
 };

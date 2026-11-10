@@ -62,6 +62,12 @@ function SellerHeader({ onAddClick, title }) {
                     >
                         {t('analytics_nav')}
                     </button>
+                    <button
+                        onClick={() => navigate(navigationStrings.SELLER_VOUCHERS)}
+                        className={tabClassName(navigationStrings.SELLER_VOUCHERS)}
+                    >
+                        {t('vouchers_nav')}
+                    </button>
                 </div>
             </div>
         </div>

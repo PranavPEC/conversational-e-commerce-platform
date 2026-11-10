@@ -75,5 +75,6 @@
   "pan_number_invalid": "Enter a valid PAN number.",
   "aadhar_image_required": "Aadhar image is required.",
   "pan_image_required": "PAN image is required.",
-  "documents_submit_failed": "Failed to submit documents."
+  "documents_submit_failed": "Failed to submit documents.",
+  "vouchers_nav": "Vouchers"
 }

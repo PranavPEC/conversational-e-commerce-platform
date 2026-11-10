@@ -6,7 +6,7 @@
 // The reducer is completely unaware of the silent concept.
 
 import axios from "axios"
-import { GET_CART_URL,ADD_TO_CART_URL,UPDATE_CART_URL,REMOVE_CART_ITEM_URL,CLEAR_CART_URL } from "../../config/urls"
+import { GET_CART_URL,ADD_TO_CART_URL,UPDATE_CART_URL,REMOVE_CART_ITEM_URL,CLEAR_CART_URL, APPLY_COUPON_URL, REMOVE_COUPON_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
     setCartItems,
@@ -14,6 +14,9 @@ import {
     setItemLoading,
     setCartError,
     clearCart,
+    setCartPricing,
+    setCouponLoading,
+    setCouponError,
 } from "../reduxReducers/cartReducers"
 
 const { dispatch } = store
@@ -28,6 +31,8 @@ const _fetchCartFromAPI = async (silent = false) => {
     try {
         const { data } = await axios.get(GET_CART_URL, { withCredentials: true })
         dispatch(setCartItems(data.data.cart?.products || []))
+        dispatch(setCartPricing(data.data.pricing || { subtotal: 0, discountAmount: 0, total: 0, couponCode: null }))
+        return data.data // now returned so callers can read couponRemoved
     } catch (error) {
         dispatch(setCartError(
             error.response?.data?.message || "Failed to fetch cart"
@@ -42,7 +47,7 @@ const _fetchCartFromAPI = async (silent = false) => {
 
 // Called on Cart.jsx mount — shows full page spinner
 export const fetchCart = async () => {
-    await _fetchCartFromAPI(false)
+    return await _fetchCartFromAPI(false)
 }
 
 // ── Add to cart ──
@@ -114,6 +119,41 @@ export const clearEntireCart = async () => {
             error.response?.data?.message || "Failed to clear cart"
         ))
         throw error
+    }
+}
+
+export const applyCoupon = async (code) => {
+    dispatch(setCouponLoading(true))
+    dispatch(setCouponError(null))
+
+    try {
+        const { data } = await axios.post(APPLY_COUPON_URL, { code }, { withCredentials: true })
+        await _fetchCartFromAPI(true)
+        return data
+    } catch (error) {
+        dispatch(setCouponError(
+            error.response?.data?.message || "Failed to apply coupon."
+        ))
+        throw error
+    } finally {
+        dispatch(setCouponLoading(false))
+    }
+}
+
+export const removeCoupon = async () => {
+    dispatch(setCouponLoading(true))
+    dispatch(setCouponError(null))
+
+    try {
+        await axios.post(REMOVE_COUPON_URL, {}, { withCredentials: true })
+        return await _fetchCartFromAPI(true)
+    } catch (error) {
+        dispatch(setCouponError(
+            error.response?.data?.message || "Failed to remove coupon."
+        ))
+        throw error
+    } finally {
+        dispatch(setCouponLoading(false))
     }
 }
 

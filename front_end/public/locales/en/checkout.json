@@ -5,11 +5,14 @@
     "done": "Done",
     "checkout": "Checkout",
     "order_summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
     "total": "Total",
     "delivery_address": "Delivery Address",
     "loading_addresses": "Loading addresses...",
     "no_saved_address": "No saved address found",
     "processing": "Processing...",
     "pay": "Pay",
+    "continue_to_payment": "Continue to payment",
     "razorpay_secure": "Secured by Razorpay · 100% safe & encrypted"
 }

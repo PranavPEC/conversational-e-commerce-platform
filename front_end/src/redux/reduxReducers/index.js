@@ -12,6 +12,7 @@ import adminReducer from "./adminReducers"
 import addressReducer from "./addressReducers"
 import themeReducer from "./themeReducers"
 import wishlistReducer from "./wishlistReducers"
+import couponReducer from "./couponReducers"
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
     address: addressReducer,
     theme: themeReducer,
     wishlist: wishlistReducer,
+    coupons: couponReducer,
 })
 
 export default rootReducer

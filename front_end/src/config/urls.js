@@ -76,3 +76,11 @@ export const SET_DEFAULT_ADDRESS_URL = (id) => SERVER_URL + "/address/set-defaul
 export const ADD_TO_WISHLIST_URL = SERVER_URL + "/wishlist/add"
 export const GET_MY_WISHLIST_URL = SERVER_URL + "/wishlist/mywishlist"
 export const REMOVE_FROM_WISHLIST_URL = (productId) => SERVER_URL + "/wishlist/remove/" + productId
+
+export const APPLY_COUPON_URL = SERVER_URL + "/cart/apply-coupon"
+export const REMOVE_COUPON_URL = SERVER_URL + "/cart/remove-coupon"
+
+export const CREATE_COUPON_URL = SERVER_URL + "/coupon"
+export const GET_MY_COUPONS_URL = SERVER_URL + "/coupon/my-coupons"
+export const UPDATE_COUPON_STATUS_URL = (id) => SERVER_URL + "/coupon/" + id + "/status"
+export const DELETE_COUPON_URL = (id) => SERVER_URL + "/coupon/" + id

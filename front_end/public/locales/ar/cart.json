@@ -13,5 +13,12 @@
   "free": "مجاني",
   "total": "الإجمالي",
   "proceed_to_checkout": "المتابعة إلى الدفع",
-  "continue_shopping": "← متابعة التسوق"
+  "continue_shopping": "← متابعة التسوق",
+  "have_coupon": "هل لديك قسيمة خصم؟",
+  "coupon_code_placeholder": "أدخل رمز القسيمة",
+  "apply": "تطبيق",
+  "applying": "جارٍ التطبيق...",
+  "discount": "الخصم",
+  "remove_coupon": "إزالة",
+  "coupon_removed_notice": "تمت إزالة القسيمة: {{reason}}"
 }

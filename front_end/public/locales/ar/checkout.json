@@ -5,11 +5,14 @@
     "done": "تم",
     "checkout": "إتمام الشراء",
     "order_summary": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
     "total": "الإجمالي",
     "delivery_address": "عنوان التوصيل",
     "loading_addresses": "جارٍ تحميل العناوين...",
     "no_saved_address": "لا يوجد عنوان محفوظ",
     "processing": "جارٍ المعالجة...",
     "pay": "ادفع",
+    "continue_to_payment": "المتابعة إلى الدفع",
     "razorpay_secure": "محمي بواسطة Razorpay · آمن ومشفر بنسبة 100٪"
 }

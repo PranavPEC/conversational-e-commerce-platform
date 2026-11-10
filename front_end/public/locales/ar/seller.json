@@ -75,5 +75,6 @@
   "pan_number_invalid": "أدخل رقم PAN صالحًا.",
   "aadhar_image_required": "صورة الهوية الوطنية مطلوبة.",
   "pan_image_required": "صورة PAN مطلوبة.",
-  "documents_submit_failed": "تعذر إرسال المستندات."
+  "documents_submit_failed": "تعذر إرسال المستندات.",
+  "vouchers_nav": "قسائم البائع"
 }

@@ -13,5 +13,12 @@
   "free": "Free",
   "total": "Total",
   "proceed_to_checkout": "Proceed to Checkout",
-  "continue_shopping": "← Continue Shopping"
+  "continue_shopping": "← Continue Shopping",
+  "have_coupon": "Have a coupon?",
+  "coupon_code_placeholder": "Enter coupon code",
+  "apply": "Apply",
+  "applying": "Applying...",
+  "discount": "Discount",
+  "remove_coupon": "Remove",
+  "coupon_removed_notice": "Your coupon was removed: {{reason}}"
 }

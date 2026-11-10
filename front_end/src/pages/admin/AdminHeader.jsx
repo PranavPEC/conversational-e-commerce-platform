@@ -40,6 +40,12 @@ function AdminHeader({ title }) {
                     >
                         {t('seller_applications')}
                     </button>
+                    <button
+                        onClick={() => navigate(navigationStrings.ADMIN_COUPONS)}
+                        className={tabClassName(navigationStrings.ADMIN_COUPONS)}
+                    >
+                        {t('coupons_nav')}
+                    </button>
                 </div>
             </div>
         </div>

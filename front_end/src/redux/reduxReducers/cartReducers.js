@@ -16,6 +16,9 @@ const initialState = {
     cartLoading: false,
     itemLoading: {},
     error: null,
+    pricing: { subtotal: 0, discountAmount: 0, total: 0, couponCode: null },
+    couponLoading: false,
+    couponError: null,
 }
 
 const cartSlice = createSlice({
@@ -55,6 +58,17 @@ const cartSlice = createSlice({
             state.cartCount = 0
             state.itemLoading = {}
             state.error = null
+            state.pricing = { subtotal: 0, discountAmount: 0, total: 0, couponCode: null }
+            state.couponError = null
+        },
+        setCartPricing: (state, action) => {
+            state.pricing = action.payload
+        },
+        setCouponLoading: (state, action) => {
+            state.couponLoading = action.payload
+        },
+        setCouponError: (state, action) => {
+            state.couponError = action.payload
         },
     },
     // No extraReducers
@@ -68,6 +82,9 @@ export const {
     setCartCount,
     clearCartCount,
     clearCart,
+    setCartPricing,
+    setCouponLoading,
+    setCouponError,
 } = cartSlice.actions
 
 export default cartSlice.reducer

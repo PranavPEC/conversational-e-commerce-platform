@@ -22,6 +22,8 @@ import Seller from '../pages/seller/Seller.jsx'
 import SellerOrders from '../pages/seller/SellerOrders.jsx'
 import SellerDashboard from '../pages/seller/SellerDashboard.jsx'
 import SellerPendingApproval from '../pages/seller/SellerPendingApproval.jsx'
+import SellerVouchers from '../pages/seller/SellerVouchers.jsx'
+import AdminCoupons from '../pages/admin/AdminCoupons.jsx'
 import ForgotPassword from '../pages/forgot_password/ForgotPassword.jsx'
 import VerifyOTP from '../pages/forgot_password/VerifyOTP.jsx'
 import ResetPassword from '../pages/forgot_password/ResetPassword.jsx'
@@ -47,6 +49,8 @@ const APP_ROUTES = [
     { path: navigationStrings.SELLER, element: <Seller />, protected: true, sellerOnly: true },
     { path: navigationStrings.SELLER_ORDERS, element: <SellerOrders />, protected: true, sellerOnly: true },
     { path: navigationStrings.SELLER_ANALYTICS, element: <SellerDashboard />, protected: true, sellerOnly: true },
+    { path: navigationStrings.SELLER_VOUCHERS, element: <SellerVouchers />, protected: true, sellerOnly: true },
+    { path: navigationStrings.ADMIN_COUPONS, element: <AdminCoupons />, protected: true, adminOnly: true },
     { path: navigationStrings.SELLER_KYC_DOCUMENTS, element: <SellerKycDocuments />, protected: true },
     { path: navigationStrings.WISHLIST, element: <Wishlist />, protected: true },
 ]

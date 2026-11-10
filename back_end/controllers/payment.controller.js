@@ -2,6 +2,8 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Cart from "../models/user.cart.js";
 import Order from "../models/order.model.js";
+import Coupon from "../models/coupon.model.js";
+import { calculateCartPricing } from "../utils/cartPricing.js";
 import Product from "../models/user.product.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
 import Address from "../models/address.model.js";
@@ -50,14 +52,17 @@ export const createRazorpayOrder = async (req, res) => {
         if (unavailableItems.length > 0) {
             return sendError(res, 400, "Some items in your cart are no longer available. Please remove them and try again.", { unavailableItems });
         }
+        const pricing = await calculateCartPricing(cart);
 
+        let couponRemoved = null;
+        if (pricing.couponRemovedReason) {
+            cart.appliedCoupon = null;
+            await cart.save();
+            couponRemoved = pricing.couponRemovedReason;
+        }
         // Calculate total in paise (Razorpay uses smallest currency unit)
         // ₹1 = 100 paise, so ₹500 = 50000
-        const totalAmount = cart.products.reduce((sum, item) => {
-            return sum + (item.product.price * item.quantity);
-        }, 0);
-
-        const amountInPaise = Math.round(totalAmount * 100);
+        const amountInPaise = Math.round(pricing.total * 100);
 
         // Create Razorpay order
         const razorpayOrder = await razorpay.orders.create({
@@ -86,14 +91,20 @@ export const createRazorpayOrder = async (req, res) => {
                 price: item.product.price
             }));
 
-            const groupTotal = groupItems.reduce((sum, item) => {
+            const groupSubtotal = groupItems.reduce((sum, item) => {
                 return sum + (item.product.price * item.quantity);
             }, 0);
+            const groupDiscount = Math.round((pricing.perSellerDiscount[sellerKey] || 0) * 100) / 100;
+            const groupTotal = Math.round((groupSubtotal - groupDiscount) * 100) / 100;
 
             const order = await Order.create({
                 user: req.userId,
                 seller: sellerKey === "unassigned" ? undefined : sellerKey,
                 products: groupProducts,
+                subtotal: groupSubtotal,
+                discountAmount: groupDiscount,
+                couponCode: pricing.appliedCoupon?.code || undefined,
+                couponId: pricing.appliedCoupon?._id || undefined,
                 totalAmount: groupTotal,
                 address: {
                     label: savedAddress.label,
@@ -122,6 +133,7 @@ export const createRazorpayOrder = async (req, res) => {
             currency: razorpayOrder.currency,
             orderIds: createdOrders.map(o => o._id),
             keyId: process.env.RAZORPAY_KEY_ID,
+            couponRemoved,
         });
 
     } catch (error) {
@@ -172,6 +184,15 @@ export const verifyPayment = async (req, res) => {
             { paymentStatus: "paid", razorpayPaymentId: razorpay_payment_id }
         );
 
+        const couponIds = [...new Set(
+            orders
+                .map(order => order.couponId?.toString())
+                .filter(Boolean)
+        )];
+        for (const couponId of couponIds) {
+            await Coupon.findByIdAndUpdate(couponId, { $inc: { usedCount: 1 } });
+        }
+
         // Reduce stock for each product, across all sibling orders
         for (let order of orders) {
             for (let item of order.products) {
@@ -196,6 +217,7 @@ export const verifyPayment = async (req, res) => {
         const cart = await Cart.findOne({ user: req.userId });
         if (cart) {
             cart.products = [];
+            cart.appliedCoupon = null;
             await cart.save();
         }
 

@@ -7,6 +7,7 @@ import cartRouter from "./routes/cart.route.js";
 import productRouter from "./routes/product.route.js";
 import paymentRouter from "./routes/payment.route.js";
 import orderRouter from "./routes/order.route.js";
+import couponRouter from "./routes/coupon.route.js";
 import wishlistRouter from "./routes/wishlist.route.js";
 import addressRouter from "./routes/address.route.js";
 import adminRouter from "./routes/admin.route.js";
@@ -42,6 +43,7 @@ app.use("/address",addressRouter);
 app.use("/wishlist",wishlistRouter);
 app.use("/admin",adminRouter);
 app.use("/seller",sellerRouter);
+app.use("/coupon", couponRouter);
 
 app.listen(port,()=>{
     mongoConnect();

@@ -81,7 +81,11 @@ const orderSchema = new mongoose.Schema({
 
     razorpayPaymentId: {
         type: String
-    }
+    },
+    subtotal: { type: Number, required: true },
+    discountAmount: { type: Number, default: 0 },
+    couponCode: { type: String },
+    couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
 
 }, { timestamps: true });
 

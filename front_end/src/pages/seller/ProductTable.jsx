@@ -48,6 +48,8 @@ function ProductTable({ products, onEdit, onDeleteClick }) {
                                 <img
                                     src={product.image}
                                     alt={product.title}
+                                    loading='lazy'
+                                    decoding='async'
                                     className='w-full h-full object-cover'
                                 />
                             ) : (

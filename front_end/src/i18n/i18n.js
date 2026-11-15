@@ -8,10 +8,10 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    debug: true,
+    debug: import.meta.env.DEV,
     fallbackLng: 'en',
     supportedLngs: ['en', 'ar'],
-    ns: ['common', 'auth', 'home', 'profile', 'orders', 'seller', 'admin', 'legal', 'checkout', 'settings', 'cart', 'errors', 'product', 'wishlist', 'coupon'],
+    ns: ['common', 'home'],
     defaultNS: 'common',
     backend: { loadPath: '/locales/{{lng}}/{{ns}}.json' },
     detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'] },

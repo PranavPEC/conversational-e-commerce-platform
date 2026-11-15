@@ -50,5 +50,7 @@
   "admin": "Admin",
   "admin_dashboard": "Admin Dashboard",
   "seller_dashboard": "Seller Dashboard",
-  "settings": "Settings"
+  "settings": "Settings",
+  "route_error_title": "Something went wrong while loading this page.",
+  "route_error_reload": "Reload"
 }

@@ -3,7 +3,6 @@
 import axios from "axios";
 import { GET_USER_DATA_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL, FORGOT_PASSWORD_URL, VERIFY_OTP_URL, RESET_PASSWORD_URL, UPDATE_USER_URL, SOCIAL_AUTH_URL } from "../../config/urls";
 import { buildFormData } from "../../utils/CommonFunctions.js";
-import { signInWithGoogle, signInWithFacebook } from "../../config/firebase.js";
 // add SOCIAL_AUTH_URL to your existing import from "../../config/urls"
 import store from "../reduxStore";
 
@@ -14,6 +13,8 @@ import {
 } from "../reduxReducers/authReducers";
 
 const { dispatch } = store;
+
+export const preloadSocialAuth = () => import("../../config/Firebase.js").catch(() => {})
 
 export const fetchUserData = async () => {
   dispatch(setAuthLoading(true));
@@ -162,6 +163,7 @@ export const resetPassword = async ({
 };
 
 export const googleLogin = async () => {
+  const { signInWithGoogle } = await import("../../config/Firebase.js");
   const idToken = await signInWithGoogle();
 
   await axios.post(
@@ -175,6 +177,7 @@ export const googleLogin = async () => {
 };
 
 export const facebookLogin = async () => {
+  const { signInWithFacebook } = await import("../../config/Firebase.js");
   const idToken = await signInWithFacebook();
 
   await axios.post(

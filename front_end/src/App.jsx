@@ -2,10 +2,11 @@
 import { useSelector } from 'react-redux'
 import { fetchUserData, initializeTheme } from './redux/reduxActions'
 import AppRouter from './route/AppRouter.jsx'
+import { prefetchShoppingFlow } from './route/lazyPages.js'
 import './App.css'
 
 function App() {
-  const { authLoading } = useSelector(state => state.auth)
+  const { authLoading, userData } = useSelector(state => state.auth)
 
   useEffect(() => {
     fetchUserData()
@@ -17,6 +18,12 @@ function App() {
     window.addEventListener('pageshow', handlePageShow)
     return () => window.removeEventListener('pageshow', handlePageShow)
   }, [])
+
+  useEffect(() => {
+    if (!authLoading) {
+      prefetchShoppingFlow(Boolean(userData))
+    }
+  }, [authLoading, userData])
 
   if (authLoading) return null
 

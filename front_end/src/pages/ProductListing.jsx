@@ -128,7 +128,7 @@ function ProductListing() {
 
             <div className='w-full h-48 overflow-hidden bg-zinc-800'>
               {product.image ? (
-                <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
+                <img src={product.image} alt={product.title} loading='lazy' decoding='async' className='w-full h-full object-cover' />
               ) : (
                 <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>
                   {t('no_image')}

@@ -1,32 +1,37 @@
+import { Suspense } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/common_components/Footer.jsx'
+import RouteFallback from '../components/common_components/RouteFallback.jsx'
+import RouteErrorBoundary from '../components/common_components/RouteErrorBoundary.jsx'
 import Home from '../pages/home/Home.jsx'
-import SignUp from '../pages/signup/SignUp.jsx'
-import Login from '../pages/login/Login.jsx'
-import SellerKycDocuments from '../pages/seller/SellerKycDocuments.jsx'
-import ProductListing from '../pages/ProductListing.jsx'
-import ProductDetail from '../pages/ProductDetail.jsx'
-import Terms from '../pages/legal/Terms.jsx'
-import PrivacyPolicy from '../pages/legal/PrivacyPolicy.jsx'
-import Cart from '../pages/Cart.jsx'
-import Wishlist from '../pages/wishlist/Wishlist.jsx'
-import Orders from '../pages/orders/Orders.jsx'
-import Profile from '../pages/profile/Profile.jsx'
-import Settings from '../pages/settings/Settings.jsx'
-import Admin from '../pages/admin/Admin.jsx'
-import SellerApplications from '../pages/admin/SellerApplications.jsx'
-import Seller from '../pages/seller/Seller.jsx'
-import SellerOrders from '../pages/seller/SellerOrders.jsx'
-import SellerDashboard from '../pages/seller/SellerDashboard.jsx'
-import SellerPendingApproval from '../pages/seller/SellerPendingApproval.jsx'
-import SellerVouchers from '../pages/seller/SellerVouchers.jsx'
-import AdminCoupons from '../pages/admin/AdminCoupons.jsx'
-import ForgotPassword from '../pages/forgot_password/ForgotPassword.jsx'
-import VerifyOTP from '../pages/forgot_password/VerifyOTP.jsx'
-import ResetPassword from '../pages/forgot_password/ResetPassword.jsx'
+import {
+    SignUp,
+    Login,
+    ForgotPassword,
+    VerifyOTP,
+    ResetPassword,
+    Terms,
+    PrivacyPolicy,
+    ProductListing,
+    ProductDetail,
+    Cart,
+    Wishlist,
+    Orders,
+    Profile,
+    Settings,
+    Seller,
+    SellerOrders,
+    SellerDashboard,
+    SellerVouchers,
+    SellerKycDocuments,
+    SellerPendingApproval,
+    Admin,
+    SellerApplications,
+    AdminCoupons,
+} from './lazyPages.js'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 const APP_ROUTES = [
@@ -92,16 +97,20 @@ function AppRouter() {
         <>
             {!hideNavbar && <Navbar />}
 
-            <Routes>
-                {APP_ROUTES.map((route) => (
-                    <Route
-                        key={route.path}
-                        path={route.path}
-                        element={resolveElement(route, userData)}
-                    />
-                ))}
-                <Route path='/*' element={userData ? <Home /> : <ProductListing />} />
-            </Routes>
+            <RouteErrorBoundary key={location.pathname}>
+                <Suspense fallback={<RouteFallback />}>
+                    <Routes>
+                        {APP_ROUTES.map((route) => (
+                            <Route
+                                key={route.path}
+                                path={route.path}
+                                element={resolveElement(route, userData)}
+                            />
+                        ))}
+                        <Route path='/*' element={userData ? <Home /> : <ProductListing />} />
+                    </Routes>
+                </Suspense>
+            </RouteErrorBoundary>
 
             {!hideNavbar && <Footer />}
         </>

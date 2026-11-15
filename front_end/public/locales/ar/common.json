@@ -50,5 +50,7 @@
   "admin": "المسؤول",
   "admin_dashboard": "لوحة المسؤول",
   "seller_dashboard": "لوحة البائع",
-  "settings": "الإعدادات"
+  "settings": "الإعدادات",
+  "route_error_title": "حدث خطأ ما أثناء تحميل هذه الصفحة.",
+  "route_error_reload": "إعادة التحميل"
 }

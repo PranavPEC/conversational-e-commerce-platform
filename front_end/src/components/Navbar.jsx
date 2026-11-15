@@ -15,6 +15,7 @@ import { clearCart } from '../redux/reduxActions'
 import { GET_ALL_PRODUCTS_URL } from '../config/urls'
 import useDebounce from '../hooks/useDebounce'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
+import { prefetch } from '../route/lazyPages.js'
 
 const NAV_CATEGORIES = [
   { key: 'electronics', label: 'category_electronics' },
@@ -194,7 +195,7 @@ function Navbar() {
             >
               <div className='w-10 h-10 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0'>
                 {product.image ? (
-                  <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
+                  <img src={product.image} alt={product.title} loading='lazy' decoding='async' className='w-full h-full object-cover' />
                 ) : (
                   <div className='w-full h-full flex items-center justify-center text-[10px] text-zinc-500'>{t('no_image_short')}</div>
                 )}
@@ -277,6 +278,8 @@ function Navbar() {
             {/* ── Login — outline/secondary style, sized to match the navbar's natural height ── */}
             <button
               onClick={() => navigate(navigationStrings.LOGIN)}
+              onMouseEnter={prefetch.login}
+              onFocus={prefetch.login}
               className='flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 bg-transparent border border-[var(--color-input-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm transition-all duration-300 cursor-pointer'
             >
               {t('login')}
@@ -286,6 +289,8 @@ function Navbar() {
             <PrimaryButton
               text={t('sign_up')}
               onClick={() => navigate(navigationStrings.SIGNUP)}
+              onMouseEnter={prefetch.signup}
+              onFocus={prefetch.signup}
               size='sm'
             />
           </div>
@@ -330,6 +335,8 @@ function Navbar() {
 
           <button
             onClick={() => navigate(navigationStrings.PRODUCTS)}
+            onMouseEnter={prefetch.products}
+            onFocus={prefetch.products}
             className={`text-sm transition-colors duration-200 ${isActive(navigationStrings.PRODUCTS) ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
           >
             {t('products')}
@@ -339,6 +346,8 @@ function Navbar() {
           {/* ── Wishlist ── */}
           <button
             onClick={() => navigate(navigationStrings.WISHLIST)}
+            onMouseEnter={prefetch.wishlist}
+            onFocus={prefetch.wishlist}
             aria-label={t('wishlist')}
             className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
           >
@@ -348,6 +357,8 @@ function Navbar() {
           {/* ── Cart — icon only, stays outside the dropdown ── */}
           <button
             onClick={() => navigate(navigationStrings.CART)}
+            onMouseEnter={prefetch.cart}
+            onFocus={prefetch.cart}
             aria-label={t('cart')}
             className={`relative transition-colors duration-200 cursor-pointer ${isActive(navigationStrings.CART) ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
           >
@@ -388,6 +399,8 @@ function Navbar() {
 
                 <button
                   onClick={() => { setDropdownOpen(false); navigate(navigationStrings.PROFILE) }}
+                  onMouseEnter={prefetch.profile}
+                  onFocus={prefetch.profile}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
                   <User size={16} /> {t('profile')}
@@ -395,6 +408,8 @@ function Navbar() {
 
                 <button
                   onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ORDERS) }}
+                  onMouseEnter={prefetch.orders}
+                  onFocus={prefetch.orders}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
                   <Package size={16} /> {t('my_orders')}
@@ -403,6 +418,8 @@ function Navbar() {
                 {(userData?.role === 'seller' || userData?.role === 'admin') && (
                   <button
                     onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SELLER) }}
+                    onMouseEnter={prefetch.seller}
+                    onFocus={prefetch.seller}
                     className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                   >
                     <Package size={16} /> {t('seller_dashboard')}
@@ -412,6 +429,8 @@ function Navbar() {
                 {userData?.role === 'admin' && (
                   <button
                     onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ADMIN) }}
+                    onMouseEnter={prefetch.admin}
+                    onFocus={prefetch.admin}
                     className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                   >
                     <Package size={16} /> {t('admin_dashboard')}
@@ -420,6 +439,8 @@ function Navbar() {
 
                 <button
                   onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SETTINGS) }}
+                  onMouseEnter={prefetch.settings}
+                  onFocus={prefetch.settings}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
                   <Settings size={16} /> {t('settings')}
@@ -453,4 +474,3 @@ function Navbar() {
 }
 
 export default Navbar
-

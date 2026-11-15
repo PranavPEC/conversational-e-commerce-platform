@@ -1,13 +1,14 @@
-﻿import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { fetchCart, updateCart, removeCartItem, clearEntireCart, applyCoupon, removeCoupon } from '../redux/reduxActions'
-import CheckoutModal from './CheckoutModal.jsx'
 import { Loader } from 'lucide-react'
 import PrimaryButton from '../components/common_components/PrimaryButton.jsx'
 import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 import { useTranslation } from 'react-i18next'
 import {formatCurrency} from '../utils/CommonFunctions.js'
+
+const CheckoutModal = lazy(() => import('./CheckoutModal.jsx'))
 
 function Cart() {
     const { t, i18n } = useTranslation('cart')
@@ -106,7 +107,9 @@ function Cart() {
     return (
         <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
-            {showCheckout && <CheckoutModal onClose={() => setShowCheckout(false)} />}
+            <Suspense fallback={null}>
+                {showCheckout && <CheckoutModal onClose={() => setShowCheckout(false)} />}
+            </Suspense>
 
             <div className='max-w-3xl mx-auto flex items-center justify-between mb-8'>
                 <h1 className='text-white text-2xl font-semibold tracking-tight'>
@@ -150,7 +153,7 @@ function Cart() {
                                 className='w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 cursor-pointer'
                             >
                                 {item.product.image ? (
-                                    <img src={item.product.image} alt={item.product.title} className='w-full h-full object-cover' />
+                                    <img src={item.product.image} alt={item.product.title} loading='lazy' decoding='async' className='w-full h-full object-cover' />
                                 ) : (
                                     <div className='w-full h-full flex items-center justify-center text-zinc-600 text-xs'>{t("no_image")}</div>
                                 )}

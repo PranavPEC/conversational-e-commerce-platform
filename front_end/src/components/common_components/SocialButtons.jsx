@@ -1,5 +1,7 @@
 import colors from '../../constants/colors/colors'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { preloadSocialAuth } from '../../redux/reduxActions'
 
 // UI only, logic passed in via props — same pattern as PrimaryButton.
 // Shared by Login.jsx and SignUp.jsx.
@@ -7,6 +9,10 @@ import { useTranslation } from 'react-i18next'
 
 function SocialButtons({ onGoogleAuth, onFacebookAuth }) {
     const { t } = useTranslation('common');
+    useEffect(() => {
+        preloadSocialAuth()
+    }, [])
+
     return (
         <>
             {/* Divider */}

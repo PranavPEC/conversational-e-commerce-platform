@@ -1,20 +1,28 @@
-import  { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import {useTranslation} from "react-i18next"
 import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-react'
 import {
     createRazorpayOrder,
     verifyRazorpayPayment,
     resetOrder,
-    clearCart,
+    fetchUserAddresses,
+    fetchCart,
 } from '../redux/reduxActions'
-import { calculateCartTotal } from '../utils/CommonFunctions.js'
+import { formatCurrency } from '../utils/CommonFunctions.js'
 
 function CheckoutModal({ onClose }) {
-    const [address, setAddress] = useState('')
+    const { t, i18n } = useTranslation('checkout')
+    const { t: tCart } = useTranslation('cart')
+    const isRTL = i18n.dir() === 'rtl'
+    const [selectedAddressId, setSelectedAddressId] = useState(null)
+    const [couponRemovedNotice, setCouponRemovedNotice] = useState(null)
+    const [checkoutReady, setCheckoutReady] = useState(false)
+    const { addresses, addressesLoading, addressesError } = useSelector(state => state.address)
 
     // New state keys from orderReducers — orderLoading/orderError instead of loading/error
     const { pendingOrder, orderLoading, orderError, paymentSuccess } = useSelector(state => state.order)
-    const { cartItems } = useSelector(state => state.cart)
+    const { cartItems, pricing } = useSelector(state => state.cart)
 
     const handleClose = () => {
         resetOrder()   // plain call — no dispatch()
@@ -22,13 +30,40 @@ function CheckoutModal({ onClose }) {
     }
 
     const handleProceedToPayment = async () => {
-        if (!address.trim()) return
-        await createRazorpayOrder({ address })   // plain call
+        if (!selectedAddressId) return
+        try {
+            const result = await createRazorpayOrder({ addressId: selectedAddressId })
+            if (result?.couponRemoved) {
+                setCouponRemovedNotice(result.couponRemoved)
+                await fetchCart()
+            } else {
+                setCheckoutReady(true)
+            }
+        } catch {
+            // Intentionally ignored here — orderError is already rendered in this modal.
+        }
     }
+
+    // Ensure addresses are available when checkout opens.
+    useEffect(() => {
+        fetchUserAddresses().catch(() => {
+            // Intentionally ignored here — addressesError / orderError are already rendered in this modal.
+        })
+    }, [])
+
+    // Auto-select default address (or first address) once list is loaded.
+    useEffect(() => {
+        if (!addresses || addresses.length === 0) {
+            setSelectedAddressId(null)
+            return
+        }
+        const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0]
+        setSelectedAddressId(defaultAddress._id)
+    }, [addresses])
 
     // Open Razorpay SDK when pendingOrder is set
     useEffect(() => {
-        if (!pendingOrder) return
+        if (!pendingOrder || !checkoutReady) return
 
         const options = {
             key: pendingOrder.keyId,
@@ -39,11 +74,13 @@ function CheckoutModal({ onClose }) {
             order_id: pendingOrder.razorpayOrderId,
 
             handler: function (response) {
-                verifyRazorpayPayment({   // plain call
+                verifyRazorpayPayment({
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_signature: response.razorpay_signature,
                     orderId: pendingOrder.orderId
+                }).catch(() => {
+                    // Intentionally ignored here — orderError is already rendered in this modal.
                 })
             },
 
@@ -56,7 +93,7 @@ function CheckoutModal({ onClose }) {
 
         const rzp = new window.Razorpay(options)
         rzp.open()
-    }, [pendingOrder])
+    }, [pendingOrder, checkoutReady])
 
     // Reset stale paymentSuccess on mount
     useEffect(() => {
@@ -66,7 +103,7 @@ function CheckoutModal({ onClose }) {
     // Clear cart after successful payment
     useEffect(() => {
         if (paymentSuccess) {
-            clearCart()   // plain call
+            fetchCart()   // plain call
         }
     }, [paymentSuccess])
 
@@ -78,15 +115,15 @@ function CheckoutModal({ onClose }) {
                     <div className='w-16 h-16 rounded-full bg-emerald-500 bg-opacity-20 border-2 border-emerald-500 flex items-center justify-center'>
                         <CheckCircle size={32} className='text-emerald-400' />
                     </div>
-                    <h2 className='text-white text-xl font-bold'>Payment Successful!</h2>
-                    <p className='text-zinc-400 text-sm'>Your order has been placed and is being processed.</p>
+                    <h2 className='text-white text-xl font-bold'>{t('payment_successful')}</h2>
+                    <p className='text-zinc-400 text-sm'>{t('order_placed_processing')}</p>
                     <div className='w-full h-px bg-zinc-800 my-2' />
-                    <p className='text-zinc-500 text-xs'>You'll receive a confirmation shortly. Track your orders in Order History.</p>
+                    <p className='text-zinc-500 text-xs'>{t('order_confirmation')}</p>
                     <button
                         onClick={handleClose}
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer mt-2'
                     >
-                        Done
+                        {t('done')}
                     </button>
                 </div>
             </div>
@@ -99,7 +136,7 @@ function CheckoutModal({ onClose }) {
             <div className='bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md flex flex-col'>
 
                 <div className='flex items-center justify-between p-6 border-b border-zinc-800'>
-                    <h2 className='text-white text-lg font-bold tracking-tight'>Checkout</h2>
+                    <h2 className='text-white text-lg font-bold tracking-tight'>{t('checkout')}</h2>
                     <button onClick={handleClose} className='text-zinc-500 hover:text-white transition-colors duration-200 cursor-pointer'>
                         <X size={18} />
                     </button>
@@ -108,34 +145,58 @@ function CheckoutModal({ onClose }) {
                 <div className='p-6 flex flex-col gap-5'>
 
                     <div className='flex flex-col gap-2'>
-                        <p className='text-zinc-400 text-xs font-medium uppercase tracking-widest'>Order Summary</p>
+                        <p className='text-zinc-400 text-xs font-medium uppercase tracking-widest'>{t('order_summary')}</p>
                         <div className='bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl p-4 flex flex-col gap-2 max-h-40 overflow-y-auto'>
                             {cartItems.map(item => (
                                 <div key={item.product._id} className='flex items-center justify-between gap-3'>
                                     <span className='text-zinc-300 text-sm truncate flex-1'>{item.product.title}</span>
                                     <span className='text-zinc-500 text-xs flex-shrink-0'>×{item.quantity}</span>
-                                    <span className='text-white text-sm font-medium flex-shrink-0'>₹{item.product.price * item.quantity}</span>
+                                    <span className='text-white text-sm font-medium flex-shrink-0'>{formatCurrency(item.product.price * item.quantity, isRTL)}</span>
                                 </div>
                             ))}
                         </div>
                         <div className='flex justify-between items-center pt-1'>
-                            <span className='text-zinc-400 text-sm'>Total</span>
-                            <span className='text-emerald-400 text-lg font-bold'>₹{calculateCartTotal(cartItems)}</span>
+                            <span className='text-zinc-400 text-sm'>{t('subtotal')}</span>
+                            <span className='text-white text-sm'>{formatCurrency(pricing.subtotal, isRTL)}</span>
+                        </div>
+                        {pricing.discountAmount > 0 && (
+                            <div className='flex justify-between items-center'>
+                                <span className='text-zinc-400 text-sm'>{t('discount')} {pricing.couponCode && `(${pricing.couponCode})`}</span>
+                                <span className='text-emerald-400 text-sm'>−{formatCurrency(pricing.discountAmount, isRTL)}</span>
+                            </div>
+                        )}
+                        <div className='flex justify-between items-center pt-1'>
+                            <span className='text-zinc-400 text-sm'>{t('total')}</span>
+                            <span className='text-emerald-400 text-lg font-bold'>{formatCurrency(pricing.total, isRTL)}</span>
                         </div>
                     </div>
 
                     <div className='flex flex-col gap-1.5'>
-                        <label className='text-zinc-300 text-sm font-medium'>Delivery Address</label>
+                        <label className='text-zinc-300 text-sm font-medium'>{t('delivery_address')}</label>
                         <div className='relative'>
                             <MapPin size={16} className='absolute left-3.5 top-3.5 text-zinc-500' />
-                            <textarea
-                                value={address}
-                                onChange={e => setAddress(e.target.value)}
-                                placeholder='Enter your full delivery address...'
-                                rows={3}
-                                className='w-full bg-zinc-800 text-white placeholder-zinc-500 outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-3 text-sm transition-colors duration-200 resize-none'
-                            />
+                            <select
+                                value={selectedAddressId || ''}
+                                onChange={(e) => setSelectedAddressId(e.target.value)}
+                                disabled={addressesLoading || addresses.length === 0}
+                                className='w-full h-12 bg-zinc-800 text-white outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl pl-10 pr-4 text-sm transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed'
+                            >
+                                {addresses.length === 0 ? (
+                                    <option value=''>
+                                        {addressesLoading ? t('loading_addresses') : t('no_saved_address')}
+                                    </option>
+                                ) : (
+                                    addresses.map((address) => (
+                                        <option key={address._id} value={address._id}>
+                                            {address.fullName}, {address.line1}, {address.city}
+                                        </option>
+                                    ))
+                                )}
+                            </select>
                         </div>
+                        {addressesError && (
+                            <p className='text-red-400 text-xs'>{addressesError}</p>
+                        )}
                     </div>
 
                     {orderError && (
@@ -144,20 +205,36 @@ function CheckoutModal({ onClose }) {
                             <p className='text-white text-sm'>{orderError}</p>
                         </div>
                     )}
+                    {couponRemovedNotice && (
+                        <div className='flex flex-col gap-3 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3'>
+                            <p className='text-amber-300 text-sm'>
+                                {tCart('coupon_removed_notice', { reason: couponRemovedNotice })}
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setCouponRemovedNotice(null)
+                                    setCheckoutReady(true)
+                                }}
+                                className='self-end text-amber-200 hover:text-white text-sm font-medium cursor-pointer'
+                            >
+                                {t('continue_to_payment')}
+                            </button>
+                        </div>
+                    )}
 
                     <button
                         onClick={handleProceedToPayment}
-                        disabled={orderLoading || !address.trim()}
+                        disabled={orderLoading || !selectedAddressId || !!couponRemovedNotice}
                         className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
                     >
                         {orderLoading ? (
-                            <><Loader size={16} className='animate-spin' />Processing...</>
+                            <><Loader size={16} className='animate-spin' />{t('processing')}</>
                         ) : (
-                            <>Pay ₹{calculateCartTotal(cartItems)}<ArrowRight size={16} /></>
+                            <>{t('pay')} {formatCurrency(pricing.total, isRTL)} <ArrowRight size={16} /></>
                         )}
                     </button>
 
-                    <p className='text-zinc-600 text-xs text-center'>Secured by Razorpay · 100% safe & encrypted</p>
+                    <p className='text-zinc-600 text-xs text-center'>{t('razorpay_secure')}</p>
                 </div>
             </div>
         </div>

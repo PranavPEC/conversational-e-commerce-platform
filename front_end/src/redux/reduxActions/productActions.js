@@ -22,7 +22,7 @@ const { dispatch } = store
 
 // ── Fetch products ──
 // Used by:
-//   Home.jsx / Admin.jsx        → fetchProducts() for all products
+//   Home.jsx / Seller.jsx        → fetchProducts() for all products
 //   ProductListing.jsx          → fetchProducts(category, search) for filtered pages
 export const fetchProducts = async (category = null, search = null) => {
     dispatch(setProductsLoading(true))
@@ -30,8 +30,8 @@ export const fetchProducts = async (category = null, search = null) => {
 
     try {
         const { data } = await axios.get(GET_ALL_PRODUCTS_URL(category, search))
-        dispatch(setProducts(data.products))
-        return data.products
+        dispatch(setProducts(data.data.products))
+        return data.data.products
     } catch (error) {
         dispatch(setProductsError(
             error.response?.data?.message || "Failed to fetch products"
@@ -51,8 +51,8 @@ export const fetchProductById = async (id) => {
 
     try {
         const { data } = await axios.get(GET_PRODUCT_BY_ID_URL(id))
-        dispatch(setSelectedProduct(data.product))
-        return data.product
+        dispatch(setSelectedProduct(data.data.product))
+        return data.data.product
     } catch (error) {
         dispatch(setProductsError(
             error.response?.data?.message || "Failed to fetch product"

@@ -1,25 +1,40 @@
-﻿import { useEffect } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { fetchProducts } from '../redux/reduxActions'
+import { Heart } from 'lucide-react'
+import { fetchProducts, fetchUserWishlist, addToWishlist, removeFromWishlist } from '../redux/reduxActions'
+import { useTranslation } from 'react-i18next'
+import { formatCurrency } from '../utils/CommonFunctions.js'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 const CATEGORY_LABELS = {
-  electronics: 'Electronics',
-  fashion: 'Fashion',
-  home: 'Home',
-  beauty: 'Beauty',
-  accessories: 'Accessories',
-  audio: 'Audio',
-  laptops: 'Laptops',
-  premium: 'Premium',
-  uncategorized: 'Uncategorized',
+  electronics: 'electronics',
+  fashion: 'fashion',
+  home: 'home',
+  beauty: 'beauty',
+  accessories: 'accessories',
+  audio: 'audio',
+  laptops: 'laptops',
+  premium: 'premium',
+  uncategorized: 'uncategorized',
 }
 
 function ProductListing() {
+  const { t, i18n } = useTranslation('product')
+  const isRTL = i18n.dir() === 'rtl'
   const navigate = useNavigate()
   const location = useLocation()
+  const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
   const { products, productsLoading } = useSelector(state => state.products)
+  const { userData } = useSelector(state => state.auth)
+  const { wishlist } = useSelector(state => state.wishlist)
+  const [togglingWishlistId, setTogglingWishlistId] = useState(null)
+
+  const wishlistedIds = useMemo(
+    () => new Set(wishlist.map(item => item.product?._id).filter(Boolean)),
+    [wishlist]
+  )
 
   const searchParams = new URLSearchParams(location.search)
   const categoryParam = searchParams.get('category')
@@ -32,16 +47,40 @@ function ProductListing() {
     fetchProducts(normalizedCategory, normalizedSearch)   // plain call — no dispatch()
   }, [normalizedCategory, normalizedSearch])
 
+  useEffect(() => {
+    if (userData) fetchUserWishlist().catch(() => {})
+  }, [userData])
+
+  const handleToggleWishlist = async (e, productId) => {
+    e.stopPropagation()   // don't trigger the card's navigate onClick
+    if (!userData) {
+      navigate(navigationStrings.LOGIN)
+      return
+    }
+    setTogglingWishlistId(productId)
+    try {
+      if (wishlistedIds.has(productId)) {
+        await removeFromWishlist(productId)
+      } else {
+        await addToWishlist(productId)
+      }
+    } catch {
+      // wishlistError is already in Redux if this fails
+    } finally {
+      setTogglingWishlistId(null)
+    }
+  }
+
   const heading = normalizedSearch
-    ? `Search results for "${normalizedSearch}"`
+    ? t('search_results_for', { query: normalizedSearch })
     : normalizedCategory
-      ? (CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
-      : 'All Products'
+      ? t(CATEGORY_LABELS[normalizedCategory] || normalizedCategory)
+      : t('all_products')
 
   if (productsLoading) {
     return (
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
-        <p className='text-zinc-400 text-sm'>Loading products...</p>
+        <p className='text-zinc-400 text-sm'>{t('loading_products')}</p>
       </div>
     )
   }
@@ -51,10 +90,10 @@ function ProductListing() {
       <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
         <p className='text-zinc-400 text-sm'>
           {normalizedSearch
-            ? 'No products match your search.'
+            ? t('no_products_match_search')
             : normalizedCategory
-              ? 'No products found in this category.'
-              : 'No products found.'}
+              ? t('no_products_in_category')
+              : t('no_products_found')}
         </p>
       </div>
     )
@@ -71,15 +110,28 @@ function ProductListing() {
         {products.map((product) => (
           <div
             key={product._id}
-            onClick={() => navigate('/product/' + product._id)}
-            className='bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
+            onClick={() => navigate(getProductDetailRoute(product._id))}
+            className='relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-500 transition-colors duration-200 flex flex-col'
           >
+            <button
+              onClick={(e) => handleToggleWishlist(e, product._id)}
+              disabled={togglingWishlistId === product._id}
+              aria-label={wishlistedIds.has(product._id) ? t('remove_from_wishlist') : t('add_to_wishlist')}
+              className='absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/60'
+            >
+              <Heart
+                size={16}
+                className={wishlistedIds.has(product._id) ? 'text-red-500' : 'text-white'}
+                fill={wishlistedIds.has(product._id) ? 'currentColor' : 'none'}
+              />
+            </button>
+
             <div className='w-full h-48 overflow-hidden bg-zinc-800'>
               {product.image ? (
-                <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
+                <img src={product.image} alt={product.title} loading='lazy' decoding='async' className='w-full h-full object-cover' />
               ) : (
                 <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>
-                  No Image
+                  {t('no_image')}
                 </div>
               )}
             </div>
@@ -90,12 +142,12 @@ function ProductListing() {
 
               <div className='mt-auto pt-3 flex items-center justify-between'>
                 <span className='text-emerald-400 font-semibold text-sm'>
-                  ₹{product.price.toLocaleString('en-IN')}
+                  {formatCurrency(product.price, isRTL)}
                 </span>
                 {product.stock === 0 ? (
-                  <span className='text-xs text-red-400 font-medium'>Out of stock</span>
+                  <span className='text-xs text-red-400 font-medium'>{t('out_of_stock')}</span>
                 ) : (
-                  <span className='text-xs text-zinc-500'>{product.stock} left</span>
+                  <span className='text-xs text-zinc-500'>{product.stock} {t('left')}</span>
                 )}
               </div>
             </div>

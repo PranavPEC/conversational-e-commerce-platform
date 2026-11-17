@@ -8,6 +8,13 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
 
+    // Checkout is split one Order per seller — this is that seller
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
     products: [
         {
             product: {
@@ -35,14 +42,30 @@ const orderSchema = new mongoose.Schema({
     },
 
     address: {
-        type: String,
-        required: true
+        label: String,
+        fullName: { type: String, required: true },
+        phone: { type: String, required: true },
+        line1: { type: String, required: true },
+        line2: String,
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        pincode: { type: String, required: true },
     },
+
+    addressId: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
 
     status: {
         type: String,
-        enum: ["placed", "shipped", "delivered", "cancelled"],
-        default: "placed"
+        enum: ["pending_approval", "placed", "shipped", "delivered", "cancelled", "rejected", "return_requested", "return_approved", "return_rejected", "refunded"],
+        default: "pending_approval"
+    },
+
+    returnReason: {
+        type: String
+    },
+
+    deliveredAt: {
+        type: Date
     },
 
     paymentStatus: {
@@ -58,7 +81,11 @@ const orderSchema = new mongoose.Schema({
 
     razorpayPaymentId: {
         type: String
-    }
+    },
+    subtotal: { type: Number, required: true },
+    discountAmount: { type: Number, default: 0 },
+    couponCode: { type: String },
+    couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
 
 }, { timestamps: true });
 

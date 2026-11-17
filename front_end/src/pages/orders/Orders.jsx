@@ -2,28 +2,41 @@ import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
-import { fetchUserOrders, cancelOrder } from '../../redux/reduxActions'
-
+import { fetchUserOrders, cancelOrder, requestReturn } from '../../redux/reduxActions'
+import { useTranslation } from 'react-i18next'
 import AccountSidebar from '../../components/common_components/AccountSidebar'
 import OrdersLoading from './OrdersLoading.jsx'
 import OrdersEmpty from './OrdersEmpty.jsx'
 import OrdersError from './OrdersError.jsx'
 import OrdersHeader from './OrdersHeader.jsx'
 import OrderCard from './OrderCard.jsx'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
 function Orders() {
+    const { t } = useTranslation('orders')
     const navigate = useNavigate()
+    const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
     const { orders, ordersLoading, ordersError } = useSelector(state => state.order)
 
     useEffect(() => {
-        fetchUserOrders()   // plain call — no dispatch()
+        fetchUserOrders().catch(() => {
+            // Intentionally ignored here — ordersError is already surfaced in OrdersError.
+        })
     }, [])
+
+    const handleCancelOrder = async (id) => {
+        try {
+            await cancelOrder(id)
+        } catch {
+            // Intentionally ignored here — ordersError is already surfaced in OrdersError.
+        }
+    }
 
     // ── Decide which content to show — sidebar + wrapper stay constant ──
     // regardless of state, so AccountSidebar never flickers in/out.
     const renderContent = () => {
         if (ordersLoading) return <OrdersLoading />
-        if (!ordersLoading && orders.length === 0) return <OrdersEmpty onBrowse={() => navigate('/products')} />
+        if (!ordersLoading && orders.length === 0) return <OrdersEmpty onBrowse={() => navigate(navigationStrings.PRODUCTS)} />
         if (ordersError) return <OrdersError error={ordersError} onRetry={() => fetchUserOrders()} />
 
         return (
@@ -35,18 +48,19 @@ function Orders() {
                         <OrderCard
                             key={order._id}
                             order={order}
-                            onProductClick={(id) => navigate('/product/' + id)}
-                            onCancel={(id) => cancelOrder(id)}   // plain call
+                            onProductClick={(id) => navigate(getProductDetailRoute(id))}
+                            onCancel={handleCancelOrder}
+                            onRequestReturn={(id, reason) => requestReturn(id, reason).catch(() => {})}
                         />
                     ))}
                 </div>
 
                 <div className='mt-8 flex justify-center'>
                     <button
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className='flex items-center gap-2 text-zinc-400 hover:text-emerald-400 text-sm transition-colors duration-200 cursor-pointer'
                     >
-                        Continue Shopping
+                        {t('continue_shopping')}
                         <ChevronRight size={15} />
                     </button>
                 </div>

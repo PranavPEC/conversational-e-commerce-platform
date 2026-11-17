@@ -1,25 +1,27 @@
-﻿import { X, Loader } from 'lucide-react'
+﻿import { X } from 'lucide-react'
+import PrimaryButton from '../../components/common_components/PrimaryButton.jsx'
+import { useTranslation } from 'react-i18next'
 
 const CATEGORY_OPTIONS = [
-    { value: 'electronics', label: 'Electronics' },
-    { value: 'fashion', label: 'Fashion' },
-    { value: 'home', label: 'Home' },
-    { value: 'beauty', label: 'Beauty' },
-    { value: 'accessories', label: 'Accessories' },
-    { value: 'audio', label: 'Audio' },
-    { value: 'laptops', label: 'Laptops' },
-    { value: 'premium', label: 'Premium' },
-    { value: 'uncategorized', label: 'Uncategorized' },
+    { value: 'electronics', label: 'electronics' },
+    { value: 'fashion', label: 'fashion' },
+    { value: 'home', label: 'home' },
+    { value: 'beauty', label: 'beauty' },
+    { value: 'accessories', label: 'accessories' },
+    { value: 'audio', label: 'audio' },
+    { value: 'laptops', label: 'laptops' },
+    { value: 'premium', label: 'premium' },
+    { value: 'uncategorized', label: 'uncategorized' },
 ]
 
 // Used for both Create and Edit modes
 // editingProduct === null  → Create mode
-// editingProduct !== null  → Edit mode (form pre-filled by Admin.jsx)
+// editingProduct !== null  → Edit mode (form pre-filled by Seller.jsx)
 //
 // Props:
 //   form, setForm          — controlled form state (title, description, price, stock, category[])
 //   imagePreview           — blob URL or existing Cloudinary URL for preview
-//   handleImageChange      — file input onChange handler (defined in Admin.jsx)
+//   handleImageChange      — file input onChange handler (defined in Seller.jsx)
 //   handleSubmit           — dispatches createProduct or updateProduct
 //   handleResetForm        — closes form and resets all state
 //   editingProduct         — null in create mode, product object in edit mode
@@ -37,7 +39,7 @@ function ProductForm({
 }) {
     // category is now an array — valid if at least one item is checked
     const isFormValid = form.title && form.description && form.price && form.stock && form.category.length > 0
-
+    const { t } = useTranslation('seller')
     const toggleCategory = (value) => {
         setForm(f => {
             const already = f.category.includes(value)
@@ -56,7 +58,7 @@ function ProductForm({
             {/* Form header */}
             <div className='flex items-center justify-between'>
                 <h2 className='text-white text-lg font-semibold'>
-                    {editingProduct ? 'Edit Product' : 'Create New Product'}
+                    {editingProduct ? t('edit_product') : t('create_new_product')}
                 </h2>
                 <button
                     onClick={handleResetForm}
@@ -71,10 +73,10 @@ function ProductForm({
 
                 {/* Title */}
                 <div className='flex flex-col gap-1.5'>
-                    <label className='text-zinc-300 text-sm font-medium'>Title</label>
+                    <label className='text-zinc-300 text-sm font-medium'>{t('title')}</label>
                     <input
                         type='text'
-                        placeholder='Product title'
+                        placeholder={t('product_title_placeholder')}
                         value={form.title}
                         onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                         className='w-full h-11 bg-zinc-800 text-white placeholder-zinc-500 outline-none border border-zinc-700 focus:border-emerald-500 rounded-xl px-4 text-sm transition-colors duration-200'
@@ -83,7 +85,7 @@ function ProductForm({
 
                 {/* Price */}
                 <div className='flex flex-col gap-1.5'>
-                    <label className='text-zinc-300 text-sm font-medium'>Price (&#8377;)</label>
+                    <label className='text-zinc-300 text-sm font-medium'>{t('price')}</label>
                     <input
                         type='number'
                         placeholder='0'
@@ -96,7 +98,7 @@ function ProductForm({
 
                 {/* Stock */}
                 <div className='flex flex-col gap-1.5'>
-                    <label className='text-zinc-300 text-sm font-medium'>Stock</label>
+                    <label className='text-zinc-300 text-sm font-medium'>{t('stock')}</label>
                     <input
                         type='number'
                         placeholder='0'
@@ -109,7 +111,7 @@ function ProductForm({
 
                 {/* Image upload */}
                 <div className='flex flex-col gap-1.5'>
-                    <label className='text-zinc-300 text-sm font-medium'>Image</label>
+                    <label className='text-zinc-300 text-sm font-medium'>{t('image')}</label>
                     <input
                         type='file'
                         accept='image/*'
@@ -120,9 +122,9 @@ function ProductForm({
 
                 {/* Description — full width */}
                 <div className='flex flex-col gap-1.5 md:col-span-2'>
-                    <label className='text-zinc-300 text-sm font-medium'>Description</label>
+                    <label className='text-zinc-300 text-sm font-medium'>{t('description')}</label>
                     <textarea
-                        placeholder='Product description'
+                        placeholder={t('product_description_placeholder')}
                         rows={3}
                         value={form.description}
                         onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
@@ -133,8 +135,8 @@ function ProductForm({
                 {/* Categories — checkbox group, full width */}
                 <div className='flex flex-col gap-3 md:col-span-2'>
                     <label className='text-zinc-300 text-sm font-medium'>
-                        Categories
-                        <span className='text-zinc-500 font-normal ml-1.5'>(select one or more)</span>
+                        {t('categories')}
+                        <span className='text-zinc-500 font-normal ml-1.5'>({t('select_one_or_more')})</span>
                     </label>
                     <div className='flex flex-wrap gap-2'>
                         {CATEGORY_OPTIONS.map(option => {
@@ -151,13 +153,13 @@ function ProductForm({
                                     }`}
                                 >
                                     {checked && <span className='mr-1'>✓</span>}
-                                    {option.label}
+                                    {t(option.label)}
                                 </button>
                             )
                         })}
                     </div>
                     {form.category.length === 0 && (
-                        <p className='text-zinc-500 text-xs'>At least one category is required.</p>
+                        <p className='text-zinc-500 text-xs'>{t('at_least_one_category_required')}</p>
                     )}
                 </div>
 
@@ -168,28 +170,26 @@ function ProductForm({
                 <div className='flex items-center gap-4'>
                     <img
                         src={imagePreview}
-                        alt='Preview'
+                        alt={t('preview')}
                         className='w-20 h-20 rounded-xl object-cover border border-zinc-700'
                     />
-                    <p className='text-zinc-500 text-xs'>Image preview</p>
+                    <p className='text-zinc-500 text-xs'>{t('image_preview')}</p>
                 </div>
             )}
 
             {/* Submit */}
-            <button
+            <PrimaryButton
+                text={editingProduct ? t('update_product') : t('create_product')}
                 onClick={handleSubmit}
-                disabled={loading || !isFormValid}
-                className='w-full h-12 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer'
-            >
-                {loading ? (
-                    <><Loader size={16} className='animate-spin' /> Processing...</>
-                ) : (
-                    editingProduct ? 'Update Product' : 'Create Product'
-                )}
-            </button>
+                loading={loading}
+                disabled={!isFormValid}
+                LoadingText={t('processing')}
+                className='w-full h-12'
+            />
 
         </div>
     )
 }
 
 export default ProductForm
+

@@ -1,17 +1,18 @@
 ﻿import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import useScrollReveal from '../../hooks/useScrollReveal'
-
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
+import { useTranslation } from 'react-i18next'
 const PROMO_CARDS = [
     {
-        title: 'New Season Arrivals',
-        subtitle: 'Fresh placeholder picks for this month',
+        title: 'new_season_arrivals',
+        subtitle: 'new_season_arrivals_desc',
         darkGradient: 'bg-gradient-to-br from-emerald-500/20 via-zinc-900 to-zinc-950',
         lightGradient: 'bg-gradient-to-br from-emerald-100 via-white to-zinc-100',
     },
     {
-        title: 'Under ₹999 Store',
-        subtitle: 'Placeholder deals for budget-friendly finds',
+        title: 'under_999_store',
+        subtitle: 'under_999_store_desc',
         darkGradient: 'bg-gradient-to-br from-cyan-500/15 via-zinc-900 to-zinc-950',
         lightGradient: 'bg-gradient-to-br from-cyan-100 via-white to-zinc-100',
     },
@@ -22,6 +23,7 @@ function PromoBannerGrid() {
     const { theme } = useSelector(state => state.theme)
     const [ref, isVisible] = useScrollReveal()
 
+    const { t } = useTranslation('home')
     const isLight = theme === 'light'
 
     return (
@@ -35,7 +37,7 @@ function PromoBannerGrid() {
                 {PROMO_CARDS.map(card => (
                     <button
                         key={card.title}
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(navigationStrings.PRODUCTS)}
                         className={`rounded-2xl overflow-hidden relative h-48 p-6 text-left border cursor-pointer transition-colors duration-200 ${
                             isLight
                                 ? `border-zinc-200 hover:border-emerald-500 ${card.lightGradient}`
@@ -45,15 +47,15 @@ function PromoBannerGrid() {
                         <div className='h-full flex flex-col justify-between'>
                             <div>
                                 <h3 className={`text-2xl font-bold leading-tight ${isLight ? 'text-zinc-900' : 'text-white'}`}>
-                                    {card.title}
+                                    {t(card.title)}
                                 </h3>
                                 <p className={`text-sm mt-2 ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
-                                    {card.subtitle}
+                                    {t(card.subtitle)}
                                 </p>
                             </div>
 
                             <span className={`text-sm font-medium ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>
-                                Shop Now →
+                                {t('shop_now')} →
                             </span>
                         </div>
                     </button>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
-
+import { useTranslation } from "react-i18next";
 import useToast from "../../utils/useToast.js";
 
 // ── Validations ──
@@ -17,8 +17,10 @@ import { resetPassword } from "../../redux/reduxActions/authActions.js";
 import Toast from "../../components/common_components/Toast.jsx";
 import BrandLogo from "../../components/common_components/BrandLogo.jsx";
 import ResetPasswordForm from "./ResetPasswordForm.jsx";
+import navigationStrings from "../../constants/navigationStrings/navigationStrings.js";
 
 function ResetPassword() {
+    const { t } = useTranslation('auth');
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -40,7 +42,7 @@ function ResetPassword() {
 
     useEffect(() => {
         if (!resetToken) {
-            navigate("/forgot-password");
+            navigate(navigationStrings.FORGOT_PASSWORD);
         }
     }, [resetToken, navigate]);
 
@@ -62,24 +64,24 @@ function ResetPassword() {
     const _checkValidations = () => {
 
         if (checkIsEmpty(newPassword)) {
-            showToast("Please enter your new password.");
+            showToast(t("new_password_required"));
             return false;
         }
 
         if (!isValidPassword(newPassword)) {
             showToast(
-                "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character."
+                t("password_policy_error")
             );
             return false;
         }
 
         if (checkIsEmpty(confirmPassword)) {
-            showToast("Please confirm your password.");
+            showToast(t("confirm_password_required"));
             return false;
         }
 
         if (newPassword !== confirmPassword) {
-            showToast("Passwords do not match.");
+            showToast(t("passwords_do_not_match"));
             return false;
         }
 
@@ -105,7 +107,7 @@ function ResetPassword() {
             showToast(response.message,"success");
 
             setTimeout(() => {
-                navigate("/login");
+                navigate(navigationStrings.LOGIN);
             }, 1000);
 
         } catch (error) {
@@ -113,7 +115,7 @@ function ResetPassword() {
             if (error.response) {
                 showToast(error.response.data.message);
             } else {
-                showToast("Server not reachable.");
+                showToast(t("server_not_reachable"));
             }
 
         } finally {
@@ -149,11 +151,11 @@ function ResetPassword() {
                     <div>
 
                         <h1 className="text-white text-2xl font-bold tracking-tight">
-                            Reset Password
+                            {t("reset_password")}
                         </h1>
 
                         <p className="text-zinc-400 text-sm">
-                            Create a strong password for your account
+                            {t("reset_password_description")}
                         </p>
 
                     </div>
@@ -174,10 +176,10 @@ function ResetPassword() {
                 />
 
                 <p
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate(navigationStrings.LOGIN)}
                     className="text-center text-sm text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 mt-6"
                 >
-                    ← Back to Login
+                    {t("back_to_login")}
                 </p>
 
             </div>

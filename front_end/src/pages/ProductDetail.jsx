@@ -1,27 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { fetchProductById, addCartItem } from '../redux/reduxActions'
+import { useTranslation } from 'react-i18next'
+import { Heart } from 'lucide-react'
+import { formatCurrency } from '../utils/CommonFunctions.js'
+import { fetchProductById, addCartItem, fetchUserWishlist, addToWishlist, removeFromWishlist } from '../redux/reduxActions'
 import PrimaryButton from '../components/common_components/PrimaryButton'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
 
 function ProductDetail() {
+    const { t, i18n } = useTranslation('product')
+    const isRTL = i18n.dir() === 'rtl'
     const { id } = useParams()
     const navigate = useNavigate()
 
     const { selectedProduct: product, productLoading } = useSelector(state => state.products)
     const { userData } = useSelector(state => state.auth)
+    const { wishlist } = useSelector(state => state.wishlist)
 
     const [quantity, setQuantity] = useState(1)
     const [adding, setAdding] = useState(false)
     const [feedback, setFeedback] = useState(null)
+    const [togglingWishlist, setTogglingWishlist] = useState(false)
 
     useEffect(() => {
         fetchProductById(id)   // plain call
     }, [id])
 
+    useEffect(() => {
+        if (userData) fetchUserWishlist().catch(() => { })
+    }, [userData])
+
+    const isWishlisted = useMemo(
+        () => wishlist.some(item => item.product?._id === product?._id),
+        [wishlist, product]
+    )
+
     const handleAddToCart = async () => {
         if (!userData) {
-            navigate('/login')
+            navigate(navigationStrings.LOGIN)
             return
         }
 
@@ -29,24 +46,40 @@ function ProductDetail() {
         setFeedback(null)
 
         try {
-            const result = await addCartItem({ productId: product._id, quantity })
-            if (result.success) {
-                setFeedback({ success: true, msg: 'Added to cart successfully!' })
-            } else {
-                setFeedback({ success: false, msg: result.message || 'Failed to add to cart.' })
-            }
+            await addCartItem({ productId: product._id, quantity })
+            setFeedback({ success: true, msg: t('added_to_cart_successfully') })
         } catch (err) {
-            setFeedback({ success: false, msg: 'Something went wrong.' })
-        } finally {
+            setFeedback({ success: false, msg: err.response?.data?.message || t('something_went_wrong') })
+        }
+        finally {
             setAdding(false)
             setTimeout(() => setFeedback(null), 3000)
+        }
+    }
+
+    const handleToggleWishlist = async () => {
+        if (!userData) {
+            navigate(navigationStrings.LOGIN)
+            return
+        }
+        setTogglingWishlist(true)
+        try {
+            if (isWishlisted) {
+                await removeFromWishlist(product._id)
+            } else {
+                await addToWishlist(product._id)
+            }
+        } catch {
+            // wishlistError is already in Redux if this fails
+        } finally {
+            setTogglingWishlist(false)
         }
     }
 
     if (productLoading) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex justify-center items-center'>
-                <p className='text-zinc-400 text-sm'>Loading product...</p>
+                <p className='text-zinc-400 text-sm'>{t('loading_product')}</p>
             </div>
         )
     }
@@ -54,9 +87,9 @@ function ProductDetail() {
     if (!product) {
         return (
             <div className='w-full min-h-screen bg-[var(--color-bg)] flex flex-col justify-center items-center gap-4'>
-                <p className='text-zinc-400 text-sm'>Product not found.</p>
-                <button onClick={() => navigate('/products')} className='text-emerald-400 text-sm hover:text-emerald-300 transition-colors duration-200'>
-                    Back to products
+                <p className='text-zinc-400 text-sm'>{t('product_not_found')}</p>
+                <button onClick={() => navigate(navigationStrings.PRODUCTS)} className='text-emerald-400 text-sm hover:text-emerald-300 transition-colors duration-200'>
+                    {t('back_to_products')}
                 </button>
             </div>
         )
@@ -66,42 +99,60 @@ function ProductDetail() {
         <div className='w-full min-h-screen bg-[var(--color-bg)] px-6 py-10'>
 
             <button
-                onClick={() => navigate('/products')}
+                onClick={() => navigate(navigationStrings.PRODUCTS)}
                 className='text-zinc-400 text-sm hover:text-white transition-colors duration-200 mb-8 flex items-center gap-2 cursor-pointer'
             >
-                ← Back to products
+                ← {t('back_to_products')}
             </button>
 
             <div className='max-w-4xl mx-auto flex flex-col md:flex-row gap-10'>
 
-                <div className='w-full md:w-[45%] bg-zinc-800 rounded-2xl overflow-hidden h-80 md:h-auto flex-shrink-0'>
+                <div className='relative w-full md:w-[45%] bg-zinc-800 rounded-2xl overflow-hidden h-80 md:h-auto flex-shrink-0'>
                     {product.image ? (
                         <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
                     ) : (
-                        <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>No Image</div>
+                        <div className='w-full h-full flex items-center justify-center text-zinc-600 text-sm'>{t('no_image')}</div>
                     )}
+
+                    <button
+                        onClick={handleToggleWishlist}
+                        disabled={togglingWishlist}
+                        aria-label={isWishlisted ? t('remove_from_wishlist') : t('add_to_wishlist')}
+                        className='absolute top-3 right-3 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/60'
+                    >
+                        <Heart
+                            size={20}
+                            className={isWishlisted ? 'text-red-500' : 'text-white'}
+                            fill={isWishlisted ? 'currentColor' : 'none'}
+                        />
+                    </button>
                 </div>
 
                 <div className='flex flex-col gap-5 flex-1'>
 
                     <div className='flex flex-col gap-2'>
                         <h1 className='text-white text-2xl font-semibold tracking-tight'>{product.title}</h1>
+                        {product.seller?.name && (
+                            <p className='text-zinc-500 text-xs'>
+                                {t('sold_by', { name: product.seller.name })}
+                            </p>
+                        )}
                         <p className='text-zinc-400 text-sm leading-relaxed'>{product.description}</p>
                     </div>
 
-                    <span className='text-emerald-400 text-3xl font-bold'>₹{product.price.toLocaleString('en-IN')}</span>
+                    <span className='text-emerald-400 text-3xl font-bold'>{formatCurrency(product.price, isRTL)}</span>
 
                     {product.stock === 0 ? (
-                        <span className='text-red-400 text-sm font-medium'>Out of stock</span>
+                        <span className='text-red-400 text-sm font-medium'>{t('out_of_stock')}</span>
                     ) : (
-                        <span className='text-zinc-500 text-sm'>{product.stock} items in stock</span>
+                        <span className='text-zinc-500 text-sm'>{product.stock} {t('items_in_stock')}</span>
                     )}
 
                     <div className='h-px bg-zinc-800 w-full' />
 
                     {product.stock > 0 && (
                         <div className='flex items-center gap-4'>
-                            <span className='text-zinc-400 text-sm'>Quantity</span>
+                            <span className='text-zinc-400 text-sm'>{t('quantity')}</span>
                             <div className='flex items-center gap-3'>
                                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className='w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-white hover:border-emerald-500 transition-colors duration-200 flex items-center justify-center text-lg'>−</button>
                                 <span className='text-white font-medium w-6 text-center'>{quantity}</span>
@@ -117,12 +168,12 @@ function ProductDetail() {
                     )}
 
                     <PrimaryButton
-                    onClick={handleAddToCart}
-                    text="Add to Cart"
-                    LoadingText='Adding...'
-                    className='w-full'
-                    disabled={product.stock === 0 || adding}
-                    loading={adding}
+                        onClick={handleAddToCart}
+                        text={t('add_to_cart')}
+                        LoadingText={t('adding')}
+                        className='w-full'
+                        disabled={product.stock === 0 || adding}
+                        loading={adding}
                     />
 
                 </div>

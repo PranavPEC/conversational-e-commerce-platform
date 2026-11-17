@@ -1,18 +1,24 @@
-
 import colors from '../../constants/colors/colors'
-import { localStrings } from '../../constants/lang'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { preloadSocialAuth } from '../../redux/reduxActions'
 
-// UI only — no props, no logic
-// Shared by Login.jsx and SignUp.jsx
-// Social auth is not yet implemented — buttons are placeholders
+// UI only, logic passed in via props — same pattern as PrimaryButton.
+// Shared by Login.jsx and SignUp.jsx.
+// Apple/Facebook remain placeholders — not implemented.
 
-function SocialButtons() {
+function SocialButtons({ onGoogleAuth, onFacebookAuth }) {
+    const { t } = useTranslation('common');
+    useEffect(() => {
+        preloadSocialAuth()
+    }, [])
+
     return (
         <>
             {/* Divider */}
             <div className='flex items-center gap-3 my-5'>
                 <div className='flex-1 h-px bg-zinc-800' />
-                <span className='text-zinc-500 text-xs'>{localStrings.or_continue_with}</span>
+                <span className='text-zinc-500 text-xs'>{t('or_continue_with')}</span>
                 <div className='flex-1 h-px bg-zinc-800' />
             </div>
 
@@ -22,6 +28,7 @@ function SocialButtons() {
                 {/* Google */}
                 <button
                     type='button'
+                    onClick={onGoogleAuth}
                     className='flex-1 h-11 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl flex items-center justify-center transition-colors duration-200 cursor-pointer'
                 >
                     <svg width='18' height='18' viewBox='0 0 24 24'>
@@ -45,6 +52,7 @@ function SocialButtons() {
                 {/* Facebook */}
                 <button
                     type='button'
+                    onClick={onFacebookAuth}
                     className='flex-1 h-11 bg-blue-600 hover:bg-blue-500 border border-blue-600 rounded-xl flex items-center justify-center transition-colors duration-200 cursor-pointer'
                 >
                     <svg width='18' height='18' viewBox='0 0 24 24' fill='white'>

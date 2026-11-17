@@ -1,8 +1,7 @@
 // src/redux/reduxActions/orderActions.js
 
 import axios from "axios"
-import { SERVER_URL } from "../../utils/APIConfig"
-import { CREATE_RAZORPAY_ORDER_URL,VERIFY_PAYMENT_URL,GET_MY_ORDERS_URL,CANCEL_ORDER_URL } from "../../config/urls"
+import { CREATE_RAZORPAY_ORDER_URL,VERIFY_PAYMENT_URL,GET_MY_ORDERS_URL,CANCEL_ORDER_URL,REQUEST_RETURN_URL,GET_SELLER_ORDERS_URL,UPDATE_ORDER_STATUS_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
     setPendingOrder,
@@ -14,24 +13,28 @@ import {
     setOrdersLoading,
     setOrdersError,
     updateOrderInList,
+    setSellerOrders,
+    setSellerOrdersLoading,
+    setSellerOrdersError,
+    updateSellerOrderInList,
 } from "../reduxReducers/orderReducers"
 
 const { dispatch } = store
 
 // ── Create Razorpay order ──
 // Returns the pendingOrder object that CheckoutModal uses to open Razorpay SDK
-export const createRazorpayOrder = async ({ address }) => {
+export const createRazorpayOrder = async ({ addressId }) => {
     dispatch(setOrderLoading(true))
     dispatch(setOrderError(null))
 
     try {
         const { data } = await axios.post(
             CREATE_RAZORPAY_ORDER_URL,
-            { address },
+            { addressId },
             { withCredentials: true }
         )
-        dispatch(setPendingOrder(data))
-        return data
+        dispatch(setPendingOrder(data.data))
+        return data.data
     } catch (error) {
         const msg = error.response?.data?.message || "Failed to create order."
         dispatch(setOrderError(msg))
@@ -60,7 +63,7 @@ export const verifyRazorpayPayment = async ({
         )
         dispatch(setPaymentSuccess(true))
         dispatch(setPendingOrder(null))
-        return data
+        return data.data
     } catch (error) {
         const msg = error.response?.data?.message || "Payment verification failed."
         dispatch(setOrderError(msg))
@@ -80,8 +83,8 @@ export const fetchUserOrders = async () => {
             GET_MY_ORDERS_URL,
             { withCredentials: true }
         )
-        dispatch(setOrders(data.orders))
-        return data.orders
+        dispatch(setOrders(data.data.orders))
+        return data.data.orders
     } catch (error) {
         dispatch(setOrdersError(
             error.response?.data?.message || "Failed to fetch orders."
@@ -103,8 +106,8 @@ export const cancelOrder = async (orderId) => {
             { withCredentials: true }
         )
         // Patch just this one order in the list — no need to re-fetch all
-        dispatch(updateOrderInList(data.order))
-        return data.order
+        dispatch(updateOrderInList(data.data.order))
+        return data.data.order
     } catch (error) {
         dispatch(setOrdersError(
             error.response?.data?.message || "Failed to cancel order."
@@ -113,5 +116,69 @@ export const cancelOrder = async (orderId) => {
     }
 }
 
+// ── Request a return for a delivered order ──
+export const requestReturn = async (orderId, reason) => {
+    dispatch(setOrdersError(null))
+
+    try {
+        const { data } = await axios.put(
+            REQUEST_RETURN_URL(orderId),
+            { reason },
+            { withCredentials: true }
+        )
+        // Patch just this one order in the list — no need to re-fetch all
+        dispatch(updateOrderInList(data.data.order))
+        return data.data.order
+    } catch (error) {
+        dispatch(setOrdersError(
+            error.response?.data?.message || "Failed to request return."
+        ))
+        throw error
+    }
+}
+
 // ── Reset order state (called when checkout modal closes) ──
 export { resetOrder }
+
+// ── Fetch all orders for the logged-in seller ──
+export const fetchSellerOrders = async () => {
+    dispatch(setSellerOrdersLoading(true))
+    dispatch(setSellerOrdersError(null))
+
+    try {
+        const { data } = await axios.get(
+            GET_SELLER_ORDERS_URL,
+            { withCredentials: true }
+        )
+        dispatch(setSellerOrders(data.data.orders))
+        return data.data.orders
+    } catch (error) {
+        dispatch(setSellerOrdersError(
+            error.response?.data?.message || "Failed to fetch seller orders."
+        ))
+        throw error
+    } finally {
+        dispatch(setSellerOrdersLoading(false))
+    }
+}
+
+// ── Update an order's status (approve / reject / ship / deliver) ──
+export const updateSellerOrderStatus = async (orderId, status) => {
+    dispatch(setSellerOrdersError(null))
+
+    try {
+        const { data } = await axios.put(
+            UPDATE_ORDER_STATUS_URL(orderId),
+            { status },
+            { withCredentials: true }
+        )
+        // Patch just this one order in the list — no need to re-fetch all
+        dispatch(updateSellerOrderInList(data.data.order))
+        return data.data.order
+    } catch (error) {
+        dispatch(setSellerOrdersError(
+            error.response?.data?.message || "Failed to update order status."
+        ))
+        throw error
+    }
+}

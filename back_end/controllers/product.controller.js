@@ -1,5 +1,6 @@
 ﻿import Product, { PRODUCT_CATEGORIES } from "../models/user.product.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 // ── Parse and normalize a categories value from FormData ──
 // FormData sends arrays as JSON strings (Admin.jsx stringifies before appending).
@@ -16,30 +17,26 @@ const parseCategories = (raw) => {
     return arr.map(c => String(c).trim().toLowerCase()).filter(Boolean)
 }
 
-// Create Product  (Admin Only)
+// Create Product  (Seller Only)
 export const createProduct = async (req, res) => {
     try {
         const { title, description, price, stock, category } = req.body;
 
         if (!title || !description || !price || !stock || !category) {
-            return res.status(400).json({
-                message: "Please provide all required fields: title, description, price, stock, category."
-            });
+            return sendError(res, 400, "Please provide all required fields: title, description, price, stock, category.");
         }
 
         const categories = parseCategories(category)
         if (!categories || categories.length === 0) {
-            return res.status(400).json({ message: "At least one category is required." })
+            return sendError(res, 400, "At least one category is required.")
         }
         const invalidCategory = categories.find(c => !PRODUCT_CATEGORIES.includes(c))
         if (invalidCategory) {
-            return res.status(400).json({ message: `Invalid category: ${invalidCategory}` })
+            return sendError(res, 400, `Invalid category: ${invalidCategory}`)
         }
 
         if (price < 0 || stock < 0) {
-            return res.status(400).json({
-                message: "Price and stock cannot be negative."
-            });
+            return sendError(res, 400, "Price and stock cannot be negative.");
         }
 
         // Upload image to Cloudinary if provided
@@ -55,16 +52,15 @@ export const createProduct = async (req, res) => {
             price: Number(price),   // req.body values from FormData come as strings — convert
             stock: Number(stock),
             category: categories,
-            image
+            image,
+            seller: req.userId,     // req.userId was attached by checkAuth middleware
         });
 
-        return res.status(201).json({
-            message: "Product Created Successfully.",
-            product: newProduct
-        });
+        return sendSuccess(res, 201, "Product Created Successfully.", { product: newProduct });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -103,9 +99,10 @@ export const getAllProducts = async (req, res) => {
         }
 
         const products = await Product.find(query)
-        return res.status(200).json({ message: "Products Fetched Successfully.", products });
+        return sendSuccess(res, 200, "Products Fetched Successfully.", { products });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -113,13 +110,26 @@ export const getAllProducts = async (req, res) => {
 // Get Single Product By ID  (Public)
 export const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate("seller", "name");
         if (!product) {
-            return res.status(404).json({ message: "Product Not Found." });
+            return sendError(res, 404, "Product Not Found.");
         }
-        return res.status(200).json({ message: "Product Fetched Successfully.", product });
+        return sendSuccess(res, 200, "Product Fetched Successfully.", { product });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
+    }
+};
+
+
+// Get My Products  (Seller Only) — only returns products owned by req.userId
+export const getMyProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ seller: req.userId });
+        return sendSuccess(res, 200, "My Products Fetched Successfully.", { products });
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -127,28 +137,40 @@ export const getProductById = async (req, res) => {
 // Update Product  (Admin Only)
 export const updateProduct = async (req, res) => {
     try {
-        const { title, description, price, stock, category } = req.body;
-
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product Not Found." });
+            return sendError(res, 404, "Product Not Found.");
+        }
+        // Ownership check: only the owning seller can update; admins bypass this
+        // Legacy products (seller === null) are admin-only — no seller can claim them
+        if (req.userRole !== 'admin') {
+            if (!product.seller || product.seller.toString() !== req.userId) {
+                return sendError(res, 403, "Access denied. You can only update your own products.");
+            }
         }
 
+        const { title, description, price, stock, category } = req.body;
+
+        // const product = await Product.findById(req.params.id);
+        // if (!product) {
+        //     return sendError(res, 404, "Product Not Found.");
+        // }
+
         if (price !== undefined && Number(price) < 0) {
-            return res.status(400).json({ message: "Price cannot be negative." });
+            return sendError(res, 400, "Price cannot be negative.");
         }
         if (stock !== undefined && Number(stock) < 0) {
-            return res.status(400).json({ message: "Stock cannot be negative." });
+            return sendError(res, 400, "Stock cannot be negative.");
         }
 
         if (category !== undefined) {
             const categories = parseCategories(category)
             if (!categories || categories.length === 0) {
-                return res.status(400).json({ message: "At least one category is required." })
+                return sendError(res, 400, "At least one category is required.")
             }
             const invalidCategory = categories.find(c => !PRODUCT_CATEGORIES.includes(c))
             if (invalidCategory) {
-                return res.status(400).json({ message: `Invalid category: ${invalidCategory}` })
+                return sendError(res, 400, `Invalid category: ${invalidCategory}`)
             }
             product.category = categories
         }
@@ -166,28 +188,36 @@ export const updateProduct = async (req, res) => {
 
         await product.save();
 
-        return res.status(200).json({
-            message: "Product Updated Successfully.",
-            product
-        });
+        return sendSuccess(res, 200, "Product Updated Successfully.", { product });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
 
-// Delete Product  (Admin Only)
+// Delete Product  (Seller Only)
 export const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: "Product Not Found." });
+            return sendError(res, 404, "Product Not Found.");
         }
 
-        return res.status(200).json({ message: "Product Deleted Successfully." });
+        // Ownership check: only the owning seller can delete; admins bypass this
+        if (req.userRole !== 'admin') {
+            if (!product.seller || product.seller.toString() !== req.userId) {
+                return sendError(res, 403, "Access denied. You can only delete your own products.");
+            }
+        }
+
+        await Product.findByIdAndDelete(req.params.id);
+
+        return sendSuccess(res, 200, "Product Deleted Successfully.");
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };

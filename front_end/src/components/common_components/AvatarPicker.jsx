@@ -54,6 +54,7 @@ function AvatarPicker({
                     <img
                         src={imageToShow}
                         className='w-full h-full object-cover'
+                        referrerPolicy='no-referrer'
                         alt='profile preview'
                     />
                 ) : initial ? (

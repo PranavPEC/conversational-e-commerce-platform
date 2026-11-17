@@ -4,23 +4,29 @@ import {
     createProduct,
     getAllProducts,
     getProductById,
+    getMyProducts,
     updateProduct,
     deleteProduct
 } from "../controllers/product.controller.js";
 
 import { checkAuth } from "../middleware/checkAuth.user.js";
-import { checkAdmin } from "../middleware/checkAdmin.middleware.js";
 import { upload } from "../middleware/multer.js";
+import { checkSeller } from "../middleware/checkSeller.middleware.js";
+import { validateObjectId } from "../middleware/validateObjectId.middleware.js";
 
 const productRouter = express.Router();
 
 // Public Routes — anyone can browse products
 productRouter.get("/all", getAllProducts);
-productRouter.get("/:id", getProductById);
 
-// Admin Routes — must be logged in AND be an admin
-productRouter.post("/create", checkAuth, checkAdmin, upload.single("image"), createProduct);
-productRouter.put("/update/:id", checkAuth, checkAdmin, upload.single("image"), updateProduct);
-productRouter.delete("/delete/:id", checkAuth, checkAdmin, deleteProduct);
+// Seller Routes — must be logged in AND be a seller
+// NOTE: /my-products must be declared BEFORE /:id to prevent Express matching "my-products" as an id param
+productRouter.get("/my-products", checkAuth, checkSeller, getMyProducts);
+productRouter.post("/create", checkAuth, checkSeller, upload.single("image"), createProduct);
+productRouter.put("/update/:id", checkAuth, checkSeller, validateObjectId(), upload.single("image"), updateProduct);
+productRouter.delete("/delete/:id", checkAuth, checkSeller, validateObjectId(), deleteProduct);
+
+// Public — declare LAST so /my-products above is not swallowed by this wildcard
+productRouter.get("/:id", validateObjectId(), getProductById);
 
 export default productRouter;

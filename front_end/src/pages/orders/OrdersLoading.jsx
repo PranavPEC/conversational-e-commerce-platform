@@ -1,5 +1,3 @@
-import React from 'react'
-
 // No props — purely visual skeleton
 // Shown while ordersLoading is true in Orders.jsx
 

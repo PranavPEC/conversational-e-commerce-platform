@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
 import useToast from "../../utils/useToast.js";
 import { forgotPassword } from "../../redux/reduxActions/authActions.js";
-
+import { useTranslation } from "react-i18next";
 // ── Validations ──
 import { checkIsEmpty, isValidEmail } from "../../utils/validations.js";
 
@@ -11,11 +11,14 @@ import { checkIsEmpty, isValidEmail } from "../../utils/validations.js";
 import Toast from "../../components/common_components/Toast.jsx";
 import BrandLogo from "../../components/common_components/BrandLogo.jsx";
 import ForgotPasswordForm from "./ForgotPasswordForm.jsx";
+import navigationStrings from "../../constants/navigationStrings/navigationStrings.js";
 
 function ForgotPassword() {
     const navigate = useNavigate();
 
     const { toast, toastVisible, showToast, dismissToast } = useToast();
+
+    const { t } = useTranslation('auth');
 
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
@@ -23,12 +26,12 @@ function ForgotPassword() {
     // ── Validations ──
     const _checkValidations = () => {
         if (checkIsEmpty(email)) {
-            showToast("Please enter your email.");
+            showToast(t("email_required"));
             return false;
         }
 
         if (!isValidEmail(email)) {
-            showToast("Please enter a valid email address.");
+            showToast(t("invalid_email"));
             return false;
         }
 
@@ -50,7 +53,7 @@ function ForgotPassword() {
             showToast(response.message,"success");
 
             setTimeout(() => {
-                navigate("/verify-otp", {
+                navigate(navigationStrings.VERIFY_OTP, {
                     state: { email },
                 });
             }, 1500);
@@ -60,7 +63,7 @@ function ForgotPassword() {
             if (error.response) {
                 showToast(error.response.data.message);
             } else {
-                showToast("Server not reachable.");
+                showToast(t("server_not_reachable"));
             }
 
         } finally {
@@ -88,11 +91,11 @@ function ForgotPassword() {
 
                     <div>
                         <h1 className="text-white text-2xl font-bold tracking-tight">
-                            Forgot Password
+                            {t("forgot_password")}
                         </h1>
 
                         <p className="text-zinc-400 text-sm">
-                            Enter your registered email address
+                            {t("forgot_password_description")}
                         </p>
                     </div>
                 </div>
@@ -105,10 +108,10 @@ function ForgotPassword() {
                 />
 
                 <p
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate(navigationStrings.LOGIN)}
                     className="text-center text-sm text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 mt-6"
                 >
-                    ← Back to Login
+                    {t("back_to_login")}
                 </p>
 
             </div>

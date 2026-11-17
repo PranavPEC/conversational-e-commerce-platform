@@ -3,10 +3,12 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
-    products: [],
-    adminLoading: false,
-    adminError: null,
-    adminSuccess: null,
+    dashboardStats: null,
+    dashboardLoading: false,
+    dashboardError: null,
+    sellerApplications: [],
+    sellerApplicationsLoading: false,
+    sellerApplicationsError: null,
 }
 
 const adminSlice = createSlice({
@@ -14,54 +16,46 @@ const adminSlice = createSlice({
     initialState,
 
     reducers: {
-        setAdminProducts: (state, action) => {
-            state.products = action.payload
+        setDashboardStats: (state, action) => {
+            state.dashboardStats = action.payload
         },
 
-        // Called after create — new product added to top of list
-        addAdminProduct: (state, action) => {
-            state.products.unshift(action.payload)
+        setDashboardLoading: (state, action) => {
+            state.dashboardLoading = action.payload
         },
 
-        // Called after update — find by _id and replace in place
-        updateAdminProduct: (state, action) => {
-            const idx = state.products.findIndex(p => p._id === action.payload._id)
-            if (idx !== -1) state.products[idx] = action.payload
+        setDashboardError: (state, action) => {
+            state.dashboardError = action.payload
         },
 
-        // Called after delete — filter out by id
-        removeAdminProduct: (state, action) => {
-            state.products = state.products.filter(p => p._id !== action.payload)
+        setSellerApplications: (state, action) => {
+            state.sellerApplications = action.payload
         },
 
-        setAdminLoading: (state, action) => {
-            state.adminLoading = action.payload
+        setSellerApplicationsLoading: (state, action) => {
+            state.sellerApplicationsLoading = action.payload
         },
 
-        setAdminError: (state, action) => {
-            state.adminError = action.payload
+        setSellerApplicationsError: (state, action) => {
+            state.sellerApplicationsError = action.payload
         },
 
-        setAdminSuccess: (state, action) => {
-            state.adminSuccess = action.payload
-        },
-
-        clearAdminStatus: (state) => {
-            state.adminError = null
-            state.adminSuccess = null
+        updateSellerApplicationInList: (state, action) => {
+            const updated = action.payload
+            const idx = state.sellerApplications.findIndex(seller => seller._id === updated._id)
+            if (idx !== -1) state.sellerApplications[idx] = updated
         },
     },
 })
 
 export const {
-    setAdminProducts,
-    addAdminProduct,
-    updateAdminProduct,
-    removeAdminProduct,
-    setAdminLoading,
-    setAdminError,
-    setAdminSuccess,
-    clearAdminStatus,
+    setDashboardStats,
+    setDashboardLoading,
+    setDashboardError,
+    setSellerApplications,
+    setSellerApplicationsLoading,
+    setSellerApplicationsError,
+    updateSellerApplicationInList,
 } = adminSlice.actions
 
 export default adminSlice.reducer

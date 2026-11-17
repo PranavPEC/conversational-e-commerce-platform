@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const forgotPassword = async (req, res) => {
     //console.log("Forgot Password Controller Hits.")
@@ -7,18 +8,12 @@ export const forgotPassword = async (req, res) => {
         //console.log("Entered Forgot Password Controller try Block.")
         const { email } = req.body;
         if (!email) {
-            return res.status(400).json({
-                success: false,
-                message: "Email is Required"
-            })
+            return sendError(res, 400, "Email is Required")
         }
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(200).json({
-                success: true,
-                message: "If an account with this email exists, an OTP has been sent.",
-            })
+            return sendSuccess(res, 200, "If an account with this email exists, an OTP has been sent.")
         }
 
         // ── Resend OTP Cooldown ──
@@ -31,11 +26,8 @@ export const forgotPassword = async (req, res) => {
 
             if (secondsPassed < cooldown) {
 
-                return res.status(429).json({
-                    success: false,
-                    message: `Please wait ${cooldown - secondsPassed
-                        } seconds before requesting another OTP.`,
-                });
+                return sendError(res, 429, `Please wait ${cooldown - secondsPassed
+                    } seconds before requesting another OTP.`);
 
             }
 
@@ -50,17 +42,12 @@ export const forgotPassword = async (req, res) => {
 
         await user.save();
         await sendEmail(email, otp);
-        return res.status(200).json({
-            success: true,
-            message: "If an account with this email exists, an OTP has been sent.",
-        })
+        return sendSuccess(res, 200, "If an account with this email exists, an OTP has been sent.")
 
 
     }
     catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        console.error(error);
+        return sendError(res, 500, error.message, error.message);
     }
 }

@@ -1,4 +1,5 @@
 import Address from "../models/address.model.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 // Create Address
 export const createAddress = async (req, res) => {
@@ -6,7 +7,7 @@ export const createAddress = async (req, res) => {
         const { label, fullName, phone, line1, line2, city, state, pincode, isDefault } = req.body;
 
         if (!fullName || !phone || !line1 || !city || !state || !pincode) {
-            return res.status(400).json({ message: "Please fill all required address fields." });
+            return sendError(res, 400, "Please fill all required address fields.");
         }
 
         // A user's very first address always becomes their default —
@@ -33,10 +34,11 @@ export const createAddress = async (req, res) => {
             isDefault: shouldBeDefault
         });
 
-        return res.status(201).json({ message: "Address Added Successfully.", address });
+        return sendSuccess(res, 201, "Address Added Successfully.", { address });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -48,10 +50,11 @@ export const getUserAddresses = async (req, res) => {
         const addresses = await Address.find({ user: req.userId })
             .sort({ isDefault: -1, createdAt: -1 });
 
-        return res.status(200).json({ addresses });
+        return sendSuccess(res, 200, "Addresses Fetched Successfully.", { addresses });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -62,11 +65,11 @@ export const updateAddress = async (req, res) => {
         const address = await Address.findById(req.params.id);
 
         if (!address) {
-            return res.status(404).json({ message: "Address Not Found." });
+            return sendError(res, 404, "Address Not Found.");
         }
 
         if (address.user.toString() !== req.userId) {
-            return res.status(403).json({ message: "Unauthorized Access." });
+            return sendError(res, 403, "Unauthorized Access.");
         }
 
         const { label, fullName, phone, line1, line2, city, state, pincode, isDefault } = req.body;
@@ -82,10 +85,11 @@ export const updateAddress = async (req, res) => {
             { returnDocument: 'after' }
         );
 
-        return res.status(200).json({ message: "Address Updated Successfully.", address: updated });
+        return sendSuccess(res, 200, "Address Updated Successfully.", { address: updated });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -96,11 +100,11 @@ export const deleteAddress = async (req, res) => {
         const address = await Address.findById(req.params.id);
 
         if (!address) {
-            return res.status(404).json({ message: "Address Not Found." });
+            return sendError(res, 404, "Address Not Found.");
         }
 
         if (address.user.toString() !== req.userId) {
-            return res.status(403).json({ message: "Unauthorized Access." });
+            return sendError(res, 403, "Unauthorized Access.");
         }
 
         const wasDefault = address.isDefault;
@@ -118,10 +122,11 @@ export const deleteAddress = async (req, res) => {
             }
         }
 
-        return res.status(200).json({ message: "Address Deleted Successfully." });
+        return sendSuccess(res, 200, "Address Deleted Successfully.");
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -132,20 +137,21 @@ export const setDefaultAddress = async (req, res) => {
         const address = await Address.findById(req.params.id);
 
         if (!address) {
-            return res.status(404).json({ message: "Address Not Found." });
+            return sendError(res, 404, "Address Not Found.");
         }
 
         if (address.user.toString() !== req.userId) {
-            return res.status(403).json({ message: "Unauthorized Access." });
+            return sendError(res, 403, "Unauthorized Access.");
         }
 
         await Address.updateMany({ user: req.userId }, { isDefault: false });
         address.isDefault = true;
         await address.save();
 
-        return res.status(200).json({ message: "Default Address Updated.", address });
+        return sendSuccess(res, 200, "Default Address Updated.", { address });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };

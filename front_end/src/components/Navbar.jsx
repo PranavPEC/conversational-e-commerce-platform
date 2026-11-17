@@ -3,8 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import PrimaryButton from './common_components/PrimaryButton.jsx'
+import { useTranslation } from 'react-i18next'
 import { Heart, ShoppingCart, User, Package, Settings, LogOut, ChevronDown, Search, Menu } from 'lucide-react'
-
+import { formatCurrency, getInitial } from '../utils/CommonFunctions.js'
 // ── New architecture: logoutUser is a plain async function, call directly ──
 import { logoutUser } from '../redux/reduxActions'
 
@@ -13,24 +14,28 @@ import { logoutUser } from '../redux/reduxActions'
 import { clearCart } from '../redux/reduxActions'
 import { GET_ALL_PRODUCTS_URL } from '../config/urls'
 import useDebounce from '../hooks/useDebounce'
-
-import { getInitial } from '../utils/CommonFunctions.js'
+import navigationStrings from '../constants/navigationStrings/navigationStrings.js'
+import { prefetch } from '../route/lazyPages.js'
 
 const NAV_CATEGORIES = [
-  { key: 'electronics', label: 'Electronics' },
-  { key: 'fashion', label: 'Fashion' },
-  { key: 'home', label: 'Home' },
-  { key: 'beauty', label: 'Beauty' },
-  { key: 'accessories', label: 'Accessories' },
-  { key: 'audio', label: 'Audio' },
-  { key: 'laptops', label: 'Laptops' },
-  { key: 'premium', label: 'Premium' },
+  { key: 'electronics', label: 'category_electronics' },
+  { key: 'fashion', label: 'category_fashion' },
+  { key: 'home', label: 'category_home' },
+  { key: 'beauty', label: 'category_beauty' },
+  { key: 'accessories', label: 'category_accessories' },
+  { key: 'audio', label: 'category_audio' },
+  { key: 'laptops', label: 'category_laptops' },
+  { key: 'premium', label: 'category_premium' },
 ]
+
+const getProductDetailRoute = (id) => navigationStrings.PRODUCT_DETAIL.replace(':id', id)
 
 function Navbar() {
   const dispatch = useDispatch()    // still needed for clearCart (RTK action)
   const navigate = useNavigate()
   const location = useLocation()
+  const { t, i18n } = useTranslation('common')
+  const isRTL = i18n.dir() === 'rtl'
 
   const { cartCount } = useSelector(state => state.cart)
   const { userData } = useSelector(state => state.auth)
@@ -85,7 +90,7 @@ function Navbar() {
         const { data } = await axios.get(GET_ALL_PRODUCTS_URL(null, debouncedSearch))
         if (!isActive) return
 
-        const suggestions = (data.products || []).slice(0, 5)
+        const suggestions = (data.data.products || []).slice(0, 5)
         setSearchSuggestions(suggestions)
         setSuggestionsOpen(true)
       } catch {
@@ -110,7 +115,7 @@ function Navbar() {
     // clearCart is still an RTK action — needs dispatch() until cart is migrated
     dispatch(clearCart())
     setDropdownOpen(false)
-    navigate('/login', { replace: true })
+    navigate(navigationStrings.LOGIN, { replace: true })
   }
 
   const isActive = (path) => location.pathname === path
@@ -122,25 +127,25 @@ function Navbar() {
     setMobileSearchOpen(false)
 
     if (!query) {
-      navigate('/products')
+      navigate(navigationStrings.PRODUCTS)
       return
     }
 
-    navigate('/products?search=' + encodeURIComponent(query))
+    navigate(navigationStrings.PRODUCTS + '?search=' + encodeURIComponent(query))
   }
 
   const handleSuggestionClick = (id) => {
     setSuggestionsOpen(false)
     setMobileSearchOpen(false)
-    navigate('/product/' + id)
+    navigate(getProductDetailRoute(id))
   }
 
   const handleCategoryNav = (category = null) => {
     if (!category) {
-      navigate('/products')
+      navigate(navigationStrings.PRODUCTS)
       return
     }
-    navigate('/products?category=' + encodeURIComponent(category))
+    navigate(navigationStrings.PRODUCTS + '?category=' + encodeURIComponent(category))
   }
 
   const renderSearchBar = (searchRef, mobile = false) => (
@@ -160,12 +165,12 @@ function Navbar() {
               handleSearchSubmit()
             }
           }}
-          placeholder='Search products...'
+          placeholder={mobile ? t('search_products') : t('search_products')}
           className='w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none'
         />
         <button
           onClick={handleSearchSubmit}
-          aria-label='Search products'
+          aria-label={t('search_products_label')}
           className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
         >
           <Search size={16} />
@@ -175,11 +180,11 @@ function Navbar() {
       {suggestionsOpen && (
         <div className='absolute left-0 right-0 mt-2 bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-2xl shadow-black/20 py-2 z-50 max-h-80 overflow-y-auto'>
           {suggestionsLoading && (
-            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>Searching...</p>
+            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>{t('searching')}</p>
           )}
 
           {!suggestionsLoading && searchSuggestions.length === 0 && (
-            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>No products found.</p>
+            <p className='px-4 py-2.5 text-sm text-[var(--color-text-secondary)]'>{t('no_products_found')}</p>
           )}
 
           {!suggestionsLoading && searchSuggestions.map((product) => (
@@ -190,14 +195,14 @@ function Navbar() {
             >
               <div className='w-10 h-10 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0'>
                 {product.image ? (
-                  <img src={product.image} alt={product.title} className='w-full h-full object-cover' />
+                  <img src={product.image} alt={product.title} loading='lazy' decoding='async' className='w-full h-full object-cover' />
                 ) : (
-                  <div className='w-full h-full flex items-center justify-center text-[10px] text-zinc-500'>No Img</div>
+                  <div className='w-full h-full flex items-center justify-center text-[10px] text-zinc-500'>{t('no_image_short')}</div>
                 )}
               </div>
               <div className='min-w-0'>
                 <p className='text-sm text-[var(--color-text-primary)] font-medium line-clamp-1'>{product.title}</p>
-                <p className='text-xs text-emerald-400 font-semibold'>₹{(product.price ?? 0).toLocaleString('en-IN')}</p>
+                <p className='text-xs text-emerald-400 font-semibold'>{formatCurrency(product.price ?? 0, isRTL)}</p>
               </div>
             </button>
           ))}
@@ -215,31 +220,29 @@ function Navbar() {
         <div className='w-max min-w-full flex items-center justify-center gap-2 md:gap-3'>
           <div className='hidden md:flex items-center gap-2 px-2 py-1.5 rounded-xl text-xs font-semibold text-[var(--color-text-primary)] bg-[var(--color-input-bg)] border border-[var(--color-input-border)]'>
             <Menu size={14} />
-            Shop by Categories
+            {t('shop_by_categories')}
           </div>
 
           <button
             onClick={() => handleCategoryNav(null)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${
-              !activeCategory
-                ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
-                : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
-            }`}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${!activeCategory
+              ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+              : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
+              }`}
           >
-            All
+            {t('all')}
           </button>
 
           {NAV_CATEGORIES.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => handleCategoryNav(key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${
-                activeCategory === key
-                  ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
-                  : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
-              }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors duration-200 cursor-pointer ${activeCategory === key
+                ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+                : 'text-[var(--color-text-secondary)] border-transparent hover:text-[var(--color-text-primary)] hover:bg-[var(--color-input-bg)]'
+                }`}
             >
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -253,7 +256,7 @@ function Navbar() {
       <nav className='w-full bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 md:px-6 py-3 md:py-4 sticky top-0 z-50'>
         <div className='flex items-center justify-between gap-3'>
           <div
-            onClick={() => navigate('/')}
+            onClick={() => navigate(navigationStrings.HOME)}
             className='text-[var(--color-text-primary)] font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
           >
             Shop<span className='text-emerald-400'>AI</span>
@@ -266,7 +269,7 @@ function Navbar() {
           <div className='flex items-center gap-2 md:gap-3'>
             <button
               onClick={() => setMobileSearchOpen(prev => !prev)}
-              aria-label='Open search'
+              aria-label={t('open_search')}
               className='md:hidden text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer p-1'
             >
               <Search size={19} />
@@ -274,16 +277,20 @@ function Navbar() {
 
             {/* ── Login — outline/secondary style, sized to match the navbar's natural height ── */}
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate(navigationStrings.LOGIN)}
+              onMouseEnter={prefetch.login}
+              onFocus={prefetch.login}
               className='flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 bg-transparent border border-[var(--color-input-border)] hover:border-emerald-500 hover:-translate-y-1 active:scale-95 text-[var(--color-text-primary)] rounded-xl text-sm transition-all duration-300 cursor-pointer'
             >
-              Login
+              {t('login')}
             </button>
 
             {/* ── Sign Up — reuses PrimaryButton, opted into the compact "sm" size for Navbar ── */}
             <PrimaryButton
-              text='Sign Up'
-              onClick={() => navigate('/signup')}
+              text={t('sign_up')}
+              onClick={() => navigate(navigationStrings.SIGNUP)}
+              onMouseEnter={prefetch.signup}
+              onFocus={prefetch.signup}
               size='sm'
             />
           </div>
@@ -306,7 +313,7 @@ function Navbar() {
 
       <div className='flex items-center justify-between gap-3'>
         <div
-          onClick={() => navigate('/')}
+          onClick={() => navigate(navigationStrings.HOME)}
           className='text-[var(--color-text-primary)] font-bold text-lg tracking-tight cursor-pointer flex-shrink-0'
         >
           Shop<span className='text-emerald-400'>AI</span>
@@ -320,23 +327,28 @@ function Navbar() {
         <div className='flex items-center gap-3 md:gap-5'>
           <button
             onClick={() => setMobileSearchOpen(prev => !prev)}
-            aria-label='Open search'
+            aria-label={t('open_search')}
             className='md:hidden text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer p-1'
           >
             <Search size={19} />
           </button>
 
           <button
-            onClick={() => navigate('/products')}
-            className={`text-sm transition-colors duration-200 ${isActive('/products') ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
+            onClick={() => navigate(navigationStrings.PRODUCTS)}
+            onMouseEnter={prefetch.products}
+            onFocus={prefetch.products}
+            className={`text-sm transition-colors duration-200 ${isActive(navigationStrings.PRODUCTS) ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
           >
-            Products
+            {t('products')}
           </button>
 
           {/* ── Wishlist — icon only, not functional yet ── */}
+          {/* ── Wishlist ── */}
           <button
-            onClick={() => { }}
-            aria-label='Wishlist'
+            onClick={() => navigate(navigationStrings.WISHLIST)}
+            onMouseEnter={prefetch.wishlist}
+            onFocus={prefetch.wishlist}
+            aria-label={t('wishlist')}
             className='text-[var(--color-text-secondary)] hover:text-emerald-400 transition-colors duration-200 cursor-pointer'
           >
             <Heart size={20} />
@@ -344,9 +356,11 @@ function Navbar() {
 
           {/* ── Cart — icon only, stays outside the dropdown ── */}
           <button
-            onClick={() => navigate('/cart')}
-            aria-label='Cart'
-            className={`relative transition-colors duration-200 cursor-pointer ${isActive('/cart') ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
+            onClick={() => navigate(navigationStrings.CART)}
+            onMouseEnter={prefetch.cart}
+            onFocus={prefetch.cart}
+            aria-label={t('cart')}
+            className={`relative transition-colors duration-200 cursor-pointer ${isActive(navigationStrings.CART) ? 'text-emerald-400' : 'text-[var(--color-text-secondary)] hover:text-emerald-400'}`}
           >
             <ShoppingCart size={20} />
             {cartCount > 0 && (
@@ -366,6 +380,7 @@ function Navbar() {
                 <img
                   src={userData.profileImage}
                   alt={userData.name}
+                  referrerPolicy='no-referrer'
                   className='w-9 h-9 rounded-full object-cover border border-[var(--color-input-border)]'
                 />
               ) : (
@@ -383,33 +398,52 @@ function Navbar() {
               <div className='absolute right-0 mt-3 w-52 bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-2xl shadow-black/20 py-2 z-50'>
 
                 <button
-                  onClick={() => { setDropdownOpen(false); navigate('/profile') }}
+                  onClick={() => { setDropdownOpen(false); navigate(navigationStrings.PROFILE) }}
+                  onMouseEnter={prefetch.profile}
+                  onFocus={prefetch.profile}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
-                  <User size={16} /> Profile
+                  <User size={16} /> {t('profile')}
                 </button>
 
                 <button
-                  onClick={() => { setDropdownOpen(false); navigate('/orders') }}
+                  onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ORDERS) }}
+                  onMouseEnter={prefetch.orders}
+                  onFocus={prefetch.orders}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
-                  <Package size={16} /> My Orders
+                  <Package size={16} /> {t('my_orders')}
                 </button>
+
+                {(userData?.role === 'seller' || userData?.role === 'admin') && (
+                  <button
+                    onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SELLER) }}
+                    onMouseEnter={prefetch.seller}
+                    onFocus={prefetch.seller}
+                    className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
+                  >
+                    <Package size={16} /> {t('seller_dashboard')}
+                  </button>
+                )}
 
                 {userData?.role === 'admin' && (
                   <button
-                    onClick={() => { setDropdownOpen(false); navigate('/admin') }}
+                    onClick={() => { setDropdownOpen(false); navigate(navigationStrings.ADMIN) }}
+                    onMouseEnter={prefetch.admin}
+                    onFocus={prefetch.admin}
                     className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                   >
-                    <Package size={16} /> Admin
+                    <Package size={16} /> {t('admin_dashboard')}
                   </button>
                 )}
 
                 <button
-                  onClick={() => { setDropdownOpen(false); navigate('/settings') }}
+                  onClick={() => { setDropdownOpen(false); navigate(navigationStrings.SETTINGS) }}
+                  onMouseEnter={prefetch.settings}
+                  onFocus={prefetch.settings}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-input-bg)] hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-pointer'
                 >
-                  <Settings size={16} /> Settings
+                  <Settings size={16} /> {t('settings')}
                 </button>
 
                 <div className='my-1.5 border-t border-[var(--color-border)]' />
@@ -418,7 +452,7 @@ function Navbar() {
                   onClick={handleLogout}
                   className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-[var(--color-input-bg)] hover:text-red-300 transition-colors duration-200 cursor-pointer'
                 >
-                  <LogOut size={16} /> Logout
+                  <LogOut size={16} /> {t('logout')}
                 </button>
 
               </div>

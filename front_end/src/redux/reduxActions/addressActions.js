@@ -27,8 +27,8 @@ export const fetchUserAddresses = async () => {
             GET_MY_ADDRESSES_URL,
             { withCredentials: true }
         )
-        dispatch(setAddresses(data.addresses))
-        return data.addresses
+        dispatch(setAddresses(data.data.addresses))
+        return data.data.addresses
     } catch (error) {
         dispatch(setAddressesError(
             error.response?.data?.message || "Failed to fetch addresses."
@@ -57,7 +57,7 @@ export const createAddress = async (addressData) => {
             { withCredentials: true }
         )
         await fetchUserAddresses()
-        return data.address
+        return data.data.address
     } catch (error) {
         dispatch(setAddressesError(
             error.response?.data?.message || "Failed to add address."
@@ -77,7 +77,7 @@ export const updateAddress = async (id, addressData) => {
             { withCredentials: true }
         )
         await fetchUserAddresses()
-        return data.address
+        return data.data.address
     } catch (error) {
         dispatch(setAddressesError(
             error.response?.data?.message || "Failed to update address."
@@ -120,7 +120,7 @@ export const setDefaultAddress = async (id) => {
             { withCredentials: true }
         )
         await fetchUserAddresses()
-        return data.address
+        return data.data.address
     } catch (error) {
         dispatch(setAddressesError(
             error.response?.data?.message || "Failed to set default address."

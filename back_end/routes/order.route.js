@@ -5,21 +5,26 @@ import {
     getUserOrders,
     getOrderById,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    requestReturn,
+    getMySellerOrders
 } from "../controllers/order.controller.js";
 
 import { checkAuth } from "../middleware/checkAuth.user.js";
-import { checkAdmin } from "../middleware/checkAdmin.middleware.js";
+import { checkSeller } from "../middleware/checkSeller.middleware.js";
+import { validateObjectId } from "../middleware/validateObjectId.middleware.js";
 
 const orderRouter = express.Router();
 
 // User Routes
 orderRouter.post("/place", checkAuth, placeOrder);
 orderRouter.get("/myorders", checkAuth, getUserOrders);
-orderRouter.get("/:id", checkAuth, getOrderById);
-orderRouter.put("/cancel/:id", checkAuth, cancelOrder);
+orderRouter.get("/seller/my-orders", checkAuth, checkSeller, getMySellerOrders);
+orderRouter.get("/:id", checkAuth, validateObjectId(), getOrderById);
+orderRouter.put("/cancel/:id", checkAuth, validateObjectId(), cancelOrder);
+orderRouter.put("/return/:id", checkAuth, validateObjectId(), requestReturn);
 
-// Admin Routes
-orderRouter.put("/status/:id", checkAuth, checkAdmin, updateOrderStatus);
+// Seller Routes (ownership + status-transition checks happen inside the controller)
+orderRouter.put("/status/:id", checkAuth, checkSeller, validateObjectId(), updateOrderStatus);
 
 export default orderRouter;

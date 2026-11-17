@@ -1,5 +1,6 @@
 import { Pencil } from 'lucide-react'
 import { getInitial } from '../../utils/CommonFunctions.js'
+import { useTranslation } from 'react-i18next'
 import AvatarPicker from '../../components/common_components/AvatarPicker.jsx'
 
 // ── Top card on the Profile page ──
@@ -11,6 +12,7 @@ import AvatarPicker from '../../components/common_components/AvatarPicker.jsx'
 //   onAvatarChange  — (file, previewUrl) => void, bubbles the pick up to Profile.jsx
 
 function ProfileSummaryCard({ userData, isEditing, onEditClick, avatarPreview, onAvatarChange }) {
+    const { t } = useTranslation('profile')
 
     return (
         <div className='bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4'>
@@ -36,6 +38,7 @@ function ProfileSummaryCard({ userData, isEditing, onEditClick, avatarPreview, o
                         <img
                             src={userData.profileImage}
                             alt={userData.name}
+                            referrerPolicy='no-referrer'
                             className='w-20 h-20 rounded-full object-cover border border-zinc-700 flex-shrink-0'
                         />
                     ) : (
@@ -60,7 +63,7 @@ function ProfileSummaryCard({ userData, isEditing, onEditClick, avatarPreview, o
                     className='flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-500 text-emerald-400 text-sm font-medium hover:bg-emerald-500/10 transition-colors duration-200 cursor-pointer'
                 >
                     <Pencil size={14} />
-                    Edit Profile
+                    {t('edit_profile')}
                 </button>
             )}
 

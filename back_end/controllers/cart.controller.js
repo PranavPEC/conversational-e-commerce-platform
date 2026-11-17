@@ -1,5 +1,8 @@
 import Cart from "../models/user.cart.js";
 import Product from "../models/user.product.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import Coupon from "../models/coupon.model.js";
+import { calculateCartPricing } from "../utils/cartPricing.js";
 
 // Add Product To Cart
 export const addToCart = async (req, res) => {
@@ -8,23 +11,17 @@ export const addToCart = async (req, res) => {
         const { productId, quantity } = req.body;
 
         if (!productId || !quantity || quantity < 1) {
-            return res.status(400).json({
-                message: "Please provide valid productId and quantity."
-            });
+            return sendError(res, 400, "Please provide valid productId and quantity.");
         }
 
         const product = await Product.findById(productId);
 
         if (!product) {
-            return res.status(404).json({
-                message: "Product Not Found."
-            });
+            return sendError(res, 404, "Product Not Found.");
         }
 
         if (quantity > product.stock) {
-            return res.status(400).json({
-                message: `Only ${product.stock} items available in stock.`
-            });
+            return sendError(res, 400, `Only ${product.stock} items available in stock.`);
         }
 
         let cart = await Cart.findOne({ user: userId });
@@ -41,10 +38,7 @@ export const addToCart = async (req, res) => {
                 ]
             });
 
-            return res.status(201).json({
-                message: "Product Added To Cart.",
-                cart
-            });
+            return sendSuccess(res, 201, "Product Added To Cart.", { cart });
         }
 
         // Product Already Exists In Cart
@@ -57,9 +51,7 @@ export const addToCart = async (req, res) => {
             const newQuantity = existingProduct.quantity + quantity;
 
             if (newQuantity > product.stock) {
-                return res.status(400).json({
-                    message: `Only ${product.stock} items available in stock.`
-                });
+                return sendError(res, 400, `Only ${product.stock} items available in stock.`);
             }
 
             existingProduct.quantity = newQuantity;
@@ -73,16 +65,11 @@ export const addToCart = async (req, res) => {
 
         await cart.save();
 
-        return res.status(200).json({
-            message: "Cart Updated Successfully.",
-            cart
-        });
+        return sendSuccess(res, 200, "Cart Updated Successfully.", { cart });
 
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            error
-        });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -91,24 +78,38 @@ export const addToCart = async (req, res) => {
 // Get User Cart
 export const getCart = async (req, res) => {
     try {
-
-        const cart = await Cart.findOne({
-            user: req.userId
-        }).populate("products.product");
+        const cart = await Cart.findOne({ user: req.userId }).populate("products.product");
 
         if (!cart) {
-            return res.status(200).json({
-                products: []
+            return sendSuccess(res, 200, "Cart Fetched Successfully.", {
+                cart: { products: [] },
+                pricing: { subtotal: 0, discountAmount: 0, total: 0, couponCode: null },
             });
         }
 
-        return res.status(200).json(cart);
+        const pricing = await calculateCartPricing(cart);
+
+        let couponRemoved = null;
+        if (pricing.couponRemovedReason && cart.appliedCoupon) {
+            cart.appliedCoupon = null;
+            await cart.save();
+            couponRemoved = pricing.couponRemovedReason;
+        }
+
+        return sendSuccess(res, 200, "Cart Fetched Successfully.", {
+            cart,
+            pricing: {
+                subtotal: pricing.subtotal,
+                discountAmount: pricing.discountAmount,
+                total: pricing.total,
+                couponCode: pricing.appliedCoupon?.code || null,
+            },
+            couponRemoved,
+        });
 
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            error
-        });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -121,9 +122,7 @@ export const updateCartItem = async (req, res) => {
         const { productId, quantity } = req.body;
 
         if (!quantity || quantity < 1) {
-            return res.status(400).json({
-                message: "Quantity must be greater than 0."
-            });
+            return sendError(res, 400, "Quantity must be greater than 0.");
         }
 
         const cart = await Cart.findOne({
@@ -131,9 +130,7 @@ export const updateCartItem = async (req, res) => {
         });
 
         if (!cart) {
-            return res.status(404).json({
-                message: "Cart Not Found."
-            });
+            return sendError(res, 404, "Cart Not Found.");
         }
 
         const cartProduct = cart.products.find(
@@ -141,39 +138,28 @@ export const updateCartItem = async (req, res) => {
         );
 
         if (!cartProduct) {
-            return res.status(404).json({
-                message: "Product Not Found In Cart."
-            });
+            return sendError(res, 404, "Product Not Found In Cart.");
         }
 
         const product = await Product.findById(productId);
 
         if (!product) {
-            return res.status(404).json({
-                message: "Product Not Found."
-            });
+            return sendError(res, 404, "Product Not Found.");
         }
 
         if (quantity > product.stock) {
-            return res.status(400).json({
-                message: `Only ${product.stock} items available in stock.`
-            });
+            return sendError(res, 400, `Only ${product.stock} items available in stock.`);
         }
 
         cartProduct.quantity = quantity;
 
         await cart.save();
 
-        return res.status(200).json({
-            message: "Cart Updated Successfully.",
-            cart
-        });
+        return sendSuccess(res, 200, "Cart Updated Successfully.", { cart });
 
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            error
-        });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -190,9 +176,7 @@ export const removeCartItem = async (req, res) => {
         });
 
         if (!cart) {
-            return res.status(404).json({
-                message: "Cart Not Found."
-            });
+            return sendError(res, 404, "Cart Not Found.");
         }
 
         cart.products = cart.products.filter(
@@ -201,16 +185,11 @@ export const removeCartItem = async (req, res) => {
 
         await cart.save();
 
-        return res.status(200).json({
-            message: "Product Removed Successfully.",
-            cart
-        });
+        return sendSuccess(res, 200, "Product Removed Successfully.", { cart });
 
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            error
-        });
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };
 
@@ -225,23 +204,68 @@ export const clearCart = async (req, res) => {
         });
 
         if (!cart) {
-            return res.status(404).json({
-                message: "Cart Not Found."
-            });
+            return sendError(res, 404, "Cart Not Found.");
         }
 
         cart.products = [];
 
         await cart.save();
 
-        return res.status(200).json({
-            message: "Cart Cleared Successfully."
-        });
+        return sendSuccess(res, 200, "Cart Cleared Successfully.");
 
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal Server Error",
-            error
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
+    }
+};
+
+export const applyCoupon = async (req, res) => {
+    try {
+        const { code } = req.body;
+        if (typeof code !== "string" || !code.trim()) {
+            return sendError(res, 400, "Please provide a valid coupon code.");
+        }
+
+        const coupon = await Coupon.findOne({ code: code.trim().toUpperCase() });
+        if (!coupon) return sendError(res, 404, "Invalid coupon code.");
+
+        const cart = await Cart.findOne({ user: req.userId }).populate("products.product");
+        if (!cart || cart.products.length === 0) return sendError(res, 400, "Your cart is empty.");
+
+        cart.appliedCoupon = coupon._id;
+        const pricing = await calculateCartPricing(cart);
+
+        if (pricing.couponRemovedReason) {
+            cart.appliedCoupon = null;
+            await cart.save();
+            return sendError(res, 400, pricing.couponRemovedReason);
+        }
+
+        await cart.save();
+
+        return sendSuccess(res, 200, "Coupon applied successfully.", {
+            subtotal: pricing.subtotal,
+            discountAmount: pricing.discountAmount,
+            total: pricing.total,
+            couponCode: coupon.code,
         });
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
+    }
+};
+
+export const removeCoupon = async (req, res) => {
+    try {
+        const cart = await Cart.findOne({ user: req.userId });
+        if (!cart) return sendError(res, 404, "Cart Not Found.");
+
+        cart.appliedCoupon = null;
+        await cart.save();
+
+        return sendSuccess(res, 200, "Coupon removed.");
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, "Internal Server Error", error.message);
     }
 };

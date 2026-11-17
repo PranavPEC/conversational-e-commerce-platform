@@ -13,6 +13,11 @@ const initialState = {
     orders: [],
     ordersLoading: false,
     ordersError: null,
+
+    // Seller order management
+    sellerOrders: [],
+    sellerOrdersLoading: false,
+    sellerOrdersError: null,
 }
 
 const orderSlice = createSlice({
@@ -61,6 +66,25 @@ const orderSlice = createSlice({
             const idx = state.orders.findIndex(o => o._id === updated._id)
             if (idx !== -1) state.orders[idx] = updated
         },
+
+        setSellerOrders: (state, action) => {
+            state.sellerOrders = action.payload
+        },
+
+        setSellerOrdersLoading: (state, action) => {
+            state.sellerOrdersLoading = action.payload
+        },
+
+        setSellerOrdersError: (state, action) => {
+            state.sellerOrdersError = action.payload
+        },
+
+        // Patch a single order in the seller's list (used after approve/reject/ship/deliver)
+        updateSellerOrderInList: (state, action) => {
+            const updated = action.payload
+            const idx = state.sellerOrders.findIndex(o => o._id === updated._id)
+            if (idx !== -1) state.sellerOrders[idx] = updated
+        },
     },
 })
 
@@ -74,6 +98,10 @@ export const {
     setOrdersLoading,
     setOrdersError,
     updateOrderInList,
+    setSellerOrders,
+    setSellerOrdersLoading,
+    setSellerOrdersError,
+    updateSellerOrderInList,
 } = orderSlice.actions
 
 export default orderSlice.reducer

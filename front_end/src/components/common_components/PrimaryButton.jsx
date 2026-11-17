@@ -4,6 +4,8 @@ function PrimaryButton({
     text,
     icon = null,
     onClick,
+    onMouseEnter,
+    onFocus,
     type = "button",
     loading = false,
     disabled = false,
@@ -23,6 +25,8 @@ function PrimaryButton({
         <button
             type={type}
             onClick={onClick}
+            onMouseEnter={onMouseEnter}
+            onFocus={onFocus}
             disabled={isDisabled}
             className={`
                 group

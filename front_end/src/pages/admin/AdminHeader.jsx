@@ -1,28 +1,53 @@
+import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
+import navigationStrings from '../../constants/navigationStrings/navigationStrings.js'
 
-import { Plus } from 'lucide-react'
+function AdminHeader({ title }) {
+    const { t } = useTranslation('admin')
+    const navigate = useNavigate()
+    const location = useLocation()
 
-// Props:
-//   onAddClick — called when "Add Product" button is clicked
-//                resets form to create mode and shows the form panel
+    const tabClassName = (path) => `px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer ${
+        location.pathname === path
+            ? 'bg-emerald-500 text-white'
+            : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+    }`
 
-function AdminHeader({ onAddClick }) {
     return (
-        <div className='flex items-center justify-between'>
-            <div>
-                <p className='text-emerald-400 text-xs font-medium tracking-widest uppercase mb-1'>
-                    Admin
-                </p>
-                <h1 className='text-white text-2xl font-bold tracking-tight'>
-                    Product Dashboard
-                </h1>
+        <div className='flex flex-col'>
+            <div className='flex items-center justify-between'>
+                <div>
+                    <p className='text-emerald-400 text-xs font-medium tracking-widest uppercase mb-1'>
+                        {t('admin')}
+                    </p>
+                    <h1 className='text-white text-2xl font-bold tracking-tight'>
+                        {title || t('dashboard_title')}
+                    </h1>
+                </div>
             </div>
-            <button
-                onClick={onAddClick}
-                className='flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-zinc-950 font-semibold rounded-xl text-sm transition-colors duration-200 cursor-pointer'
-            >
-                <Plus size={16} />
-                Add Product
-            </button>
+
+            <div className='border-t border-zinc-800 pt-4 mt-4'>
+                <div className='inline-flex items-center bg-zinc-900 rounded-xl p-1'>
+                    <button
+                        onClick={() => navigate(navigationStrings.ADMIN)}
+                        className={tabClassName(navigationStrings.ADMIN)}
+                    >
+                        {t('analytics')}
+                    </button>
+                    <button
+                        onClick={() => navigate(navigationStrings.SELLER_APPLICATIONS)}
+                        className={tabClassName(navigationStrings.SELLER_APPLICATIONS)}
+                    >
+                        {t('seller_applications')}
+                    </button>
+                    <button
+                        onClick={() => navigate(navigationStrings.ADMIN_COUPONS)}
+                        className={tabClassName(navigationStrings.ADMIN_COUPONS)}
+                    >
+                        {t('coupons_nav')}
+                    </button>
+                </div>
+            </div>
         </div>
     )
 }

@@ -3,15 +3,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import useToast from "../../utils/useToast.js";
 import { verifyOTP, forgotPassword } from "../../redux/reduxActions/authActions.js";
-
+import { useTranslation } from "react-i18next";
 // ── Child Components ──
 import Toast from "../../components/common_components/Toast.jsx";
 import BrandLogo from "../../components/common_components/BrandLogo.jsx";
 import VerifyOTPForm from "./VerifyOTPForm.jsx";
+import navigationStrings from "../../constants/navigationStrings/navigationStrings.js";
 
 function VerifyOTP() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation('auth');
 
     // Email received from ForgotPassword.jsx
     const email = location.state?.email;
@@ -28,7 +30,7 @@ function VerifyOTP() {
 
     useEffect(() => {
         if (!email) {
-            navigate("/forgot-password");
+            navigate(navigationStrings.FORGOT_PASSWORD);
         }
     }, [email, navigate]);
 
@@ -52,7 +54,7 @@ function VerifyOTP() {
         const enteredOTP = otp.join("");
 
         if (enteredOTP.length !== 6) {
-            showToast("Please enter the complete 6-digit OTP.");
+            showToast(t("otp_incomplete"));
             return false;
         }
 
@@ -78,7 +80,7 @@ function VerifyOTP() {
 
 
             setTimeout(() => {
-                navigate("/reset-password", {
+                navigate(navigationStrings.RESET_PASSWORD, {
                     state: {
                         resetToken: response.resetToken,
                         successMessage: response.message,
@@ -91,7 +93,7 @@ function VerifyOTP() {
             if (error.response) {
                 showToast(error.response.data.message);
             } else {
-                showToast("Server not reachable.");
+                showToast(t("server_not_reachable"));
             }
 
         } finally {
@@ -130,7 +132,7 @@ function VerifyOTP() {
             if (error.response) {
                 showToast(error.response.data.message);
             } else {
-                showToast("Server not reachable.");
+                showToast(t("server_not_reachable"));
             }
 
         }
@@ -159,11 +161,11 @@ function VerifyOTP() {
 
                     <div>
                         <h1 className="text-white text-2xl font-bold tracking-tight">
-                            Verify OTP
+                            {t("verify_otp")}
                         </h1>
 
                         <p className="text-zinc-400 text-sm">
-                            Enter the 6-digit verification code sent to
+                            {t("verify_otp_description")}
                         </p>
 
                         <p className="text-emerald-400 text-sm font-medium break-all">
@@ -182,10 +184,10 @@ function VerifyOTP() {
                 />
 
                 <p
-                    onClick={() => navigate("/forgot-password")}
+                    onClick={() => navigate(navigationStrings.FORGOT_PASSWORD)}
                     className="text-center text-sm text-emerald-400 hover:text-emerald-300 cursor-pointer transition-colors duration-200 mt-6"
                 >
-                    ← Back
+                    {t("back")}
                 </p>
 
             </div>

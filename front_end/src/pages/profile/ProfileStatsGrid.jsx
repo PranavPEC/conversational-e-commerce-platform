@@ -1,46 +1,49 @@
 import { ShoppingBag, Heart, MapPin, ShieldCheck } from 'lucide-react'
-
+import { useTranslation } from 'react-i18next'
 // ── 4-card stat strip, same "data-driven map" pattern as PerksBar.jsx ──
 // Props:
-//   ordersCount — real number, passed down from Profile.jsx (state.order.orders.length)
+//   ordersCount    — real number, passed down from Profile.jsx (state.order.orders.length)
+//   addressesCount — real number, passed down from Profile.jsx (state.address.addresses.length)
 
-function ProfileStatsGrid({ ordersCount }) {
+function ProfileStatsGrid({ ordersCount, addressesCount }) {
+    const { t } = useTranslation('profile')
 
-    // Wishlist and Addresses aren't built yet — show '—' instead of '0' so it
-    // reads as "not available yet" rather than "you have zero of these,"
-    // which would be a misleading claim about a feature that doesn't exist.
+    // Wishlist isn't built yet — show '—' instead of '0' so it reads as
+    // "not available yet" rather than "you have zero of these," which would
+    // be a misleading claim about a feature that doesn't exist. Addresses
+    // IS built now, so it gets a real count like Orders does.
     const STATS = [
         {
             icon: ShoppingBag,
             iconColor: 'text-emerald-400',
             iconBg: 'bg-emerald-500/10',
-            label: 'Orders',
+            label: 'orders',
             value: ordersCount,
-            desc: 'Total Orders',
+            desc: 'total_orders',
         },
         {
             icon: Heart,
             iconColor: 'text-pink-400',
             iconBg: 'bg-pink-500/10',
-            label: 'Wishlist',
+            label: 'wishlist',
             value: '—',
-            desc: 'Coming soon',
+            desc: 'coming_soon',
         },
         {
             icon: MapPin,
             iconColor: 'text-amber-400',
             iconBg: 'bg-amber-500/10',
-            label: 'Addresses',
-            value: '—',
-            desc: 'Coming soon',
+            label: 'addresses',
+            value: addressesCount,
+            desc: 'saved_addresses',
         },
         {
             icon: ShieldCheck,
             iconColor: 'text-emerald-400',
             iconBg: 'bg-emerald-500/10',
-            label: 'Account',
-            value: 'Active',
-            desc: 'Account status',
+            label: 'account',
+            value: t('active'),
+            desc: 'account_status',
         },
     ]
 
@@ -55,9 +58,9 @@ function ProfileStatsGrid({ ordersCount }) {
                         <Icon size={18} className={iconColor} />
                     </div>
                     <div>
-                        <p className='text-zinc-500 text-xs'>{label}</p>
+                        <p className='text-zinc-500 text-xs'>{t(label)}</p>
                         <p className='text-white text-lg font-semibold leading-tight'>{value}</p>
-                        <p className='text-zinc-600 text-xs mt-0.5'>{desc}</p>
+                        <p className='text-zinc-600 text-xs mt-0.5'>{t(desc)}</p>
                     </div>
                 </div>
             ))}

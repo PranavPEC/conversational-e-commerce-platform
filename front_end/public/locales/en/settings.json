@@ -1,0 +1,18 @@
+{
+  "language": "Language",
+  "preferred_language": "Choose your preferred language",
+  "english": "English",
+  "arabic": "العربية",
+  "switch_to_arabic": "Switch to Arabic",
+  "switch_to_english": "Switch to English",
+  "toggle_language": "Toggle language",
+  "appearance": "Appearance",
+  "appearance_description": "Choose how ShopAI looks to you",
+  "dark_mode": "Dark Mode",
+  "light_mode": "Light Mode",
+  "dark_mode_description": "Easy on the eyes in low-light environments",
+  "light_mode_description": "Clean and bright for daytime use",
+  "toggle_theme": "Toggle theme",
+  "settings": "Settings",
+  "settings_description": "Manage your preferences and account settings"
+}

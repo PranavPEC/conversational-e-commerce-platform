@@ -1,4 +1,4 @@
-
+import { useTranslation } from "react-i18next";
 import { useRef } from "react";
 import PrimaryButton from "../../components/common_components/PrimaryButton";
 function VerifyOTPForm({
@@ -9,6 +9,7 @@ function VerifyOTPForm({
     loading,
     resendTimer
 }) {
+    const { t } = useTranslation('auth');
     const inputRefs = useRef([]);
 
     // Handle typing
@@ -70,7 +71,7 @@ function VerifyOTPForm({
             {/* OTP Inputs */}
             <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-4 text-center">
-                    Verification Code
+                    {t("verification_code")}
                 </label>
 
                 <div
@@ -102,11 +103,11 @@ function VerifyOTPForm({
             {/* Verify Button */}
 
             <PrimaryButton
-                text="Verify OTP"
+                text={t("verify_otp")}
                 type="submit"
                 loading={loading}
                 disabled={loading}
-                loadingText="Verifying..."
+                LoadingText={t("verifying")}
                 className="w-full"
                 textColor='text-white'
             />
@@ -114,7 +115,7 @@ function VerifyOTPForm({
             {/* Resend OTP */}
             <div className="text-center">
                 <p className="text-zinc-400 text-sm">
-                    Didn't receive the OTP?{" "}
+                    {t("otp_not_received")}{" "}
                     <button
                         type="button"
                         onClick={handleResendOTP}
@@ -125,8 +126,8 @@ function VerifyOTPForm({
                             }`}
                     >
                         {resendTimer > 0
-                            ? `Resend OTP in ${resendTimer}s`
-                            : "Resend OTP"}
+                            ? t("resend_otp_in", { seconds: resendTimer })
+                            : t("resend_otp")}
                     </button>
                 </p>
             </div>

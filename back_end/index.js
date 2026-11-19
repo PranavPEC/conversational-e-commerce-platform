@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import dotenv from "dotenv";
 import userRouter from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
@@ -13,6 +14,7 @@ import addressRouter from "./routes/address.route.js";
 import adminRouter from "./routes/admin.route.js";
 import sellerRouter from "./routes/seller.route.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
+import { initSocket } from "./socket/socketServer.js";
 import helmet from "helmet";
 import cors from "cors";
 
@@ -45,7 +47,10 @@ app.use("/admin",adminRouter);
 app.use("/seller",sellerRouter);
 app.use("/coupon", couponRouter);
 
-app.listen(port,()=>{
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(port,()=>{
     mongoConnect();
     console.log(`Server is listening on port ${port}`);
 });

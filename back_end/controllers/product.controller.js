@@ -1,6 +1,7 @@
 ﻿import Product, { PRODUCT_CATEGORIES } from "../models/user.product.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { emitStockUpdate } from "../socket/emitters.js";
 
 // ── Parse and normalize a categories value from FormData ──
 // FormData sends arrays as JSON strings (Admin.jsx stringifies before appending).
@@ -187,6 +188,9 @@ export const updateProduct = async (req, res) => {
         }
 
         await product.save();
+
+        // Broadcast the new stock level if the seller/admin changed it
+        if (stock !== undefined) emitStockUpdate(product);
 
         return sendSuccess(res, 200, "Product Updated Successfully.", { product });
 

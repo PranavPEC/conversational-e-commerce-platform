@@ -7,6 +7,7 @@ import { calculateCartPricing } from "../utils/cartPricing.js";
 import Product from "../models/user.product.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
 import Address from "../models/address.model.js";
+import { emitStockUpdate, emitOrderCreated } from "../socket/emitters.js";
 // Razorpay instance — reads keys from .env
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -193,23 +194,18 @@ export const verifyPayment = async (req, res) => {
             await Coupon.findByIdAndUpdate(couponId, { $inc: { usedCount: 1 } });
         }
 
-        // Reduce stock for each product, across all sibling orders
+        // Reduce stock for each product, across all sibling orders,
+        // and broadcast the new stock level in realtime
         for (let order of orders) {
             for (let item of order.products) {
-                if (item.product) {
-                    await Product.findByIdAndUpdate(
-                        item.product._id,
-                        { $inc: { stock: -item.quantity } }
-                    );
-                }
+                if (!item.product) continue;
 
-                // SOCKET.IO HOOK (add in Step 15):
-                // const updated = await Product.findById(item.product._id);
-                // if (updated.stock === 0) {
-                //     io.emit("product:soldout", { productId: item.product._id });
-                // } else {
-                //     io.emit("product:stock_updated", { productId: item.product._id, stock: updated.stock });
-                // }
+                const updated = await Product.findByIdAndUpdate(
+                    item.product._id,
+                    { $inc: { stock: -item.quantity } },
+                    { new: true }
+                );
+                if (updated) emitStockUpdate(updated, { notifySeller: true });
             }
         }
 
@@ -220,6 +216,9 @@ export const verifyPayment = async (req, res) => {
             cart.appliedCoupon = null;
             await cart.save();
         }
+
+        // Payment confirmed: only now should sellers hear about the new orders
+        orders.forEach((order) => emitOrderCreated(order));
 
         return sendSuccess(res, 200, "Payment Verified. Order Placed Successfully.", { orders });
 

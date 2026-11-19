@@ -2,6 +2,7 @@ import Order from "../models/order.model.js";
 import Cart from "../models/user.cart.js";
 import Product from "../models/user.product.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { emitStockUpdate, emitOrderStatusChanged } from "../socket/emitters.js";
 
 const RETURN_WINDOW_DAYS = 7;
 
@@ -186,14 +187,20 @@ export const updateOrderStatus = async (req, res) => {
         if (status === "refunded" && order.paymentStatus === "paid") {
             for (let item of order.products) {
                 if (item.product) {
-                    await Product.findByIdAndUpdate(
+                    const restored = await Product.findByIdAndUpdate(
                         item.product,
-                        { $inc: { stock: item.quantity } }
+                        { $inc: { stock: item.quantity } },
+                        { new: true }
                     );
+                    if (restored) emitStockUpdate(restored);
                 }
             }
         }
         await order.save();
+
+        // Tell the other party (buyer, and the seller if an admin made the change).
+        // The person who made the change is skipped: their screen already updated.
+        emitOrderStatusChanged(order, req.userId);
 
         return sendSuccess(res, 200, "Order Status Updated.", { order });
 
@@ -223,19 +230,24 @@ export const cancelOrder = async (req, res) => {
         }
 
         // Restore stock for each product
-         if (order.paymentStatus === "paid") {
+        if (order.paymentStatus === "paid") {
             for (let item of order.products) {
                 if (item.product) {
-                    await Product.findByIdAndUpdate(
+                    const restored = await Product.findByIdAndUpdate(
                         item.product._id,
-                        { $inc: { stock: item.quantity } }
+                        { $inc: { stock: item.quantity } },
+                        { new: true }
                     );
+                    if (restored) emitStockUpdate(restored);
                 }
             }
         }
 
         order.status = "cancelled";
         await order.save();
+
+        // Notify the seller that the customer cancelled
+        emitOrderStatusChanged(order, req.userId);
 
         return sendSuccess(res, 200, "Order Cancelled Successfully.", { order });
 
@@ -278,6 +290,9 @@ export const requestReturn = async (req, res) => {
         order.status = "return_requested";
         order.returnReason = reason || "";
         await order.save();
+
+        // Notify the seller that the customer requested a return
+        emitOrderStatusChanged(order, req.userId);
 
         return sendSuccess(res, 200, "Return Requested Successfully.", { order });
 

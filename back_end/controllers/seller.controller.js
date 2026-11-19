@@ -4,6 +4,7 @@ import Order from "../models/order.model.js";
 import User from "../models/user.model.js"
 import uploadOnCloudinary from "../config/cloudinary.js"
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { emitSellerApplicationSubmitted } from "../socket/emitters.js";
 
 export const getSellerDashboardStats = async (req, res) => {
     try {
@@ -127,6 +128,9 @@ export const submitSellerKycDocuments = async (req, res) => {
       submittedAt: new Date(),
     };
     await user.save();
+
+    // Let any admin who is online see the new application live
+    emitSellerApplicationSubmitted({ sellerId: user._id, name: user.name });
 
     return sendSuccess(res, 200, "KYC documents submitted. Awaiting admin review.", {
       sellerDocuments: user.sellerDocuments,

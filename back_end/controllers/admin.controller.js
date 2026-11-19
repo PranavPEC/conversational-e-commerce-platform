@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import Product from "../models/user.product.js";
 import Order from "../models/order.model.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { emitSellerStatusChanged } from "../socket/emitters.js";
 
 const SELLER_STATUS_TRANSITIONS = {
     pending: ["approved", "rejected"],
@@ -181,6 +182,9 @@ export const updateSellerStatus = async (req, res) => {
 
         seller.sellerStatus = status;
         await seller.save();
+
+        // Tell the seller live, so their pending screen can flip without a refresh
+        emitSellerStatusChanged(seller._id, seller.sellerStatus);
 
         return sendSuccess(res, 200, "Seller Status Updated.", {
             seller: {

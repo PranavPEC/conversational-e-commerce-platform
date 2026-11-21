@@ -141,8 +141,8 @@ export const requestReturn = async (orderId, reason) => {
 export { resetOrder }
 
 // ── Fetch all orders for the logged-in seller ──
-export const fetchSellerOrders = async () => {
-    dispatch(setSellerOrdersLoading(true))
+export const fetchSellerOrders = async ({ silent = false } = {}) => {
+    if (!silent) dispatch(setSellerOrdersLoading(true))
     dispatch(setSellerOrdersError(null))
 
     try {
@@ -153,12 +153,15 @@ export const fetchSellerOrders = async () => {
         dispatch(setSellerOrders(data.data.orders))
         return data.data.orders
     } catch (error) {
-        dispatch(setSellerOrdersError(
-            error.response?.data?.message || "Failed to fetch seller orders."
-        ))
+        // A failed background refresh shouldn't put an error banner on screen
+        if (!silent) {
+            dispatch(setSellerOrdersError(
+                error.response?.data?.message || "Failed to fetch seller orders."
+            ))
+        }
         throw error
     } finally {
-        dispatch(setSellerOrdersLoading(false))
+        if (!silent) dispatch(setSellerOrdersLoading(false))
     }
 }
 

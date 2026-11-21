@@ -53,6 +53,12 @@ const productSlice = createSlice({
         setProductsError: (state, action) => {
             state.error = action.payload
         },
+        updateProductStock: (state, action) => {
+    const { productId, stock } = action.payload
+    const product = state.products.find(p => p._id === productId)
+    if (product) product.stock = stock
+    if (state.selectedProduct?._id === productId) state.selectedProduct.stock = stock
+},
     },
     // ← No extraReducers. That's the entire point of this architecture.
 })
@@ -64,6 +70,7 @@ export const {
     setProductsLoading,
     setProductLoading,
     setProductsError,
+    updateProductStock,
 } = productSlice.actions
 
 export default productSlice.reducer

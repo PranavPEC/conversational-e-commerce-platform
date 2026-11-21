@@ -85,6 +85,18 @@ const orderSlice = createSlice({
             const idx = state.sellerOrders.findIndex(o => o._id === updated._id)
             if (idx !== -1) state.sellerOrders[idx] = updated
         },
+        // Patches the order in whichever list holds it (buyer orders and/or seller orders)
+patchOrderStatus: (state, action) => {
+    const { orderId, status } = action.payload
+    const apply = (order) => {
+        order.status = status
+        if (status === 'delivered') order.deliveredAt = new Date().toISOString()
+    }
+    const buyerOrder = state.orders.find(o => o._id === orderId)
+    if (buyerOrder) apply(buyerOrder)
+    const sellerOrder = state.sellerOrders.find(o => o._id === orderId)
+    if (sellerOrder) apply(sellerOrder)
+},
     },
 })
 
@@ -102,6 +114,7 @@ export const {
     setSellerOrdersLoading,
     setSellerOrdersError,
     updateSellerOrderInList,
+    patchOrderStatus,
 } = orderSlice.actions
 
 export default orderSlice.reducer

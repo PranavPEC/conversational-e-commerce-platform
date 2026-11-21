@@ -70,6 +70,11 @@ const cartSlice = createSlice({
         setCouponError: (state, action) => {
             state.couponError = action.payload
         },
+        updateCartItemStock: (state, action) => {
+    const { productId, stock } = action.payload
+    const item = state.cartItems.find(i => i.product?._id === productId)
+    if (item) item.product.stock = stock
+},
     },
     // No extraReducers
 })
@@ -85,6 +90,7 @@ export const {
     setCartPricing,
     setCouponLoading,
     setCouponError,
+    updateCartItemStock,
 } = cartSlice.actions
 
 export default cartSlice.reducer

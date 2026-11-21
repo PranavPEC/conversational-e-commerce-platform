@@ -52,5 +52,21 @@
   "seller_dashboard": "لوحة البائع",
   "settings": "الإعدادات",
   "route_error_title": "حدث خطأ ما أثناء تحميل هذه الصفحة.",
-  "route_error_reload": "إعادة التحميل"
+  "route_error_reload": "إعادة التحميل",
+  "rt_cart_item_stock": "أصبح أحد المنتجات في سلتك محدود الكمية أو نفد من المخزون.",
+"rt_low_stock": "مخزون منخفض: لم يتبقَّ من {{title}} سوى {{qty}}.",
+"rt_new_order": "لديك طلب جديد بانتظار الموافقة.",
+"rt_order_placed": "أخبار سارة! تمت الموافقة على طلبك من قِبل البائع.",
+"rt_order_rejected": "تم رفض طلبك من قِبل البائع.",
+"rt_order_cancelled": "تم إلغاء طلبك.",
+"rt_order_shipped": "تم شحن طلبك.",
+"rt_order_delivered": "تم توصيل طلبك.",
+"rt_order_return_approved": "تمت الموافقة على طلب الإرجاع.",
+"rt_order_return_rejected": "تم رفض طلب الإرجاع.",
+"rt_order_refunded": "تمت معالجة استرداد المبلغ.",
+"rt_seller_order_cancelled": "قام عميل بإلغاء طلب.",
+"rt_seller_order_return_requested": "قام عميل بطلب إرجاع.",
+"rt_seller_approved": "تمت الموافقة على حساب البائع. يمكنك البدء بالبيع!",
+"rt_seller_rejected": "لم تتم الموافقة على طلب حساب البائع.",
+"rt_new_application": "قام بائع بإرسال مستندات للمراجعة."
 }

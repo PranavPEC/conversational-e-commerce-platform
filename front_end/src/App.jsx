@@ -2,6 +2,7 @@
 import { useSelector } from 'react-redux'
 import { fetchUserData, initializeTheme } from './redux/reduxActions'
 import AppRouter from './route/AppRouter.jsx'
+import RealtimeListener from './components/RealtimeListener.jsx'
 import { prefetchShoppingFlow } from './route/lazyPages.js'
 import './App.css'
 
@@ -27,7 +28,12 @@ function App() {
 
   if (authLoading) return null
 
-  return <AppRouter />
+  return (
+    <>
+      <AppRouter />
+      <RealtimeListener />
+    </>
+  )
 }
 
 export default App

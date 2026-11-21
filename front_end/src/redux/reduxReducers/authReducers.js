@@ -24,6 +24,9 @@ const authSlice = createSlice({
     setAuthLoading: (state, action) => {
       state.authLoading = action.payload;
     },
+    patchUserData: (state, action) => {
+    if (state.userData) state.userData = { ...state.userData, ...action.payload }
+},
   },
 });
 
@@ -31,6 +34,7 @@ export const {
   setUserData,
   clearUserData,
   setAuthLoading,
+  patchUserData,
 } = authSlice.actions;
 
 export default authSlice.reducer;

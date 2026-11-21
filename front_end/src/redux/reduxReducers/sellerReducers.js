@@ -65,6 +65,11 @@ const sellerSlice = createSlice({
         setSellerDashboardError: (state, action) => {
             state.dashboardError = action.payload
         },
+        patchSellerProductStock: (state, action) => {
+    const { productId, stock } = action.payload
+    const product = state.products.find(p => p._id === productId)
+    if (product) product.stock = stock
+},
     },
 })
 
@@ -80,6 +85,7 @@ export const {
     setSellerDashboardStats,
     setSellerDashboardLoading,
     setSellerDashboardError,
+    patchSellerProductStock,
 } = sellerSlice.actions
 
 export default sellerSlice.reducer

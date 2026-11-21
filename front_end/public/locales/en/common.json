@@ -52,5 +52,21 @@
   "seller_dashboard": "Seller Dashboard",
   "settings": "Settings",
   "route_error_title": "Something went wrong while loading this page.",
-  "route_error_reload": "Reload"
+  "route_error_reload": "Reload",
+  "rt_cart_item_stock": "An item in your cart is now limited or out of stock.",
+"rt_low_stock": "Low stock: {{title}} has only {{qty}} left.",
+"rt_new_order": "You have a new order awaiting approval.",
+"rt_order_placed": "Good news! Your order was approved by the seller.",
+"rt_order_rejected": "Your order was rejected by the seller.",
+"rt_order_cancelled": "Your order was cancelled.",
+"rt_order_shipped": "Your order has been shipped.",
+"rt_order_delivered": "Your order has been delivered.",
+"rt_order_return_approved": "Your return request was approved.",
+"rt_order_return_rejected": "Your return request was rejected.",
+"rt_order_refunded": "Your refund has been processed.",
+"rt_seller_order_cancelled": "A customer cancelled an order.",
+"rt_seller_order_return_requested": "A customer requested a return.",
+"rt_seller_approved": "Your seller account has been approved. You can start selling!",
+"rt_seller_rejected": "Your seller application was not approved.",
+"rt_new_application": "A seller submitted documents for review."
 }

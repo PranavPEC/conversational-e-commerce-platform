@@ -38,8 +38,8 @@ export const fetchDashboardStats = async () => {
 }
 
 // ── Fetch seller applications for admins ──
-export const fetchSellerApplications = async () => {
-    dispatch(setSellerApplicationsLoading(true))
+export const fetchSellerApplications = async ({ silent = false } = {}) => {
+    if (!silent) dispatch(setSellerApplicationsLoading(true))
     dispatch(setSellerApplicationsError(null))
 
     try {
@@ -50,12 +50,15 @@ export const fetchSellerApplications = async () => {
         dispatch(setSellerApplications(data.data.sellers))
         return data.data.sellers
     } catch (error) {
-        dispatch(setSellerApplicationsError(
-            error.response?.data?.message || "Failed to fetch seller applications."
-        ))
+        // A failed background refresh shouldn't put an error banner on screen
+        if (!silent) {
+            dispatch(setSellerApplicationsError(
+                error.response?.data?.message || "Failed to fetch seller applications."
+            ))
+        }
         throw error
     } finally {
-        dispatch(setSellerApplicationsLoading(false))
+        if (!silent) dispatch(setSellerApplicationsLoading(false))
     }
 }
 

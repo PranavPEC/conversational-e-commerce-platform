@@ -68,9 +68,13 @@ const orderSchema = new mongoose.Schema({
         type: Date
     },
 
+    // pending  = checkout started, not paid yet (stock is held for a while)
+    // paid     = payment confirmed
+    // failed   = payment verification failed
+    // expired  = never paid in time, or the buyer abandoned it; stock was released
     paymentStatus: {
         type: String,
-        enum: ["pending", "paid", "failed"],
+        enum: ["pending", "paid", "failed", "expired"],
         default: "pending"
     },
 
@@ -87,7 +91,23 @@ const orderSchema = new mongoose.Schema({
     couponCode: { type: String },
     couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
 
+    // True while this order's units are taken off the product's stock.
+    // Releasing stock flips it to false first, so stock is never restored twice.
+    stockReserved: { type: Boolean, default: false },
+
+    // When an unpaid checkout stops holding stock
+    reservationExpiresAt: { type: Date },
+
+    // Payment was taken but the goods were no longer available: needs a refund
+    needsRefund: { type: Boolean, default: false },
+
 }, { timestamps: true });
+
+// Indexes for the queries the app runs constantly
+orderSchema.index({ seller: 1, createdAt: -1 });
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ razorpayOrderId: 1 });
+orderSchema.index({ paymentStatus: 1, stockReserved: 1, reservationExpiresAt: 1 });
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;

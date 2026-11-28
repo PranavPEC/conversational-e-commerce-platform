@@ -1,7 +1,7 @@
 // src/redux/reduxActions/orderActions.js
 
 import axios from "axios"
-import { CREATE_RAZORPAY_ORDER_URL,VERIFY_PAYMENT_URL,GET_MY_ORDERS_URL,CANCEL_ORDER_URL,REQUEST_RETURN_URL,GET_SELLER_ORDERS_URL,UPDATE_ORDER_STATUS_URL } from "../../config/urls"
+import { CREATE_RAZORPAY_ORDER_URL,VERIFY_PAYMENT_URL,RELEASE_CHECKOUT_URL,GET_MY_ORDERS_URL,CANCEL_ORDER_URL,REQUEST_RETURN_URL,GET_SELLER_ORDERS_URL,UPDATE_ORDER_STATUS_URL } from "../../config/urls"
 import store from "../reduxStore"
 import {
     setPendingOrder,
@@ -70,6 +70,21 @@ export const verifyRazorpayPayment = async ({
         throw error
     } finally {
         dispatch(setOrderLoading(false))
+    }
+}
+
+// ── Release the stock held for an unpaid checkout ──
+// Called when the buyer closes the payment window without paying.
+// Best effort: the server also releases it by itself after the timeout.
+export const releaseCheckout = async (razorpayOrderId) => {
+    try {
+        await axios.post(
+            RELEASE_CHECKOUT_URL,
+            { razorpay_order_id: razorpayOrderId },
+            { withCredentials: true }
+        )
+    } catch {
+        // Intentionally ignored: nothing the buyer can do, and the timeout covers it
     }
 }
 

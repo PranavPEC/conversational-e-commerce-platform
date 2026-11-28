@@ -5,6 +5,7 @@ import { X, MapPin, ArrowRight, CheckCircle, Loader, AlertCircle } from 'lucide-
 import {
     createRazorpayOrder,
     verifyRazorpayPayment,
+    releaseCheckout,
     resetOrder,
     fetchUserAddresses,
     fetchCart,
@@ -25,6 +26,8 @@ function CheckoutModal({ onClose }) {
     const { cartItems, pricing } = useSelector(state => state.cart)
 
     const handleClose = () => {
+        // Left before paying (for example at the coupon notice): free the held stock
+        if (pendingOrder && !paymentSuccess) releaseCheckout(pendingOrder.razorpayOrderId)
         resetOrder()   // plain call — no dispatch()
         onClose()
     }
@@ -65,6 +68,9 @@ function CheckoutModal({ onClose }) {
     useEffect(() => {
         if (!pendingOrder || !checkoutReady) return
 
+        // Once the buyer has paid, closing the Razorpay window must not release the stock
+        let paymentStarted = false
+
         const options = {
             key: pendingOrder.keyId,
             amount: pendingOrder.amount,
@@ -74,6 +80,7 @@ function CheckoutModal({ onClose }) {
             order_id: pendingOrder.razorpayOrderId,
 
             handler: function (response) {
+                paymentStarted = true
                 verifyRazorpayPayment({
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
@@ -87,7 +94,11 @@ function CheckoutModal({ onClose }) {
             prefill: { name: "", email: "", contact: "" },
             theme: { color: "#10b981" },
             modal: {
-                ondismiss: () => resetOrder()   // plain call
+                ondismiss: () => {
+                    // Closed without paying: give the held stock back right away
+                    if (!paymentStarted) releaseCheckout(pendingOrder.razorpayOrderId)
+                    resetOrder()   // plain call
+                }
             }
         }
 

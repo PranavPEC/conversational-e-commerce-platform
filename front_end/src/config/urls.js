@@ -50,6 +50,7 @@ export const UPDATE_ORDER_STATUS_URL = (id) => SERVER_URL + "/order/status/" + i
 // ── Payment ──
 export const CREATE_RAZORPAY_ORDER_URL = SERVER_URL + "/payment/create-order"
 export const VERIFY_PAYMENT_URL = SERVER_URL + "/payment/verify"
+export const RELEASE_CHECKOUT_URL = SERVER_URL + "/payment/release"
 
 // ── Seller / Products CRUD ──
 export const CREATE_PRODUCT_URL = SERVER_URL + "/product/create"

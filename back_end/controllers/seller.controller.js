@@ -21,14 +21,14 @@ export const getSellerDashboardStats = async (req, res) => {
             lowStockProducts,
         ] = await Promise.all([
             Product.countDocuments({ seller: req.userId }),
-            Order.countDocuments({ seller: req.userId }),
+            Order.countDocuments({ seller: req.userId, paymentStatus: "paid" }),
             Order.aggregate([
                 { $match: { seller: sellerObjectId, paymentStatus: "paid" } },
                 { $group: { _id: null, total: { $sum: "$totalAmount" } } },
             ]),
-            Order.countDocuments({ seller: req.userId, status: "pending_approval" }),
+            Order.countDocuments({ seller: req.userId, status: "pending_approval", paymentStatus: "paid" }),
             Order.aggregate([
-                { $match: { seller: sellerObjectId } },
+                { $match: { seller: sellerObjectId, paymentStatus: "paid" } },
                 { $group: { _id: "$status", count: { $sum: 1 } } },
             ]),
             Order.aggregate([
@@ -43,7 +43,7 @@ export const getSellerDashboardStats = async (req, res) => {
                 { $project: { _id: 0, month: "$_id", revenue: 1 } },
             ]),
             Order.aggregate([
-                { $match: { seller: sellerObjectId } },
+                { $match: { seller: sellerObjectId, paymentStatus: "paid" } },
                 { $unwind: "$products" },
                 { $group: { _id: "$products.product", unitsSold: { $sum: "$products.quantity" } } },
                 { $sort: { unitsSold: -1 } },

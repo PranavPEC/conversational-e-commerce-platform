@@ -1,7 +1,6 @@
 import express from "express";
 
 import {
-    placeOrder,
     getUserOrders,
     getOrderById,
     updateOrderStatus,
@@ -17,7 +16,8 @@ import { validateObjectId } from "../middleware/validateObjectId.middleware.js";
 const orderRouter = express.Router();
 
 // User Routes
-orderRouter.post("/place", checkAuth, placeOrder);
+// (POST /order/place was removed: it created orders without payment.
+//  Orders are created only by the Razorpay flow, see /payment/create-order.)
 orderRouter.get("/myorders", checkAuth, getUserOrders);
 orderRouter.get("/seller/my-orders", checkAuth, checkSeller, getMySellerOrders);
 orderRouter.get("/:id", checkAuth, validateObjectId(), getOrderById);

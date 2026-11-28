@@ -15,6 +15,7 @@ import adminRouter from "./routes/admin.route.js";
 import sellerRouter from "./routes/seller.route.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
 import { initSocket } from "./socket/socketServer.js";
+import { releaseExpiredReservations } from "./utils/inventory.js";
 import helmet from "helmet";
 import cors from "cors";
 
@@ -53,4 +54,12 @@ initSocket(server);
 server.listen(port,()=>{
     mongoConnect();
     console.log(`Server is listening on port ${port}`);
+
+    // Every minute, give back stock held by checkouts that were never paid.
+    // Safe if it overlaps with a payment: each order is flipped atomically.
+    setInterval(() => {
+        releaseExpiredReservations().catch((error) =>
+            console.error("Reservation sweep failed:", error.message)
+        );
+    }, 60 * 1000).unref();
 });

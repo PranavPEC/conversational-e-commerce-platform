@@ -1,8 +1,7 @@
 import Order from "../models/order.model.js";
-import Cart from "../models/user.cart.js";
-import Product from "../models/user.product.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
-import { emitStockUpdate, emitOrderStatusChanged } from "../socket/emitters.js";
+import { emitOrderStatusChanged } from "../socket/emitters.js";
+import { releaseOrderStock } from "../utils/inventory.js";
 
 const RETURN_WINDOW_DAYS = 7;
 
@@ -19,108 +18,20 @@ const ALLOWED_TRANSITIONS = {
     rejected: [],
 };
 
-// Place Order
-export const placeOrder = async (req, res) => {
-    try {
-        const { address } = req.body;
+// When an order ends in one of these, the customer is not keeping the goods,
+// so the units go back on the shelf. (return_rejected: customer keeps them.)
+const STOCK_RELEASING_STATUSES = ["cancelled", "rejected", "refunded"];
 
-        if (!address) {
-            return sendError(res, 400, "Please provide a delivery address.");
-        }
-
-        // Step 1 — Get user's cart with product details populated
-        const cart = await Cart.findOne({ user: req.userId }).populate("products.product");
-
-        if (!cart || cart.products.length === 0) {
-            return sendError(res, 400, "Your cart is empty.");
-        }
-
-        // Step 2 — Check stock for every product before doing anything
-        const unavailableItems = [];
-        for (let item of cart.products) {
-            if (!item.product) {
-                unavailableItems.push(item._id);
-                continue;
-            }
-
-            if (item.product.stock < item.quantity) {
-                return sendError(res, 400, `Only ${item.product.stock} unit(s) of "${item.product.title}" available.`);
-            }
-        }
-
-        if (unavailableItems.length > 0) {
-            return sendError(res, 400, "Some items in your cart are no longer available. Please remove them and try again.", { unavailableItems });
-        }
-
-        // Step 3 — Group cart items by seller — one Order per seller per checkout
-        const groups = {};
-        for (let item of cart.products) {
-            const sellerKey = item.product.seller ? item.product.seller.toString() : "unassigned";
-            if (!groups[sellerKey]) groups[sellerKey] = [];
-            groups[sellerKey].push(item);
-        }
-
-        // Step 5 — Create one order per seller group
-        const createdOrders = [];
-        for (const sellerKey of Object.keys(groups)) {
-            const groupItems = groups[sellerKey];
-
-            const groupProducts = groupItems.map(item => ({
-                product: item.product._id,
-                quantity: item.quantity,
-                price: item.product.price
-            }));
-
-            const groupTotal = groupItems.reduce((sum, item) => {
-                return sum + (item.product.price * item.quantity);
-            }, 0);
-
-            const order = await Order.create({
-                user: req.userId,
-                seller: sellerKey === "unassigned" ? undefined : sellerKey,
-                products: groupProducts,
-                totalAmount: groupTotal,
-                address,
-                status: "pending_approval",
-                paymentStatus: "pending"
-            });
-
-            createdOrders.push(order);
-        }
-
-        // Step 6 — Reduce stock for each product (iterate ALL cart items, not the groups)
-        for (let item of cart.products) {
-            await Product.findByIdAndUpdate(
-                item.product._id,
-                { $inc: { stock: -item.quantity } }
-            );
-
-            // SOCKET.IO HOOK (add in Phase 6):
-            // const updated = await Product.findById(item.product._id);
-            // if (updated.stock === 0) {
-            //     io.emit("product:soldout", { productId: item.product._id });
-            // } else {
-            //     io.emit("product:stock_updated", { productId: item.product._id, stock: updated.stock });
-            // }
-        }
-
-        // Step 7 — Clear the cart
-        cart.products = [];
-        await cart.save();
-
-        return sendSuccess(res, 201, "Order Placed Successfully.", { orders: createdOrders });
-
-    } catch (error) {
-        console.error(error);
-        return sendError(res, 500, "Internal Server Error", error.message);
-    }
-};
+// NOTE: the old placeOrder endpoint was removed on purpose. It created orders and
+// took stock WITHOUT any payment. Orders are now created only by the Razorpay
+// flow in payment.controller.js.
 
 
-// Get All Orders For Logged In User
+// Get All Orders For Logged In User (paid orders only: an unpaid checkout is
+// not an order yet)
 export const getUserOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ user: req.userId })
+        const orders = await Order.find({ user: req.userId, paymentStatus: "paid" })
             .populate("products.product", "title image price")
             .sort({ createdAt: -1 }); // newest first
 
@@ -176,6 +87,11 @@ export const updateOrderStatus = async (req, res) => {
             return sendError(res, 403, "Unauthorized Access.");
         }
 
+        // Nobody may approve, ship or otherwise progress an order that isn't paid
+        if (order.paymentStatus !== "paid") {
+            return sendError(res, 400, "This order has not been paid for yet.");
+        }
+
         if (!ALLOWED_TRANSITIONS[order.status].includes(status)) {
             return sendError(res, 400, `Cannot change status from ${order.status} to ${status}.`);
         }
@@ -184,19 +100,17 @@ export const updateOrderStatus = async (req, res) => {
         if (status === "delivered") {
             order.deliveredAt = new Date();
         }
-        if (status === "refunded" && order.paymentStatus === "paid") {
-            for (let item of order.products) {
-                if (item.product) {
-                    const restored = await Product.findByIdAndUpdate(
-                        item.product,
-                        { $inc: { stock: item.quantity } },
-                        { new: true }
-                    );
-                    if (restored) emitStockUpdate(restored);
-                }
+        await order.save();
+
+        // Give the stock back when the customer is not keeping the goods.
+        // Safe to repeat: stock is only restored once per order.
+        if (STOCK_RELEASING_STATUSES.includes(status)) {
+            try {
+                await releaseOrderStock(order._id);
+            } catch (releaseError) {
+                console.error("Stock release failed for order", order._id.toString(), releaseError.message);
             }
         }
-        await order.save();
 
         // Tell the other party (buyer, and the seller if an admin made the change).
         // The person who made the change is skipped: their screen already updated.
@@ -211,11 +125,10 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 
-// Cancel Order — User can cancel only if status is "placed"
+// Cancel Order — User can cancel a paid order that is still "placed" or pending approval
 export const cancelOrder = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id)
-            .populate("products.product");
+        const order = await Order.findById(req.params.id);
 
         if (!order) {
             return sendError(res, 404, "Order Not Found.");
@@ -225,26 +138,24 @@ export const cancelOrder = async (req, res) => {
             return sendError(res, 403, "Unauthorized Access.");
         }
 
+        // An unpaid checkout is closed by releasing it, not by cancelling an order
+        if (order.paymentStatus !== "paid") {
+            return sendError(res, 400, "Only paid orders can be cancelled.");
+        }
+
         if (order.status !== "placed" && order.status !== "pending_approval") {
             return sendError(res, 400, "Only placed or pending-approval orders can be cancelled.");
         }
 
-        // Restore stock for each product
-        if (order.paymentStatus === "paid") {
-            for (let item of order.products) {
-                if (item.product) {
-                    const restored = await Product.findByIdAndUpdate(
-                        item.product._id,
-                        { $inc: { stock: item.quantity } },
-                        { new: true }
-                    );
-                    if (restored) emitStockUpdate(restored);
-                }
-            }
-        }
-
         order.status = "cancelled";
         await order.save();
+
+        // Put the units back on the shelf (at most once)
+        try {
+            await releaseOrderStock(order._id);
+        } catch (releaseError) {
+            console.error("Stock release failed for order", order._id.toString(), releaseError.message);
+        }
 
         // Notify the seller that the customer cancelled
         emitOrderStatusChanged(order, req.userId);
@@ -303,10 +214,10 @@ export const requestReturn = async (req, res) => {
 };
 
 
-// Get Orders For Logged In Seller — only orders whose seller is req.userId
+// Get Orders For Logged In Seller — only PAID orders whose seller is req.userId
 export const getMySellerOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ seller: req.userId })
+        const orders = await Order.find({ seller: req.userId, paymentStatus: "paid" })
             .populate("user", "name")
             .populate("products.product", "title image price")
             .sort({ createdAt: -1 });

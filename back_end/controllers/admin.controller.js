@@ -28,13 +28,14 @@ export const getDashboardStats = async (req, res) => {
             User.countDocuments({ role: "user" }),
             User.countDocuments({ role: "seller" }),
             Product.countDocuments(),
-            Order.countDocuments(),
+            Order.countDocuments({ paymentStatus: "paid" }),
             Order.aggregate([
                 { $match: { paymentStatus: "paid" } },
                 { $group: { _id: null, total: { $sum: "$totalAmount" } } },
             ]),
-            Order.countDocuments({ status: "pending_approval" }),
+            Order.countDocuments({ status: "pending_approval", paymentStatus: "paid" }),
             Order.aggregate([
+                { $match: { paymentStatus: "paid" } },
                 { $group: { _id: "$status", count: { $sum: 1 } } },
             ]),
             Order.aggregate([
@@ -72,6 +73,7 @@ export const getDashboardStats = async (req, res) => {
                 },
             ]),
             Order.aggregate([
+                { $match: { paymentStatus: "paid" } },
                 { $unwind: "$products" },
                 { $group: { _id: "$products.product", unitsSold: { $sum: "$products.quantity" } } },
                 { $sort: { unitsSold: -1 } },
